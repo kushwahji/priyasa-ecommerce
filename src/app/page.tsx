@@ -3,6 +3,7 @@ import {getBestSellers,getHomeCms,getLatestLaunches,getProductsForHomeSection,ge
 import {ProductCard} from '@/components/ProductCard';
 import HomeHeroCarousel from '@/components/HomeHeroCarousel';
 import HomeImageCarousel from '@/components/HomeImageCarousel';
+import HomeCmsSection from '@/components/HomeCmsSection';
 import {TruckIcon,ShieldIcon,ReturnIcon,GiftIcon} from '@/components/StorefrontIcons';
 
 const productSectionType=(type:string)=>{const t=type.toLowerCase();return t.startsWith('products-')||['latest','latest-collection','best-sellers','trending','sale'].includes(t)};
@@ -17,6 +18,7 @@ export default async function Home(){
  const sectionProducts=await Promise.all(productSections.map(s=>getProductsForHomeSection(s.type,8)));
  const promos=sections.filter(s=>['promo','banner','collection-banner'].includes(s.type.toLowerCase()));
  const features=sections.filter(s=>['feature','lifestyle'].includes(s.type.toLowerCase()));
+ const customSections=sections.filter(s=>['category-grid','text'].includes(s.type.toLowerCase()));
  const hasCmsProducts=productSections.length>0;
  return <>
   {heroSlides.length>0?<HomeHeroCarousel slides={heroSlides}/>:<section className="hero hero-editorial hero-fallback"><div className="hero-copy"><span className="eyebrow">PRIYASA COLLECTIONS</span><h1>Every you, beautifully.</h1><p>Discover fashion made for every mood, moment and occasion.</p><Link className="button" href="/new-arrivals">Shop New Arrivals →</Link></div></section>}
@@ -30,6 +32,7 @@ export default async function Home(){
   {imageSlides.length>0&&<HomeImageCarousel slides={imageSlides}/>} 
   {promos.map(p=><section className="split-banner" key={p.id}><div className="split-copy"><span className="eyebrow dark">{p.type.replaceAll('-',' ').toUpperCase()}</span><h2>{p.title||'The Priyasa edit'}</h2>{p.subtitle&&<p>{p.subtitle}</p>}{p.ctaHref&&<Link className="button dark-button" href={p.ctaHref}>{p.ctaLabel||'Shop Now'} →</Link>}</div><div className="split-image" style={{backgroundImage:`url(${p.imageUrl||''})`}}/></section>)}
   {features.length>0&&<section className="section section-tight"><div className="section-head"><div><span className="eyebrow dark">PRIYASA EDIT</span><h2>Style for Every You</h2></div></div><div className="feature-grid feature-grid-editorial">{features.map(f=><Link key={f.id} href={f.ctaHref||'/shop'} className="feature" style={{backgroundImage:`linear-gradient(180deg,rgba(0,0,0,.05),rgba(0,0,0,.5)),url(${f.imageUrl||''})`}}><span className="eyebrow">{f.type.replaceAll('-',' ')}</span><h3>{f.title||'Explore the edit'}</h3><span>{f.ctaLabel||'Shop Now'} →</span></Link>)}</div></section>}
+  {customSections.map(s=><HomeCmsSection key={s.id} section={s}/>) }
   <section className="newsletter"><div><span className="eyebrow dark">STAY IN THE LOOP</span><h2>New styles, offers and order updates.</h2><p>Sign in to receive Priyasa updates.</p></div><Link className="button dark-button" href="/account">My Account →</Link></section>
  </>;
 }
