@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "node scripts/use-mysql-schema.mjs && prisma generate --schema prisma/schema.mysql.prisma && next dev",
     "build": "node scripts/use-mysql-schema.mjs && prisma generate --schema prisma/schema.mysql.prisma && next build",
-    "start": "node scripts/use-mysql-schema.mjs && prisma generate --schema prisma/schema.mysql.prisma && tsx prisma/seed.ts && next start",
+    "start": "node scripts/use-mysql-schema.mjs && prisma generate --schema prisma/schema.mysql.prisma && prisma db push --schema prisma/schema.mysql.prisma && next start",
     "lint": "next lint",
     "db:prepare:mysql": "node scripts/use-mysql-schema.mjs",
     "db:generate": "node scripts/use-mysql-schema.mjs && prisma generate --schema prisma/schema.mysql.prisma",
