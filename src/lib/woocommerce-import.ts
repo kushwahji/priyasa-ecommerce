@@ -30,24 +30,26 @@ export async function previewWooCommerceImport(){
  return {categories:categories.data.length,products:products.data.length,variableProducts,variations};
 }
 
-export async function importWooCommerceCatalog(){
+export async function importWooCommerceCatalog(options:{sync?:boolean}={}){
  const [categories,products]=await Promise.all([getWooCategories(),getWooProducts()]);
  categorySource=categories.data;
  const categoryCache=new Map<number,string>();
  const fallback=await db.category.upsert({where:{slug:'uncategorized'},create:{name:'Uncategorized',slug:'uncategorized'},update:{}});
  let categoriesCreatedOrUpdated=0,productsCreatedOrUpdated=0,variationsCreatedOrUpdated=0,imagesImported=0,skipped=0;
+ const importedSlugs:string[]=[];
  for(const c of categories.data){await ensureCategory(c,categoryCache);categoriesCreatedOrUpdated++;}
  for(const p of products.data){
   try{
    const categoryId=p.categories[0]?await ensureCategory((await getWooCategory(p.categories[0].id))!,categoryCache):fallback.id;
    const slug=cleanSlug(p.slug||p.name,p.id);
+   importedSlugs.push(slug);
    const active=p.status==='publish'&&p.catalog_visibility!=='hidden';
    const mrp=rupees(p.regular_price||p.price||p.sale_price);
    const sale=rupees(p.sale_price||p.price||p.regular_price);
    const salePrice=Math.min(sale||mrp,mrp||sale);
    const variants=p.type==='variable'?(await getWooVariations(p.id)).data:[];
    await db.$transaction(async tx=>{
-    const product=await tx.product.upsert({where:{slug},create:{name:p.name,slug,description:p.description||p.short_description||'',categoryId,brand:null,mrp:mrp||salePrice,salePrice:salePrice||mrp,active},update:{name:p.name,description:p.description||p.short_description||'',categoryId,mrp:mrp||salePrice,salePrice:salePrice||mrp,active}});
+    const product=await tx.product.upsert({where:{slug},create:{name:p.name,slug,description:stripHtml(p.description||p.short_description||''),categoryId,brand:null,mrp:mrp||salePrice,salePrice:salePrice||mrp,active},update:{name:p.name,description:stripHtml(p.description||p.short_description||''),categoryId,mrp:mrp||salePrice,salePrice:salePrice||mrp,active}});
     await tx.productImage.deleteMany({where:{productId:product.id}});
     if(p.images.length)await tx.productImage.createMany({data:p.images.map((i,index)=>({productId:product.id,url:i.src,alt:i.alt||i.name||p.name,sortOrder:i.position??index}))});
     imagesImported+=p.images.length;
@@ -58,5 +60,11 @@ export async function importWooCommerceCatalog(){
    productsCreatedOrUpdated++;
   }catch(error){skipped++;console.error(`WooCommerce product ${p.id} import failed`,error);}
  }
- return {categories:categoriesCreatedOrUpdated,products:productsCreatedOrUpdated,variants:variationsCreatedOrUpdated,images:imagesImported,skipped};
+ if(options.sync&&skipped===0&&importedSlugs.length){
+  const stale=await db.product.updateMany({where:{slug:{notIn:importedSlugs}},data:{active:false}});
+  return {categories:categoriesCreatedOrUpdated,products:productsCreatedOrUpdated,variants:variationsCreatedOrUpdated,images:imagesImported,skipped,deactivatedStaleProducts:stale.count};
+ }
+ return {categories:categoriesCreatedOrUpdated,products:productsCreatedOrUpdated,variants:variationsCreatedOrUpdated,images:imagesImported,skipped,deactivatedStaleProducts:0};
 }
+
+export async function syncWooCommerceCatalog(){return importWooCommerceCatalog({sync:true});}
