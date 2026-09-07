@@ -1,4 +1,5 @@
 import './globals.css';
+import './premium.css';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import {AuthButton} from '@/components/AuthButton';
