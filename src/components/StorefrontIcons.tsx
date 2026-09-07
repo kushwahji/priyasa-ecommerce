@@ -7,7 +7,7 @@ export const SearchIcon=(p:Props)=><Icon {...p}><circle cx="11" cy="11" r="6.5"/
 export const UserIcon=(p:Props)=><Icon {...p}><circle cx="12" cy="8" r="3.2"/><path d="M5.2 20c.8-3.4 3.1-5.2 6.8-5.2s6 1.8 6.8 5.2"/></Icon>;
 export const HeartIcon=(p:Props)=><Icon {...p}><path d="M20.8 8.8c0 5-8.8 10.2-8.8 10.2S3.2 13.8 3.2 8.8A4.7 4.7 0 0 1 12 6.2a4.7 4.7 0 0 1 8.8 2.6Z"/></Icon>;
 export const BagIcon=(p:Props)=><Icon {...p}><path d="M5 8.5h14l-1 11H6l-1-11Z"/><path d="M9 9V6.5a3 3 0 0 1 6 0V9"/></Icon>;
-export const MenuIcon=(p:Props)=><Icon {...p><path d="M4 7h16M4 12h16M4 17h16"/></Icon>;
+export const MenuIcon=(p:Props)=><Icon {...p}><path d="M4 7h16M4 12h16M4 17h16"/></Icon>;
 export const CloseIcon=(p:Props)=><Icon {...p}><path d="m6 6 12 12M18 6 6 18"/></Icon>;
 export const ChevronIcon=(p:Props)=><Icon {...p}><path d="m9 6 6 6-6 6"/></Icon>;
 export const TruckIcon=(p:Props)=><Icon {...p}><path d="M3 6h11v10H3zM14 10h4l3 3v3h-7z"/><circle cx="7" cy="18" r="1.5"/><circle cx="18" cy="18" r="1.5"/></Icon>;
