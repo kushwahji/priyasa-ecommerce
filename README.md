@@ -1,85 +1,53 @@
 # PRIYASA Ecommerce
 
-Production-oriented Indian fashion commerce platform matching the supplied Priyasa storefront direction.
+Production-oriented Indian fashion commerce platform with a premium Priyasa customer experience and a database-driven storefront.
 
-## Implemented in `main`
+## Customer experience
 
-- Next.js App Router + TypeScript foundation
-- Priyasa responsive fashion storefront with announcement bar, navigation, hero, categories, offers and best sellers
-- Shop and category listing routes
-- Product detail with size/color selection UI and cart action
-- Browser-persistent cart with discount/shipping calculation
-- Checkout address flow with server-side order creation
-- PostgreSQL + Prisma transactional commerce schema
-- Inventory reservation during order creation
-- Coupon model and `WELCOME10` seed
-- Customer account, wishlist and order tracking entry points
-- Protected admin dashboard with ADMIN/STAFF RBAC
-- Admin product, order, inventory, CMS and marketing control centers
-- Server-side Razorpay order creation
-- Independent Razorpay payment signature verification
-- Razorpay webhook signature verification and payment/order state transitions
-- SEO metadata, sitemap and robots policy
-- WhatsApp OTP login via the existing `api.priyasa.com` authentication service
-- Secure HTTP-only cookie storage for the provider access token after OTP verification
-- FCM web push permission popup, token acquisition and device registration/update/refresh/logout/delete proxy routes
-- Firebase messaging service worker for background notifications
-- GitHub Actions CI
-- Secrets excluded from source control with `.env.example`
+The storefront is designed as a complete fashion-commerce journey: responsive home, live catalogue/category pages, product detail, variants, wishlist, bag, delivery pincode, saved addresses, authenticated checkout, Razorpay payment, order confirmation, order tracking, My Orders and payment retry.
 
-## Auth and device APIs
+## Data architecture
 
-The storefront uses server-side proxy routes so browser code never needs to call the external authentication service directly:
+Customer-facing product, category, variant, inventory, review, offer/coupon, CMS and customer/order data are read from Prisma/MySQL at runtime. The UI does not contain a hardcoded product catalogue. CMS sections control homepage/shop/offer creative content; coupons control live offers and the offer popup.
 
-- `POST /api/auth/send-otp` → `POST https://api.priyasa.com/api/v1/auth/send-otp`
-- `POST /api/auth/verify-otp` → `POST https://api.priyasa.com/api/v1/auth/verify-otp`
-- `POST /api/auth/resend-otp` → `POST https://api.priyasa.com/api/v1/auth/resend-otp`
-- `DELETE /api/auth/cancel-otp/[requestId]` → external OTP cancellation endpoint
-- `POST /api/device/register` → external device registration endpoint
-- `POST /api/device/update` → external device/user linking endpoint
-- `POST /api/device/refresh` → external FCM token refresh endpoint
-- `POST /api/device/logout` → external device logout endpoint
-- `DELETE /api/device/delete` → external device removal endpoint
+The seed script only provides initial database content for a new environment. Production content should be managed through the admin/CMS layer.
 
-The login modal asks for browser notification permission before sending OTP. If Firebase web configuration is present, it obtains the FCM registration token and registers the device. If Firebase is not configured yet, WhatsApp OTP login still works and the UI explains that push registration needs Firebase settings.
+## Authentication
+
+Customer login is phone-number + WhatsApp OTP only. OTP verification is proxied server-side to `api.priyasa.com`, and the provider access token is stored in a secure HTTP-only cookie. Successful verification also synchronizes the customer phone into the local commerce `User` record so orders, addresses and wishlist data are owned by the authenticated customer.
+
+## Notifications
+
+The notification permission UI is independent from login. When the customer grants permission, the browser obtains an FCM token and the server-side device proxy registers it with the configured Priyasa API. Firebase web configuration remains deployment-only.
+
+## Checkout and payment
+
+Checkout requires an authenticated customer, validates real database variant IDs and live inventory, reserves inventory transactionally, applies the database coupon rules, creates an order in `PAYMENT_PENDING`, and creates a Razorpay payment order. Razorpay signature verification is server-side. Successful verification finalizes inventory and moves the order to `CONFIRMED`. Customers can retry an incomplete payment from My Orders.
+
+## Shipping
+
+The product and checkout experience includes a live delivery-pincode check backed by the configured Shiprocket provider and the merchant pickup pincode.
 
 ## Routes
 
-Storefront: `/`, `/shop`, `/new-arrivals`, `/category/[slug]`, `/product/[slug]`, `/offers`, `/cart`, `/checkout`, `/account`, `/wishlist`, `/track-order`, `/about`, `/contact`.
+Storefront: `/`, `/shop`, `/new-arrivals`, `/category/[slug]`, `/product/[slug]`, `/offers`, `/cart`, `/checkout`, `/checkout/payment/[orderId]`, `/checkout/success`, `/account`, `/account/edit`, `/account/addresses`, `/account/orders`, `/account/orders/[id]`, `/wishlist`, `/track-order`, `/about`, `/contact`.
+
+Customer APIs: `/api/customer/session`, `/api/customer/orders`, `/api/customer/orders/[id]`, `/api/customer/addresses`, `/api/customer/profile`, `/api/customer/wishlist`, `/api/storefront/promo`.
+
+Auth/device APIs: `/api/auth/send-otp`, `/api/auth/verify-otp`, `/api/auth/resend-otp`, `/api/auth/cancel-otp/[requestId]`, `/api/device/register`, `/api/device/update`, `/api/device/refresh`, `/api/device/logout`, `/api/device/delete`.
+
+Payment APIs: `/api/payments/razorpay`, `/api/payments/razorpay/verify`, `/api/webhooks/razorpay`.
 
 Admin: `/admin`, `/admin/login`, `/admin/products`, `/admin/orders`, `/admin/inventory`, `/admin/cms`, `/admin/marketing`.
 
-API: `/api/health`, `/api/products`, `/api/orders`, `/api/admin/products`, `/api/auth/admin`, `/api/auth/send-otp`, `/api/auth/verify-otp`, `/api/auth/resend-otp`, `/api/auth/cancel-otp/[requestId]`, `/api/device/register`, `/api/device/update`, `/api/device/refresh`, `/api/device/logout`, `/api/device/delete`, `/api/payments/razorpay`, `/api/payments/razorpay/verify`, `/api/webhooks/razorpay`.
+## MySQL deployment
 
-## Firebase web configuration
+Hostinger production uses the generated `prisma/schema.mysql.prisma` schema. The deployment build prepares the MySQL schema before Prisma generation and Next.js build. CI validates the MySQL schema and runs TypeScript/tests/build checks.
 
-Set these deployment environment variables to enable real FCM token registration:
+## Environment
 
-`NEXT_PUBLIC_FIREBASE_API_KEY`
-`NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN`
-`NEXT_PUBLIC_FIREBASE_PROJECT_ID`
-`NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET`
-`NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID`
-`NEXT_PUBLIC_FIREBASE_APP_ID`
-`NEXT_PUBLIC_FIREBASE_VAPID_KEY`
+Configure deployment secrets/environment variables for `DATABASE_URL`, `SESSION_SECRET`, Razorpay, Shiprocket, the Priyasa API token/base URL and Firebase web settings. Never commit credentials to Git.
 
-The app does not commit Firebase credentials or provider secrets.
+## Quality gates
 
-## Local setup
-
-1. Install Node.js 20+ and PostgreSQL.
-2. Copy `.env.example` to `.env` and configure `DATABASE_URL` and a strong `SESSION_SECRET`.
-3. Install dependencies: `npm install`.
-4. Create schema: `npm run db:push`.
-5. Seed catalog and optional admin account: `ADMIN_PHONE=... ADMIN_PASSWORD=... npm run db:seed`.
-6. Start: `npm run dev`.
-
-Never put provider credentials in Git. Configure Razorpay, Firebase and external Priyasa API settings in deployment secrets/environment configuration.
-
-## Commerce state model
-
-Orders progress through server-controlled states such as `PAYMENT_PENDING → CONFIRMED → PROCESSING → SHIPPED → DELIVERED`. The client cannot mark an order paid. Razorpay verification/webhooks are authoritative for payment confirmation.
-
-## Architecture
-
-The Prisma schema covers users, sessions, addresses, categories, products, variants, inventory movements, carts, wishlists, coupons, orders, payments, refunds, shipments, returns, reviews, CMS sections, pages, redirects and audit logs. Provider integrations remain behind server routes so credentials and financial state are never trusted from the browser.
+The repository includes TypeScript checks, unit tests, Playwright storefront checks and MySQL Prisma validation. A CI failure must be fixed before treating a commit as production-ready.
