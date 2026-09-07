@@ -1,11 +1,10 @@
 'use client';
 import Link from 'next/link';
 import {useEffect,useMemo,useState} from 'react';
-
 type Row={id:string;sku:string;size:string;color:string;price:number|null;stock:number;reserved:number;product:{id:string;name:string;category:{name:string}}};
 export default function BulkVariants(){
  const [rows,setRows]=useState<Row[]>([]),[selected,setSelected]=useState<string[]>([]),[q,setQ]=useState(''),[priceMode,setPriceMode]=useState('keep'),[priceValue,setPriceValue]=useState(''),[stockMode,setStockMode]=useState('keep'),[stockValue,setStockValue]=useState(''),[message,setMessage]=useState(''),[busy,setBusy]=useState(false);
- async function load(){const r=await fetch('/api/admin/inventory?all=1',{cache:'no-store'});const d=await r.json();if(r.ok)setRows(d.data||[]);else setMessage(d.error||'Unable to load variants')}
+ async function load(){const r=await fetch('/api/admin/products',{cache:'no-store'});const d=await r.json();if(r.ok)setRows((d.data||[]).flatMap((p:any)=>(p.variants||[]).map((v:any)=>({...v,product:{id:p.id,name:p.name,category:p.category}})));else setMessage(d.error||'Unable to load variants')}
  useEffect(()=>{load()},[]);
  const filtered=useMemo(()=>{const s=q.trim().toLowerCase();return s?rows.filter(r=>[r.sku,r.size,r.color,r.product.name,r.product.category.name].join(' ').toLowerCase().includes(s)):rows},[rows,q]);
  const toggle=(id:string)=>setSelected(x=>x.includes(id)?x.filter(v=>v!==id):[...x,id]);
