@@ -1,4 +1,4 @@
-import {importWooCommerceCatalog,previewWooCommerceImport} from '../src/lib/woocommerce-import';
+import {importWooCommerceCatalog,previewWooCommerceImport,syncWooCommerceCatalog} from '../src/lib/woocommerce-import';
 
 const mode=process.argv[2]||'preview';
 if(mode==='preview'){
@@ -8,6 +8,10 @@ if(mode==='preview'){
  console.log('Starting WooCommerce → Priyasa catalog import...');
  const result=await importWooCommerceCatalog();
  console.log(JSON.stringify(result,null,2));
+}else if(mode==='sync'){
+ console.log('Starting authoritative WooCommerce → Priyasa catalog sync...');
+ const result=await syncWooCommerceCatalog();
+ console.log(JSON.stringify(result,null,2));
 }else{
- throw new Error('Usage: npm run woocommerce:import -- preview|import');
+ throw new Error('Usage: npm run woocommerce:import -- preview|import|sync');
 }
