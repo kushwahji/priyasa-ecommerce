@@ -1,13 +1,4 @@
 'use client';
-
-import { useState } from 'react';
-import { SafeImage } from '@/components/SafeImage';
-
-export function ProductGallery({ image, name, gallery = [] }: { image: string; name: string; gallery?: string[] }) {
-  const images = [...new Set([image, ...gallery])];
-  const [active, setActive] = useState(0);
-  return <div className="pdp-gallery">
-    <div className="pdp-thumbs">{images.map((src,i)=><button key={src+i} className={i===active?'active':''} onClick={()=>setActive(i)} aria-label={`View image ${i+1}`}><SafeImage src={src} alt="" width={120} height={150}/></button>)}</div>
-    <div className="pdp-main-image"><SafeImage src={images[active]} alt={name} width={1000} height={1250} priority /></div>
-  </div>;
-}
+import {useState} from 'react';
+import {SafeImage} from '@/components/SafeImage';
+export function ProductGallery({image,name,gallery=[]}:{image:string;name:string;gallery?:string[]}){const images=[...new Set([image,...gallery])];const[active,setActive]=useState(0);const next=()=>setActive(x=>(x+1)%images.length);const prev=()=>setActive(x=>(x-1+images.length)%images.length);return <div className="pdp-gallery premium-pdp-gallery"><div className="pdp-thumbs">{images.map((src,i)=><button type="button" key={src+i} className={i===active?'active':''} onClick={()=>setActive(i)} aria-label={`View image ${i+1}`}><SafeImage src={src} alt="" width={120} height={150}/></button>)}</div><div className="pdp-main-image"><SafeImage src={images[active]} alt={name} width={1000} height={1250} priority/><button type="button" className="gallery-arrow gallery-prev" onClick={prev} aria-label="Previous image">‹</button><button type="button" className="gallery-arrow gallery-next" onClick={next} aria-label="Next image">›</button><div className="gallery-counter">{active+1} / {images.length}</div></div><div className="pdp-mobile-slider">{images.map((src,i)=><button type="button" key={`m${src}${i}`} onClick={()=>setActive(i)} className={i===active?'active':''}><SafeImage src={src} alt={i===active?name:''} width={800} height={1000}/></button>)}</div><div className="gallery-dots">{images.map((_,i)=><button type="button" key={i} className={i===active?'active':''} onClick={()=>setActive(i)} aria-label={`Image ${i+1}`}/>)}</div></div>}
