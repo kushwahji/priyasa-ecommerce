@@ -1,0 +1,1 @@
+export function InfoPage({title,children}:{title:string;children:React.ReactNode}){return <div className="page"><div className="form" style={{maxWidth:900,margin:'0 auto'}}><div className="eyebrow">PRIYASA</div><h1 style={{font:'normal 40px Georgia,serif'}}>{title}</h1><div className="muted" style={{lineHeight:1.8}}>{children}</div></div></div>}
