@@ -1,0 +1,106 @@
+'use client';
+
+import {useEffect,useMemo,useState} from 'react';
+
+type Step='phone'|'otp';
+type VerifyResult={data?:{success?:boolean;token?:string;user?:{id?:number;mobile?:string};message?:string;request_id?:string};message?:string;errors?:Record<string,string[]>};
+
+const key='priyasa_device_id';
+const getDeviceId=()=>{let id=localStorage.getItem(key);if(!id){id=`web-${crypto.randomUUID()}`;localStorage.setItem(key,id)}return id};
+
+async function jsonFetch(path:string,body:unknown,method='POST'){const r=await fetch(path,{method,headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});const data=await r.json().catch(()=>({}));return {ok:r.ok,data};}
+
+export function AuthOtpModal({open,onClose}:{open:boolean;onClose:()=>void}){
+  const [step,setStep]=useState<Step>('phone');
+  const [mobile,setMobile]=useState('');
+  const [otp,setOtp]=useState('');
+  const [requestId,setRequestId]=useState('');
+  const [cooldown,setCooldown]=useState(0);
+  const [loading,setLoading]=useState(false);
+  const [error,setError]=useState('');
+  const [message,setMessage]=useState('');
+  const [permission,setPermission]=useState<NotificationPermission|undefined>();
+  const [pushStatus,setPushStatus]=useState('');
+  const normalized=useMemo(()=>mobile.replace(/\D/g,'').slice(-10),[mobile]);
+
+  useEffect(()=>{if(open&&typeof Notification!=='undefined')setPermission(Notification.permission)},[open]);
+  useEffect(()=>{if(cooldown<=0)return;const t=setInterval(()=>setCooldown(v=>Math.max(0,v-1)),1000);return()=>clearInterval(t)},[cooldown]);
+
+  if(!open)return null;
+
+  const requestPushPermission=async()=>{
+    setPushStatus('');
+    try{
+      if(!('Notification'in window)||!('serviceWorker'in navigator)){setPushStatus('Push notifications are not supported in this browser.');return null}
+      const result=await Notification.requestPermission();setPermission(result);
+      if(result!=='granted'){setPushStatus('Notifications are disabled. You can enable them later in browser settings.');return null}
+      const cfg={apiKey:process.env.NEXT_PUBLIC_FIREBASE_API_KEY,authDomain:process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,projectId:process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,storageBucket:process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,messagingSenderId:process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,appId:process.env.NEXT_PUBLIC_FIREBASE_APP_ID};
+      if(Object.values(cfg).some(v=>!v)||!process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY){setPushStatus('Push permission granted. Add Firebase web settings to enable device token registration.');return null}
+      const [{initializeApp},{getMessaging,isSupported},{getToken}]=await Promise.all([import('firebase/app'),import('firebase/messaging'),import('firebase/messaging')]);
+      if(!(await isSupported())){setPushStatus('Push is not supported on this browser.');return null}
+      const registration=await navigator.serviceWorker.register('/firebase-messaging-sw.js');
+      registration.active?.postMessage({type:'INIT_FIREBASE',config:cfg});
+      const app=initializeApp(cfg,'priyasa-web');
+      const messaging=getMessaging(app);
+      const token=await getToken(messaging,{vapidKey:process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY,serviceWorkerRegistration:registration});
+      if(!token){setPushStatus('Unable to obtain an FCM token.');return null}
+      const deviceId=getDeviceId();
+      const payload={device_id:deviceId,token,user_id:undefined,phone_number:normalized||undefined,guest_id:deviceId,platform:'web',device:navigator.userAgent,browser:navigator.userAgent,timezone:Intl.DateTimeFormat().resolvedOptions().timeZone,permission:'granted',channel:'push',delivery_target:'fcm',source:'priyasa-web'};
+      const r=await jsonFetch('/api/device/register',payload);
+      if(r.ok)setPushStatus('Notifications enabled.');else setPushStatus(r.data?.message||'Device registration failed.');
+      return token;
+    }catch(e){setPushStatus(e instanceof Error?e.message:'Unable to enable notifications.');return null}
+  };
+
+  const sendOtp=async()=>{
+    setError('');setMessage('');
+    if(!/^\d{10}$/.test(normalized)){setError('Enter a valid 10-digit mobile number.');return}
+    setLoading(true);
+    try{
+      const deviceId=getDeviceId();
+      const token=await requestPushPermission();
+      const r=await jsonFetch('/api/auth/send-otp',{mobile:normalized,country_code:'+91',device_token:token||'fcm-token-not-available',device_id:deviceId,purpose:'login',channel:'whatsapp',app_version:'1.0.0',platform:'web'});
+      const d=r.data as {data?:{success?:boolean;message?:string;request_id?:string;retry_after?:number;expires_in?:number};message?:string};
+      if(!r.ok||d.data?.success===false){setError(d.data?.message||d.message||'Unable to send OTP.');return}
+      setRequestId(d.data?.request_id||'');setCooldown(Number(d.data?.retry_after||30));setStep('otp');setMessage(d.data?.message||'OTP sent successfully on WhatsApp.');
+    }finally{setLoading(false)}
+  };
+
+  const verifyOtp=async()=>{
+    setError('');setMessage('');
+    if(!/^\d{4,8}$/.test(otp)){setError('Enter the OTP you received.');return}
+    if(!requestId){setError('OTP request has expired. Please request a new OTP.');return}
+    setLoading(true);
+    try{
+      const deviceId=getDeviceId();
+      const r=await jsonFetch('/api/auth/verify-otp',{mobile:normalized,otp,request_id:requestId,device_token:'fcm-token-not-available',device_id:deviceId,app_version:'1.0.0',platform:'web'});
+      const d=r.data as VerifyResult;
+      if(!r.ok||!d.data?.success){setError(d.data?.message||d.message||d.errors?.otp?.[0]||'OTP verification failed.');return}
+      if(d.data.user?.id){await jsonFetch('/api/device/update',{device_id:deviceId,token:'',user_id:d.data.user.id,phone_number:d.data.user.mobile||normalized});}
+      setMessage('Login successful.');setTimeout(()=>{onClose();window.location.reload()},500);
+    }finally{setLoading(false)}
+  };
+
+  const resend=async()=>{if(!requestId||cooldown>0)return;setError('');setLoading(true);try{const r=await jsonFetch('/api/auth/resend-otp',{request_id:requestId,device_token:'fcm-token-not-available',device_id:getDeviceId(),app_version:'1.0.0',platform:'web'});const d=r.data as {message?:string;data?:{message?:string;retry_after?:number}};if(!r.ok){setError(d.data?.message||d.message||'Please try again later.');return}setCooldown(Number(d.data?.retry_after||30));setMessage(d.data?.message||d.message||'OTP resent successfully.')}finally{setLoading(false)}};
+
+  const cancel=async()=>{if(requestId)await fetch(`/api/auth/cancel-otp/${encodeURIComponent(requestId)}`,{method:'DELETE',headers:{'Content-Type':'application/json'},body:JSON.stringify({device_id:getDeviceId(),platform:'web'})}).catch(()=>{});onClose();};
+
+  return <div className="otp-backdrop" role="dialog" aria-modal="true" aria-label="Priyasa login" onMouseDown={e=>{if(e.target===e.currentTarget)cancel()}}>
+    <div className="otp-modal">
+      <button className="otp-close" onClick={cancel} aria-label="Close">×</button>
+      <div className="eyebrow">PRIYASA</div><h2>Welcome back</h2><p className="muted">Sign in securely with your mobile number and WhatsApp OTP.</p>
+      {step==='phone'?<>
+        <label>Mobile number<div className="otp-phone"><span>+91</span><input autoFocus inputMode="numeric" maxLength={10} value={mobile} onChange={e=>setMobile(e.target.value.replace(/\D/g,''))} placeholder="97525 72357" /></div></label>
+        <div className="push-consent"><strong>🔔 Get order updates</strong><span>Allow Priyasa notifications for order status, offers and important updates.</span><button type="button" className="button outline" onClick={requestPushPermission}>{permission==='granted'?'Notifications enabled':'Allow notifications'}</button></div>
+        <button className="button otp-submit" disabled={loading} onClick={sendOtp}>{loading?'Sending…':'Continue with WhatsApp OTP'}</button>
+      </>:<>
+        <p>OTP sent to <strong>+91 {normalized}</strong></p><label>Enter OTP<input className="input otp-code" autoFocus inputMode="numeric" maxLength={8} value={otp} onChange={e=>setOtp(e.target.value.replace(/\D/g,''))} placeholder="••••••" /></label>
+        <button className="button otp-submit" disabled={loading} onClick={verifyOtp}>{loading?'Verifying…':'Verify & Sign In'}</button>
+        <button className="otp-link" disabled={loading||cooldown>0} onClick={resend}>{cooldown>0?`Resend OTP in ${cooldown}s`:'Resend OTP'}</button>
+        <button className="otp-link" onClick={()=>{setStep('phone');setOtp('');setError('');}}>Change number</button>
+      </>}
+      {message&&<div className="otp-success">{message}</div>}{error&&<div className="otp-error">{error}</div>}{pushStatus&&<div className="otp-note">{pushStatus}</div>}
+      <small className="otp-foot">By continuing, you agree to Priyasa's Terms and Privacy Policy.</small>
+    </div>
+  </div>;
+}
