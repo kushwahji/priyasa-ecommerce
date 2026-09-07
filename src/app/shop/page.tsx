@@ -1,3 +1,21 @@
+import Image from 'next/image';
+import Link from 'next/link';
 import { products } from '@/lib/catalog';
-import { ProductCard } from '@/components/ProductCard';
-export default function Shop(){return <div className="page"><div className="breadcrumbs">Home / Shop</div><h1 style={{font:'normal 38px Georgia,serif'}}>All Fashion</h1><div className="shop-layout"><aside className="filters"><h3>Filters</h3>{['Sarees','Kurtis & Kurtas','Salwar Suits','Anarkali','Nightwear','Lingerie','Activewear'].map(x=><label key={x}><input type="checkbox"/> {x}</label>)}<hr/><h3>Size</h3>{['XS','S','M','L','XL','XXL'].map(x=><label key={x}><input type="checkbox"/> {x}</label>)}<hr/><h3>Price</h3><label>₹0 — ₹10,000+</label></aside><div><p className="muted">{products.length} products</p><div className="product-grid shop">{products.map(p=><ProductCard key={p.id} product={p}/>)}</div></div></div></div>}
+import { ShopFilters } from '@/components/ShopFilters';
+
+const hero = 'https://images.unsplash.com/photo-1529139574466-a303027c1d8b?auto=format&fit=crop&w=2200&q=88';
+
+export default function Shop(){
+  return <div className="storefront-page">
+    <section className="plp-hero">
+      <Image src={hero} alt="Priyasa fashion collection" fill priority sizes="100vw" className="plp-hero-image" />
+      <div className="plp-hero-overlay"><span className="eyebrow">PRIYASA COLLECTIONS</span><h1>Fashion for<br/><em>every mood.</em></h1><p>Discover considered silhouettes, everyday essentials and occasion-ready Indian style.</p></div>
+    </section>
+    <div className="page storefront-inner">
+      <div className="breadcrumbs"><Link href="/">Home</Link> / Shop</div>
+      <div className="collection-intro"><div><span className="eyebrow dark">THE PRIYASA EDIT</span><h2>All styles</h2></div><p>Explore the complete collection, from intimate essentials to festive statements.</p></div>
+      <div className="category-pills">{['Lingerie','Nightwear','Ethnic Wear','Activewear','Loungewear','Accessories'].map(x=><Link href={`/category/${x.toLowerCase().replaceAll(' ','-')}`} key={x}>{x}</Link>)}</div>
+      <ShopFilters products={products}/>
+    </div>
+  </div>;
+}
