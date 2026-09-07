@@ -5,7 +5,17 @@ importScripts('https://www.gstatic.com/firebasejs/12.4.0/firebase-messaging-comp
 let initialized=false;
 self.addEventListener('message',event=>{
   if(event.data?.type!=='INIT_FIREBASE'||initialized)return;
-  try{firebase.initializeApp(event.data.config);initialized=true;firebase.messaging();}catch(error){console.error('Priyasa FCM init failed',error);}
+  try{
+    firebase.initializeApp(event.data.config);
+    initialized=true;
+    const messaging=firebase.messaging();
+    messaging.onBackgroundMessage(payload=>{
+      const notification=payload.notification||{};
+      const title=notification.title||'PRIYASA';
+      const options={body:notification.body||'You have an update from Priyasa.',icon:notification.icon||'/icon-192.png',data:payload.data||{}};
+      self.registration.showNotification(title,options);
+    });
+  }catch(error){console.error('Priyasa FCM init failed',error);}
 });
 
 self.addEventListener('notificationclick',event=>{
