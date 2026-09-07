@@ -24,9 +24,11 @@ function variantParts(v:WooVariation){
 function stockFor(manage:boolean|string,quantity:number|null,inStock:boolean){if(quantity!==null&&quantity!==undefined)return Math.max(0,quantity);return inStock?9999:0;}
 
 export async function previewWooCommerceImport(){
+ // WooCommerce product responses already contain variation IDs. Do not call the
+ // variation endpoint once per product during preview; that can exceed hosting timeouts.
  const [categories,products]=await Promise.all([getWooCategories(),getWooProducts()]);
  let variableProducts=0;let variations=0;
- for(const p of products.data){if(p.type==='variable'){variableProducts++;variations+=(await getWooVariations(p.id)).data.length;}}
+ for(const p of products.data){if(p.type==='variable'){variableProducts++;variations+=Array.isArray(p.variations)?p.variations.length:0;}}
  return {categories:categories.data.length,products:products.data.length,variableProducts,variations};
 }
 
