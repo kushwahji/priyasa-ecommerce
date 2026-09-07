@@ -13,7 +13,7 @@ export async function GET(){
   await requireAdminPermission('products.read');
   return json({data:await previewWooCommerceImport()});
  }catch(error){
-  return json({error:error instanceof Error?error.message:'Unable to connect to WooCommerce'},{ } as never);
+  return json({error:error instanceof Error?error.message:'Unable to connect to WooCommerce'},500);
  }
 }
 
