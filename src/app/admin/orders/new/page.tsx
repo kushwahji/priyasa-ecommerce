@@ -1,9 +1,46 @@
 'use client';
-import {useEffect,useState} from 'react';import Link from 'next/link';
+import {useEffect,useState} from 'react';
+import Link from 'next/link';
+
 export default function ManualOrder(){
- const [variants,setVariants]=useState<any[]>([]);const [form,setForm]=useState({phone:'',name:'',line1:'',city:'',state:'',pincode:'',paymentMethod:'COD',note:'',variantId:'',quantity:'1'});const [items,setItems]=useState<any[]>([]);const [msg,setMsg]=useState('');const [busy,setBusy]=useState(false);
- useEffect(()=>{fetch('/api/admin/products').then(r=>r.json()).then(d=>setVariants((d.data||[]).flatMap((p:any)=>p.variants.map((v:any)=>({...v,productName:p.name,price:v.price??p.salePrice,available:v.stock-v.reserved})))).catch(()=>setMsg('Unable to load catalog'))},[]);
- function add(){const v=variants.find(x=>x.id===form.variantId);if(!v)return setMsg('Select a variant');const q=Number(form.quantity);if(!Number.isInteger(q)||q<1||q>v.available)return setMsg(`Quantity unavailable. Available: ${v.available}`);setItems(x=>[...x,{variantId:v.id,quantity:q,name:`${v.productName} · ${v.size} · ${v.color}`,price:v.price}]);setMsg('')}
- async function submit(e:React.FormEvent){e.preventDefault();setBusy(true);setMsg('');try{if(!items.length)throw new Error('Add at least one item');const r=await fetch('/api/admin/orders/manual',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...form,items})});const d=await r.json();if(!r.ok)throw new Error(d.error||'Unable to create order');window.location.href='/admin/orders'}catch(e){setMsg(e instanceof Error?e.message:'Unable to create order')}finally{setBusy(false)}}
- return <div className="admin-shell"><aside className="admin-nav"><h2>PRIYASA Admin</h2><Link href="/admin">← Dashboard</Link><Link href="/admin/orders">Orders</Link><Link href="/admin/orders/new">Manual Order</Link></aside><section className="admin-main"><div className="section-head"><div><h1>Create Manual Order</h1><p className="muted">Create phone/COD orders for customers using the same inventory validation as checkout.</p></div></div><form className="admin-form" onSubmit={submit}><div className="admin-card"><h2>Customer & delivery</h2><div className="admin-form-grid"><label>Phone<input className="input" required value={form.phone} onChange={e=>setForm(x=>({...x,phone:e.target.value}))}/></label><label>Full name<input className="input" required value={form.name} onChange={e=>setForm(x=>({...x,name:e.target.value}))}/></label><label className="full-span">Address<input className="input" required value={form.line1} onChange={e=>setForm(x=>({...x,line1:e.target.value}))}/></label><label>City<input className="input" required value={form.city} onChange={e=>setForm(x=>({...x,city:e.target.value}))}/></label><label>State<input className="input" required value={form.state} onChange={e=>setForm(x=>({...x,state:e.target.value}))}/></label><label>Pincode<input className="input" required inputMode="numeric" maxLength={6} value={form.pincode} onChange={e=>setForm(x=>({...x,pincode:e.target.value.replace(/\D/g,'').slice(0,6)}))}/></label><label>Payment<select className="input" value={form.paymentMethod} onChange={e=>setForm(x=>({...x,paymentMethod:e.target.value}))}><option value="COD">Cash on Delivery</option><option value="MANUAL_PAID">Already Paid / Offline</option></select></label></div></div><div className="admin-card"><h2>Add items</h2><div className="admin-form-grid"><label className="full-span">Variant<select className="input" value={form.variantId} onChange={e=>setForm(x=>({...x,variantId:e.target.value}))}><option value="">Select variant</option>{variants.filter(v=>v.available>0).map(v=><option key={v.id} value={v.id}>{v.productName} · {v.size} · {v.color} · ₹{v.price} · stock {v.available}</option>)}</select></label><label>Quantity<input className="input" type="number" min="1" value={form.quantity} onChange={e=>setForm(x=>({...x,quantity:e.target.value}))}/></label><div style={{display:'flex',alignItems:'end'}}><button type="button" className="button" onClick={add}>Add item</button></div></div>{items.map((i,n)=><div key={n} className="saved-address"><strong>{i.name}</strong><small>Qty {i.quantity} · ₹{i.price*i.quantity}</small></div>)}</div><label>Internal note<textarea className="input" rows={3} value={form.note} onChange={e=>setForm(x=>({...x,note:e.target.value}))}/></label>{msg&&<div className="checkout-status">{msg}</div>}<button className="button dark-button" disabled={busy}>{busy?'Creating…':'Create Order'}</button></form></section></div>
+ const [variants,setVariants]=useState<any[]>([]);
+ const [form,setForm]=useState({phone:'',name:'',line1:'',city:'',state:'',pincode:'',paymentMethod:'COD',note:'',variantId:'',quantity:'1'});
+ const [items,setItems]=useState<any[]>([]);
+ const [msg,setMsg]=useState('');
+ const [busy,setBusy]=useState(false);
+
+ useEffect(()=>{
+  fetch('/api/admin/products')
+   .then(r=>r.json())
+   .then(d=>setVariants((d.data||[]).flatMap((p:any)=>p.variants.map((v:any)=>({
+    ...v,
+    productName:p.name,
+    price:v.price??p.salePrice,
+    available:v.stock-v.reserved,
+   }))))
+   .catch(()=>setMsg('Unable to load catalog'));
+ },[]);
+
+ function add(){
+  const v=variants.find(x=>x.id===form.variantId);
+  if(!v)return setMsg('Select a variant');
+  const q=Number(form.quantity);
+  if(!Number.isInteger(q)||q<1||q>v.available)return setMsg(`Quantity unavailable. Available: ${v.available}`);
+  setItems(x=>[...x,{variantId:v.id,quantity:q,name:`${v.productName} · ${v.size} · ${v.color}`,price:v.price}]);
+  setMsg('');
+ }
+
+ async function submit(e:React.FormEvent){
+  e.preventDefault();setBusy(true);setMsg('');
+  try{
+   if(!items.length)throw new Error('Add at least one item');
+   const r=await fetch('/api/admin/orders/manual',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...form,items})});
+   const d=await r.json();
+   if(!r.ok)throw new Error(d.error||'Unable to create order');
+   window.location.href='/admin/orders';
+  }catch(e){setMsg(e instanceof Error?e.message:'Unable to create order');}
+  finally{setBusy(false);}
+ }
+
+ return <div className="admin-shell"><aside className="admin-nav"><h2>PRIYASA Admin</h2><Link href="/admin">← Dashboard</Link><Link href="/admin/orders">Orders</Link><Link href="/admin/orders/new">Manual Order</Link></aside><section className="admin-main"><div className="section-head"><div><h1>Create Manual Order</h1><p className="muted">Create phone/COD orders for customers using the same inventory validation as checkout.</p></div></div><form className="admin-form" onSubmit={submit}><div className="admin-card"><h2>Customer & delivery</h2><div className="admin-form-grid"><label>Phone<input className="input" required value={form.phone} onChange={e=>setForm(x=>({...x,phone:e.target.value}))}/></label><label>Full name<input className="input" required value={form.name} onChange={e=>setForm(x=>({...x,name:e.target.value}))}/></label><label className="full-span">Address<input className="input" required value={form.line1} onChange={e=>setForm(x=>({...x,line1:e.target.value}))}/></label><label>City<input className="input" required value={form.city} onChange={e=>setForm(x=>({...x,city:e.target.value}))}/></label><label>State<input className="input" required value={form.state} onChange={e=>setForm(x=>({...x,state:e.target.value}))}/></label><label>Pincode<input className="input" required inputMode="numeric" maxLength={6} value={form.pincode} onChange={e=>setForm(x=>({...x,pincode:e.target.value.replace(/\D/g,'').slice(0,6)}))}/></label><label>Payment<select className="input" value={form.paymentMethod} onChange={e=>setForm(x=>({...x,paymentMethod:e.target.value}))}><option value="COD">Cash on Delivery</option><option value="MANUAL_PAID">Already Paid / Offline</option></select></label></div></div><div className="admin-card"><h2>Add items</h2><div className="admin-form-grid"><label className="full-span">Variant<select className="input" value={form.variantId} onChange={e=>setForm(x=>({...x,variantId:e.target.value}))}><option value="">Select variant</option>{variants.filter(v=>v.available>0).map(v=><option key={v.id} value={v.id}>{v.productName} · {v.size} · {v.color} · ₹{v.price} · stock {v.available}</option>)}</select></label><label>Quantity<input className="input" type="number" min="1" value={form.quantity} onChange={e=>setForm(x=>({...x,quantity:e.target.value}))}/></label><div style={{display:'flex',alignItems:'end'}}><button type="button" className="button" onClick={add}>Add item</button></div></div>{items.map((i,n)=><div key={n} className="saved-address"><strong>{i.name}</strong><small>Qty {i.quantity} · ₹{i.price*i.quantity}</small></div>)}</div><label>Internal note<textarea className="input" rows={3} value={form.note} onChange={e=>setForm(x=>({...x,note:e.target.value}))}/></label>{msg&&<div className="checkout-status">{msg}</div>}<button className="button dark-button" disabled={busy}>{busy?'Creating…':'Create Order'}</button></form></section></div>;
 }
