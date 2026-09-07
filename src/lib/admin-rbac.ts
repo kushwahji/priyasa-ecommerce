@@ -1,0 +1,2 @@
+import {getSession} from '@/lib/auth';import {db} from '@/lib/db';
+export async function requirePermission(permission:string){const s=await getSession();if(!s||!['ADMIN','STAFF'].includes(s.role))throw new Error('FORBIDDEN');if(s.role==='ADMIN')return s;const user=await db.user.findUnique({where:{id:s.userId},include:{adminRole:{include:{permissions:{include:{permission:true}}}}}});if(!user?.adminRole?.permissions.some(x=>x.permission.key===permission))throw new Error('FORBIDDEN');return s;}
