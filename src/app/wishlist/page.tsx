@@ -1,0 +1,1 @@
+import {InfoPage} from '@/components/InfoPage';export default function Wishlist(){return <InfoPage title="Wishlist"><p>Save your favourite Priyasa styles here. Customer-specific wishlist persistence is backed by the Wishlist/WishlistItem database models and can be connected to the signed customer session.</p></InfoPage>}
