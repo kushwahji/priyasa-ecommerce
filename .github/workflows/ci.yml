@@ -30,9 +30,8 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
-          cache: npm
-      - run: npm ci
+          node-version: 22
+      - run: npm install --no-audit --no-fund
       - run: npm run db:prepare:mysql
       - run: npx prisma validate --schema prisma/schema.mysql.prisma
       - run: npx prisma generate --schema prisma/schema.mysql.prisma
