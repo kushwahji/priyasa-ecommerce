@@ -4,6 +4,7 @@ import './storefront.css';
 import './priyasa-premium.css';
 import './reference-ui.css';
 import './promo-ui.css';
+import './customer-auth.css';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { AuthButton } from '@/components/AuthButton';
