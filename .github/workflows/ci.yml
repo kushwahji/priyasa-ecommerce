@@ -8,21 +8,22 @@ jobs:
   verify:
     runs-on: ubuntu-latest
     services:
-      postgres:
-        image: postgres:16
+      mysql:
+        image: mysql:8.4
         env:
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_USER: postgres
-          POSTGRES_DB: priyasa
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: priyasa
+          MYSQL_USER: priyasa
+          MYSQL_PASSWORD: priyasa
         ports:
-          - 5432:5432
+          - 3306:3306
         options: >-
-          --health-cmd="pg_isready -U postgres -d priyasa"
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -u root -proot"
           --health-interval=10s
           --health-timeout=5s
-          --health-retries=5
+          --health-retries=10
     env:
-      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/priyasa
+      DATABASE_URL: mysql://priyasa:priyasa@127.0.0.1:3306/priyasa
       SESSION_SECRET: ci-only-secret-change-me
     steps:
       - uses: actions/checkout@v4
@@ -30,9 +31,10 @@ jobs:
         with:
           node-version: 20
       - run: npm install
-      - run: npx prisma validate
-      - run: npx prisma generate
-      - run: npx prisma db push
+      - run: npm run db:prepare:mysql
+      - run: npx prisma validate --schema prisma/schema.mysql.prisma
+      - run: npx prisma generate --schema prisma/schema.mysql.prisma
+      - run: npx prisma db push --schema prisma/schema.mysql.prisma
       - run: npx tsc --noEmit
       - run: npm test
       - run: npm run build
