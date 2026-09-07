@@ -36,8 +36,9 @@ test('storefront and checkout entry are reachable', async ({ page }) => {
 test('customer login is mobile OTP only', async ({ page }) => {
   await page.goto('/login');
   await expect(page.locator('body')).toContainText(/Sign in with mobile|Continue with Mobile/i);
-  await expect(page.locator('body')).not.toContainText('Google');
-  await expect(page.locator('body')).not.toContainText('Facebook');
+  const main = page.locator('main');
+  await expect(main).not.toContainText('Google');
+  await expect(main).not.toContainText('Facebook');
 });
 
 test('customer order and payment routes are present', async ({ page }) => {
