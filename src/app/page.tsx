@@ -1,0 +1,14 @@
+import Image from 'next/image';
+import Link from 'next/link';
+import { categories, products } from '@/lib/catalog';
+import { ProductCard } from '@/components/ProductCard';
+
+const categoryImages=['https://images.unsplash.com/photo-1596755389378-c31d21fd1273?auto=format&fit=crop&w=500&q=80','https://images.unsplash.com/photo-1586023492125-27b2c045efd7?auto=format&fit=crop&w=500&q=80','https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=500&q=80','https://images.unsplash.com/photo-1518611012118-696072aa579a?auto=format&fit=crop&w=500&q=80','https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=500&q=80','https://images.unsplash.com/photo-1525507119028-ed4c629a60a3?auto=format&fit=crop&w=500&q=80'];
+export default function Home(){return <>
+  <section className="hero"><div className="hero-copy"><div className="eyebrow">PRIYASA FESTIVE EDIT</div><h1>Tradition<br/>Meets You</h1><p>Elegant fashion for the modern woman — thoughtfully designed for comfort, confidence and celebration.</p><Link className="button" href="/category/ethnic-wear">Shop Ethnic Wear →</Link></div></section>
+  <section className="section"><div className="section-head"><div><h2>Shop by Category</h2><p className="muted">Find your perfect everyday and occasion edit.</p></div><Link href="/shop">View All →</Link></div><div className="category-grid">{categories.map((c,i)=><Link className="category-card" key={c} href={`/category/${c.toLowerCase().replaceAll(' ','-')}`}><div className="circle" style={{backgroundImage:`url(${categoryImages[i]})`}}/><strong>{c}</strong></Link>)}</div></section>
+  <section className="banner"><div><div className="eyebrow">FESTIVE SALE</div><h2>Flat 30–70% OFF</h2><p>Make every celebration beautiful.</p></div><Link className="button" href="/offers">Shop Offers →</Link></section>
+  <section className="section"><div className="section-head"><div><h2>Best Sellers</h2><p className="muted">Loved by Priyasa women.</p></div><Link href="/shop">Shop All →</Link></div><div className="product-grid">{products.slice(0,4).map(p=><ProductCard key={p.id} product={p}/>)}</div></section>
+  <section className="section"><div className="feature-grid"><div className="feature"><h3>Feel Confident Everyday</h3><p>Premium essentials designed around real women.</p><Link href="/category/lingerie">Shop Lingerie →</Link></div><div className="feature"><h3>Festive Ethnic Collection</h3><p>Grace in every drape, from intimate gatherings to grand celebrations.</p><Link href="/category/ethnic-wear">Shop Now →</Link></div><div className="feature"><h3>Comfort Looks Good On You</h3><p>Nightwear and loungewear you will want to live in.</p><Link href="/category/nightwear">Shop Nightwear →</Link></div></div></section>
+  <section className="section" style={{textAlign:'center'}}><h2>Every You, Beautiful</h2><p className="muted">Quality fabrics. Considered fits. Indian fashion made for your life.</p></section>
+</>}
