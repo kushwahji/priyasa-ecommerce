@@ -1,0 +1,35 @@
+/* Final storefront responsive fixes. Loaded after all legacy styles. */
+.product-media .badge,.discount-badge{background:#d71945!important;color:#fff!important;font-weight:800!important;letter-spacing:.35px;border-radius:2px}
+.discount-badge{display:inline-block;padding:4px 7px;font-size:10px;line-height:1.1;vertical-align:middle;margin-left:7px}
+.home-hero-carousel{isolation:isolate}
+.home-hero-media img{object-fit:cover}
+.home-hero-copy h1{max-width:11ch;overflow-wrap:anywhere}
+@media(max-width:720px){
+ .home-hero-carousel{height:auto;min-height:520px;aspect-ratio:3/4}
+ .home-hero-copy{left:18px;right:18px;bottom:52px}
+ .home-hero-copy h1{font-size:clamp(32px,10vw,48px);line-height:.96;letter-spacing:-1px;max-width:9ch;margin:10px 0 14px}
+ .home-hero-copy .eyebrow{font-size:9px;letter-spacing:2px}
+ .home-hero-copy p{font-size:12px;line-height:1.45;margin-bottom:14px}
+ .home-hero-control{width:34px;height:34px;font-size:24px}
+ .home-hero-prev{left:8px}.home-hero-next{right:8px}
+ .home-hero-dots{bottom:16px}
+ .trust-strip{display:flex!important;overflow-x:auto!important;justify-content:flex-start!important;gap:24px!important;padding:15px 18px!important;scroll-snap-type:x mandatory!important;white-space:nowrap!important}
+ .trust-strip>span{flex:0 0 auto;min-width:145px;scroll-snap-align:start}
+ .trust-strip>i{display:none!important}
+ body:has(.checkout-page){padding-bottom:0!important}
+ body:has(.checkout-page) .mobile-bottom-nav{display:none!important}
+ .checkout-page{padding-bottom:32px!important}
+ .checkout-page .checkout-layout{display:flex;flex-direction:column}
+ .checkout-page .checkout-summary{position:static;order:-1;margin-bottom:16px}
+ .checkout-page .checkout-form{display:flex;flex-direction:column}
+ .checkout-page .checkout-card{width:100%;overflow:hidden}
+ .checkout-page .form-grid{grid-template-columns:1fr!important}
+ .checkout-page .input{font-size:16px;min-height:50px}
+ .checkout-page .payment-method-grid{grid-template-columns:1fr 1fr!important}
+ .checkout-page .checkout-steps{margin-bottom:24px}
+ .checkout-page .checkout-summary h2{font-size:24px}
+ .checkout-page .checkout-item{grid-template-columns:58px minmax(0,1fr) auto}
+ .checkout-page .checkout-item span{min-width:0}
+ .admin-main{overflow:hidden}
+}
+@media(max-width:390px){.checkout-page .payment-method-grid{grid-template-columns:1fr!important}.home-hero-copy h1{font-size:34px}.home-hero-carousel{min-height:500px}.trust-strip>span{min-width:138px}}
