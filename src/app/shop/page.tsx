@@ -1,21 +1,11 @@
-import Image from 'next/image';
 import Link from 'next/link';
-import { products } from '@/lib/catalog';
-import { ShopFilters } from '@/components/ShopFilters';
+import {getActiveCms,getStorefrontCategories,getStorefrontProducts} from '@/lib/storefront-data';
+import {ShopFilters} from '@/components/ShopFilters';
 
-const hero = 'https://images.unsplash.com/photo-1529139574466-a303027c1d8b?auto=format&fit=crop&w=2200&q=88';
-
-export default function Shop(){
-  return <div className="storefront-page">
-    <section className="plp-hero">
-      <Image src={hero} alt="Priyasa fashion collection" fill priority sizes="100vw" className="plp-hero-image" />
-      <div className="plp-hero-overlay"><span className="eyebrow">PRIYASA COLLECTIONS</span><h1>Fashion for<br/><em>every mood.</em></h1><p>Discover considered silhouettes, everyday essentials and occasion-ready Indian style.</p></div>
-    </section>
-    <div className="page storefront-inner">
-      <div className="breadcrumbs"><Link href="/">Home</Link> / Shop</div>
-      <div className="collection-intro"><div><span className="eyebrow dark">THE PRIYASA EDIT</span><h2>All styles</h2></div><p>Explore the complete collection, from intimate essentials to festive statements.</p></div>
-      <div className="category-pills">{['Lingerie','Nightwear','Ethnic Wear','Activewear','Loungewear','Accessories'].map(x=><Link href={`/category/${x.toLowerCase().replaceAll(' ','-')}`} key={x}>{x}</Link>)}</div>
-      <ShopFilters products={products}/>
-    </div>
-  </div>;
+export default async function Shop(){
+ const [products,categories,hero]=await Promise.all([getStorefrontProducts(),getStorefrontCategories(),getActiveCms('shop.hero')]);
+ return <div className="storefront-page">
+  {hero&&<section className="plp-hero" style={{backgroundImage:`linear-gradient(90deg,rgba(27,13,16,.76),rgba(27,13,16,.1)),url(${hero.imageUrl||''})`,backgroundSize:'cover',backgroundPosition:'center'}}><div className="plp-hero-overlay"><span className="eyebrow">{hero.type}</span><h1>{hero.title}</h1>{hero.subtitle&&<p>{hero.subtitle}</p>}{hero.ctaHref&&<Link className="button" href={hero.ctaHref}>{hero.ctaLabel||'Shop Now'} →</Link>}</div></section>}
+  <div className="page storefront-inner"><div className="breadcrumbs"><Link href="/">Home</Link> / Shop</div><div className="collection-intro"><div><span className="eyebrow dark">THE PRIYASA EDIT</span><h2>All styles</h2></div><p>Explore the live collection.</p></div><div className="category-pills">{categories.map(c=><Link href={`/category/${c.slug}`} key={c.id}>{c.name}</Link>)}</div><ShopFilters products={products} categories={categories.map(c=>c.name)} /></div>
+ </div>;
 }
