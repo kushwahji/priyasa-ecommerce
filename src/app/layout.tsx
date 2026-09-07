@@ -8,6 +8,7 @@ import Link from 'next/link';
 import { AuthButton } from '@/components/AuthButton';
 import { BrandLogo } from '@/components/BrandLogo';
 import { MobileMenu } from '@/components/MobileMenu';
+import { StorefrontPromos } from '@/components/StorefrontPromos';
 import { SearchIcon, UserIcon, HeartIcon, BagIcon, HomeIcon } from '@/components/StorefrontIcons';
 
 export const metadata: Metadata = {
@@ -51,5 +52,6 @@ export default function RootLayout({ children }: Readonly<{children: React.React
       <Link href="/cart"><BagIcon/><small>Cart</small></Link>
       <Link href="/account"><UserIcon/><small>Account</small></Link>
     </nav>
+    <StorefrontPromos />
   </body></html>
 }
