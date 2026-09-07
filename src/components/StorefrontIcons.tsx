@@ -1,15 +1,13 @@
 'use client';
-
-import type { SVGProps } from 'react';
-
-type Props = SVGProps<SVGSVGElement>;
-const Icon = ({children, ...props}: Props & {children: React.ReactNode}) => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" {...props}>{children}</svg>;
+import type {SVGProps} from 'react';
+type Props=SVGProps<SVGSVGElement>;
+const Icon=({children,...props}:Props&{children:React.ReactNode})=><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" {...props}>{children}</svg>;
 export const HomeIcon=(p:Props)=><Icon {...p}><path d="m3 10 9-7 9 7v10H3V10Z"/><path d="M9 20v-6h6v6"/></Icon>;
 export const SearchIcon=(p:Props)=><Icon {...p}><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.2 4.2"/></Icon>;
 export const UserIcon=(p:Props)=><Icon {...p}><circle cx="12" cy="8" r="3.2"/><path d="M5.2 20c.8-3.4 3.1-5.2 6.8-5.2s6 1.8 6.8 5.2"/></Icon>;
 export const HeartIcon=(p:Props)=><Icon {...p}><path d="M20.8 8.8c0 5-8.8 10.2-8.8 10.2S3.2 13.8 3.2 8.8A4.7 4.7 0 0 1 12 6.2a4.7 4.7 0 0 1 8.8 2.6Z"/></Icon>;
 export const BagIcon=(p:Props)=><Icon {...p}><path d="M5 8.5h14l-1 11H6l-1-11Z"/><path d="M9 9V6.5a3 3 0 0 1 6 0V9"/></Icon>;
-export const MenuIcon=(p:Props)=><Icon {...p}><path d="M4 7h16M4 12h16M4 17h16"/></Icon>;
+export const MenuIcon=(p:Props)=><Icon {...p><path d="M4 7h16M4 12h16M4 17h16"/></Icon>;
 export const CloseIcon=(p:Props)=><Icon {...p}><path d="m6 6 12 12M18 6 6 18"/></Icon>;
 export const ChevronIcon=(p:Props)=><Icon {...p}><path d="m9 6 6 6-6 6"/></Icon>;
 export const TruckIcon=(p:Props)=><Icon {...p}><path d="M3 6h11v10H3zM14 10h4l3 3v3h-7z"/><circle cx="7" cy="18" r="1.5"/><circle cx="18" cy="18" r="1.5"/></Icon>;
@@ -19,5 +17,8 @@ export const BellIcon=(p:Props)=><Icon {...p}><path d="M18 9a6 6 0 0 0-12 0c0 7-
 export const GiftIcon=(p:Props)=><Icon {...p}><path d="M3 10h18v10H3zM2 7h20v3H2zM12 7v13"/><path d="M12 7H8.8A2.8 2.8 0 1 1 12 4.2V7ZM12 7h3.2A2.8 2.8 0 1 0 12 4.2V7Z"/></Icon>;
 export const MapPinIcon=(p:Props)=><Icon {...p}><path d="M19 10c0 5-7 11-7 11S5 15 5 10a7 7 0 1 1 14 0Z"/><circle cx="12" cy="10" r="2.3"/></Icon>;
 export const CreditCardIcon=(p:Props)=><Icon {...p}><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18M7 15h4"/></Icon>;
+export const CashIcon=(p:Props)=><Icon {...p}><rect x="3" y="6" width="18" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/><path d="M7 9h.01M17 15h.01"/></Icon>;
+export const UpiIcon=(p:Props)=><Icon {...p}><path d="M5 4h8l6 6-8 10H5l6-10-6-6Z"/><path d="M11 10h8"/></Icon>;
+export const WalletIcon=(p:Props)=><Icon {...p}><path d="M4 7h16v12H4z"/><path d="M4 7V5h13M16 13h4"/><circle cx="16" cy="13" r=".6"/></Icon>;
 export const HelpIcon=(p:Props)=><Icon {...p}><circle cx="12" cy="12" r="9"/><path d="M9.8 9a2.4 2.4 0 1 1 3.7 2c-1 .6-1.5 1-1.5 2M12 16.5h.01"/></Icon>;
 export const CheckIcon=(p:Props)=><Icon {...p}><path d="m5 12 4 4L19 6"/></Icon>;
