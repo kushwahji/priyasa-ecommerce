@@ -1,5 +1,5 @@
 import {db} from '@/lib/db';
-import {getWooCategories,getWooProducts,getWooVariations,type WooCategory,type WooProduct,type WooVariation} from '@/lib/woocommerce';
+import {getWooCategories,getWooProducts,getWooVariations,type WooCategory,type WooVariation} from '@/lib/woocommerce';
 
 const rupees=(value:string|number|null|undefined)=>{const n=Number(value||0);return Number.isFinite(n)?Math.max(0,Math.round(n)):0;};
 const cleanSlug=(value:string,id:number)=>{const s=value.trim().toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,180);return s||`woocommerce-${id}`;};
