@@ -497,7 +497,7 @@ model AdminRolePermission {
   roleId String
   permissionId String
   role AdminRole @relation(fields: [roleId], references: [id], onDelete: Cascade)
-  permission AdminPermission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+  permission AdminRolePermission[]
   @@id([roleId, permissionId])
 }
 model Notification {
@@ -603,5 +603,12 @@ model Settings {
   id String @id @default(cuid())
   key String @unique
   value Json
+  updatedAt DateTime @updatedAt
+}
+model NewsletterSubscriber {
+  id String @id @default(cuid())
+  email String @unique
+  active Boolean @default(true)
+  createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
