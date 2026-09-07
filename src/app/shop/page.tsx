@@ -2,6 +2,8 @@ import Link from 'next/link';
 import {getActiveCms,getStorefrontCategories,getStorefrontProducts} from '@/lib/storefront-data';
 import {ShopFilters} from '@/components/ShopFilters';
 
+export const dynamic = 'force-dynamic';
+
 export default async function Shop(){
  const [products,categories,hero]=await Promise.all([getStorefrontProducts(),getStorefrontCategories(),getActiveCms('shop.hero')]);
  return <div className="storefront-page">
