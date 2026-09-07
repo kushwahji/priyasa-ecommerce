@@ -1,0 +1,4 @@
+import {NextResponse} from 'next/server';
+import {cookies} from 'next/headers';
+import {db} from '@/lib/db';
+export async function GET(){const jar=await cookies();const id=jar.get('priyasa_local_user_id')?.value;const phone=jar.get('priyasa_mobile')?.value;if(!id&&!phone)return NextResponse.json({error:'Authentication required'},{status:401});const user=id?await db.user.findUnique({where:{id},select:{id:true}}):await db.user.findUnique({where:{phone},select:{id:true}});if(!user)return NextResponse.json({error:'Authentication required'},{status:401});const orders=await db.order.findMany({where:{userId:user.id},orderBy:{createdAt:'desc'},take:50,include:{items:{include:{variant:{include:{product:{include:{images:{orderBy:{sortOrder:'asc'},take:1}}}}}}},payment:true,shipment:true,address:true,statusHistory:{orderBy:{createdAt:'desc'},take:1}}});return NextResponse.json({data:orders});}
