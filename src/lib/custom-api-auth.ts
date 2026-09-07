@@ -1,0 +1,4 @@
+import { NextResponse } from 'next/server';
+import { getConnectionByApiKey, logCustomRequest, type CustomConnection } from '@/lib/custom-api';
+export async function authenticateCustomApi(req:Request,scope:string){const auth=req.headers.get('authorization')||'';const key=auth.startsWith('Bearer ')?auth.slice(7):req.headers.get('x-commerce-api-key')||'';const c=key?await getConnectionByApiKey(key):null;if(!c||!JSON.parse(c.scopes||'[]').includes(scope)&&!JSON.parse(c.scopes||'[]').includes('*')){await logCustomRequest(c,req,401);return {connection:null,response:NextResponse.json({success:false,error:'Unauthorized'},{status:401})};}return {connection:c,response:null};}
+export async function finishCustomApi(req:Request,c:CustomConnection|null,status:number){await logCustomRequest(c,req,status);}
