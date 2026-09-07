@@ -17,7 +17,7 @@ export default function ManualOrder(){
     productName:p.name,
     price:v.price??p.salePrice,
     available:v.stock-v.reserved,
-   }))))
+   })))) )
    .catch(()=>setMsg('Unable to load catalog'));
  },[]);
 
