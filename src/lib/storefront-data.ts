@@ -1,8 +1,9 @@
 import {db} from '@/lib/db';
 import type {Product} from '@/lib/catalog';
+import type {Prisma} from '@prisma/client';
 
 const activeWindow=(now:Date)=>({active:true,OR:[{startsAt:null},{startsAt:{lte:now}}],AND:[{OR:[{endsAt:null},{endsAt:{gte:now}}]}]});
-const productInclude={category:true,variants:{orderBy:{stock:'desc'}},images:{orderBy:{sortOrder:'asc'}}};
+const productInclude = {category:true,variants:{orderBy:{stock:'desc'}},images:{orderBy:{sortOrder:'asc'}}} satisfies Prisma.ProductInclude;
 
 function mapProduct(p:any):Product{
  const variant=p.variants?.find((v:any)=>v.stock-v.reserved>0)||p.variants?.[0];
