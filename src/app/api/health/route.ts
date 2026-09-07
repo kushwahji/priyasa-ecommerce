@@ -9,9 +9,12 @@ const configured = (name:string) => Boolean(process.env[name]?.trim());
 export async function GET(){
   const startedAt = Date.now();
   const databaseConfigured = configured('DATABASE_URL');
+  const sessionSecretConfigured = configured('SESSION_SECRET');
+  const adminEnvironmentConfigured = configured('ADMIN_EMAIL') && configured('ADMIN_PASSWORD') && configured('ADMIN_PHONE');
   const environment = {
     databaseUrl:databaseConfigured,
-    sessionSecret:configured('SESSION_SECRET'),
+    sessionSecret:sessionSecretConfigured,
+    adminCredentials:adminEnvironmentConfigured,
   };
 
   if (!databaseConfigured) {
@@ -25,10 +28,14 @@ export async function GET(){
 
   try {
     await db.$queryRaw`SELECT 1`;
+    const admin = adminEnvironmentConfigured
+      ? await db.user.findFirst({where:{role:'ADMIN'},select:{id:true}})
+      : null;
     return NextResponse.json({
       ok:true,
       service:'priyasa-commerce',
       database:'up',
+      adminUser:adminEnvironmentConfigured ? (admin ? 'present' : 'missing') : 'not_configured',
       latencyMs:Date.now()-startedAt,
       environment,
     },{headers:{'Cache-Control':'no-store'}});
