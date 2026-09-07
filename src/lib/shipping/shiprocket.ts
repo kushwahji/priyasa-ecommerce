@@ -16,7 +16,7 @@ export async function checkPincode(input:{pickupPincode:string;deliveryPincode:s
     amount:best?.rate||0,
     etaDays:best?.etaDays,
     courier:best?.name,
-    codAvailable:couriers.some(x=>x.codAvailable),
+    codAvailable:couriers.some((x:{codAvailable:boolean})=>x.codAvailable),
     couriers
   };
 }
