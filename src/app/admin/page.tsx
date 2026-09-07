@@ -17,6 +17,7 @@ function initials(name:string){return name.split(/\s+/).map(x=>x[0]).slice(0,2).
 export default async function Admin(){
   const session=await getSession();
   if(!session||!['ADMIN','STAFF'].includes(session.role))redirect('/admin/login');
+  const adminUser=await db.user.findUnique({where:{id:session.userId},select:{name:true,email:true,phone:true}});
 
   const now=new Date();
   const sevenDaysAgo=new Date(now.getTime()-7*86400000);
@@ -57,6 +58,8 @@ export default async function Admin(){
   const donutColors=['#19a27b','#1c91d1','#39a4b4','#f0b33e','#df3b62'];
   const donutGradient=statusCounts.map((count,i)=>{const start=(cursor/totalForDonut)*100;cursor+=count;const end=(cursor/totalForDonut)*100;return `${donutColors[i]} ${start}% ${end}%`}).join(',');
   const statusLabels=[['Delivered',statusCounts[0]],['Processing',statusCounts[1]],['Shipped',statusCounts[2]],['Pending',statusCounts[3]],['Cancelled',statusCounts[4]]];
+  const adminName=adminUser?.name||'Admin';
+  const adminEmail=adminUser?.email||adminUser?.phone||'admin@priyasa.com';
 
   return <div className="dashboard-v2">
     <aside className="dashboard-sidebar">
@@ -72,7 +75,7 @@ export default async function Admin(){
         <input className="dashboard-search" aria-label="Search admin" placeholder="Search orders, products, customers..." />
         <span className="dashboard-top-spacer" />
         <button className="dashboard-top-action" type="button" aria-label="Notifications">♧<span className="dashboard-notification">{pending>99?'99+':pending}</span></button>
-        <div className="dashboard-profile"><span className="dashboard-avatar">{initials(session.name||'Admin')}</span><div><strong>{session.name||'Admin'}</strong><small>{session.email||'admin@priyasa.com'}</small></div><span className="dashboard-caret">⌄</span></div>
+        <div className="dashboard-profile"><span className="dashboard-avatar">{initials(adminName)}</span><div><strong>{adminName}</strong><small>{adminEmail}</small></div><span className="dashboard-caret">⌄</span></div>
       </header>
 
       <main className="dashboard-main">
@@ -94,7 +97,7 @@ export default async function Admin(){
             <div className="dashboard-chart">
               <svg viewBox={`0 0 ${chartW} ${chartH}`} role="img" aria-label="Seven day revenue chart">
                 {[0,1,2,3,4].map(i=>{const y=padT+(plotH*i/4);return <g key={i}><line className="dashboard-chart-grid" x1={padL} x2={chartW-padR} y1={y} y2={y}/><text className="dashboard-chart-axis" x="3" y={y+3}>{money(Math.round(maxDaily*(1-i/4)))}</text></g>})}
-                {points.map((p,i)=><rect key={i} className="dashboard-chart-bar" x={p.x-barWidth/2} y={padT+plotH-(p.value/maxDaily)*plotH} width={barWidth} height={(p.value/maxDaily)*plotH} rx="3"/>) }
+                {points.map((p,i)=><rect key={i} className="dashboard-chart-bar" x={p.x-barWidth/2} y={padT+plotH-(p.value/maxDaily)*plotH} width={barWidth} height={(p.value/maxDaily)*plotH} rx="3"/>)}
                 <path className="dashboard-chart-line" d={linePath}/>
                 {points.map((p,i)=><g key={`point-${i}`}><circle className="dashboard-chart-dot" cx={p.x} cy={p.y} r="3.5"/><text className="dashboard-chart-axis" textAnchor="middle" x={p.x} y={chartH-9}>{labels[i]}</text></g>)}
               </svg>
@@ -132,9 +135,7 @@ export default async function Admin(){
           </div>
         </section>
 
-        <div className="dashboard-module-strip">
-          {nav.slice(3,11).map(([label,href])=><Link className="dashboard-module-card" href={href} key={href}><strong>{label}</strong><span>Open →</span></Link>)}
-        </div>
+        <div className="dashboard-module-strip">{nav.slice(3,11).map(([label,href])=><Link className="dashboard-module-card" href={href} key={href}><strong>{label}</strong><span>Open →</span></Link>)}</div>
         <div className="dashboard-footer-note">PRIYASA Commerce Control Center · {coupons} active coupons · {cmsSections} live homepage sections · {categories} categories · {lowStock} low-stock variants · {failedPayments} failed payments in the last 7 days · {inTransit} shipments in transit</div>
         <AdminDemoCleanup/>
       </main>
