@@ -1,1 +1,22 @@
-import type { MetadataRoute } from 'next';import {products} from '@/lib/catalog';export default function sitemap():MetadataRoute.Sitemap{const base=process.env.NEXT_PUBLIC_APP_URL||'http://localhost:3000';return [{url:base},{url:`${base}/shop`},{url:`${base}/new-arrivals`},{url:`${base}/offers`},{url:`${base}/about`},{url:`${base}/contact`},...products.map(p=>({url:`${base}/product/${p.slug}`,lastModified:new Date()}))];}
+import type { MetadataRoute } from 'next';
+import { getStorefrontProducts } from '@/lib/storefront-data';
+
+export const dynamic = 'force-dynamic';
+
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const base = process.env.NEXT_PUBLIC_APP_URL || 'https://staging.priyasa.in';
+  const products = await getStorefrontProducts();
+
+  return [
+    { url: base, lastModified: new Date() },
+    { url: `${base}/shop`, lastModified: new Date() },
+    { url: `${base}/new-arrivals`, lastModified: new Date() },
+    { url: `${base}/offers`, lastModified: new Date() },
+    { url: `${base}/about`, lastModified: new Date() },
+    { url: `${base}/contact`, lastModified: new Date() },
+    ...products.map((p) => ({
+      url: `${base}/product/${p.slug}`,
+      lastModified: new Date(),
+    })),
+  ];
+}
