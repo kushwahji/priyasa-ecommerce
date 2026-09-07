@@ -1,147 +1,55 @@
-# Priyasa Ecommerce
+# PRIYASA Ecommerce
 
-Production-ready fashion ecommerce platform for Priyasa.
+Production-oriented Indian fashion commerce platform matching the supplied Priyasa storefront direction.
 
-## Vision
+## Implemented in `main`
 
-Priyasa is being built as a mobile-first Indian fashion commerce platform with a high-quality storefront, secure checkout, customer accounts, administration, WhatsApp commerce, Meta marketing automation, AI-assisted shopping, SEO, analytics, and production-grade reliability.
+- Next.js App Router + TypeScript foundation
+- Priyasa responsive fashion storefront with announcement bar, navigation, hero, categories, offers and best sellers
+- Shop and category listing routes
+- Product detail with size/color selection UI and cart action
+- Browser-persistent cart with discount/shipping calculation
+- Checkout address flow with server-side order creation
+- PostgreSQL + Prisma transactional commerce schema
+- Inventory reservation during order creation
+- Coupon model and `WELCOME10` seed
+- Customer account, wishlist and order tracking entry points
+- Protected admin dashboard with ADMIN/STAFF RBAC
+- Admin product, order, inventory, CMS and marketing control centers
+- Server-side Razorpay order creation
+- Independent Razorpay payment signature verification
+- Razorpay webhook signature verification and payment/order state transitions
+- SEO metadata, sitemap and robots policy
+- Vitest unit tests and GitHub Actions CI
+- Secrets excluded from source control with `.env.example`
 
-## Planned Stack
+## Routes
 
-- Next.js App Router + TypeScript
-- Tailwind CSS + accessible component system
-- Server-side rendering and SEO-first product/category pages
-- Relational database with migrations and transactional commerce operations
-- Razorpay for payments
-- Meta WhatsApp Business Platform for conversational commerce
-- Meta Graph API for Facebook/Instagram marketing automation
-- AI provider abstraction for shopping and marketing assistance
+Storefront: `/`, `/shop`, `/new-arrivals`, `/category/[slug]`, `/product/[slug]`, `/offers`, `/cart`, `/checkout`, `/account`, `/wishlist`, `/track-order`, `/about`, `/contact`.
 
-## Core Commerce
+Admin: `/admin`, `/admin/login`, `/admin/products`, `/admin/orders`, `/admin/inventory`, `/admin/cms`, `/admin/marketing`.
 
-- Home, categories, collections, offers, and campaigns
-- Product pages with variants, SKU, pricing, inventory, media, and structured data
-- Search, filters, sorting, wishlist, cart, and checkout
-- Customer accounts, addresses, orders, returns, refunds, and notifications
-- Coupons, discounts, taxes, invoices, shipping, and payment records
-- Idempotent payment and webhook processing
+API: `/api/health`, `/api/products`, `/api/orders`, `/api/admin/products`, `/api/auth/admin`, `/api/payments/razorpay`, `/api/payments/razorpay/verify`, `/api/webhooks/razorpay`.
 
-## Security
+## Local setup
 
-- Secure HTTP-only session cookies
-- Server-side authorization and admin RBAC
-- Password hashing and account recovery
-- Input/schema validation and rate limiting
-- Webhook signature verification
-- Idempotency for financial and external-provider operations
-- Secrets kept outside source control
-- Audit logging for sensitive administrative actions
+1. Install Node.js 20+ and PostgreSQL.
+2. Copy `.env.example` to `.env` and configure `DATABASE_URL` and a strong `SESSION_SECRET`.
+3. Install dependencies: `npm install`.
+4. Create schema: `npm run db:push`.
+5. Seed catalog and optional admin account: `ADMIN_PHONE=... ADMIN_PASSWORD=... npm run db:seed`.
+6. Start: `npm run dev`.
 
-## SEO & Performance
+Never put provider credentials in Git. Configure Razorpay secrets and webhook secret in deployment settings before enabling live payments.
 
-- Server-rendered indexable pages
-- Metadata, canonical URLs, Open Graph, sitemap, and robots
-- Product, Offer, Breadcrumb, and Organization JSON-LD
-- Clean slugs and redirect handling
-- Optimized images, accessibility, and Core Web Vitals
+## Commerce state model
 
-## Integrations
+Orders progress through server-controlled states such as `PAYMENT_PENDING → CONFIRMED → PROCESSING → SHIPPED → DELIVERED`. The client cannot mark an order paid. Razorpay verification/webhooks are authoritative for payment confirmation.
 
-### Razorpay
+## Architecture
 
-Create payment orders server-side, verify signatures independently, process webhooks idempotently, synchronize captures/refunds, and reconcile payment state.
+The Prisma schema covers users, sessions, addresses, categories, products, variants, inventory movements, carts, wishlists, coupons, orders, payments, refunds, shipments, returns, reviews, CMS sections, pages, redirects and audit logs. Provider integrations remain behind server routes so credentials and financial state are never trusted from the browser.
 
-### WhatsApp
+## Next production phase
 
-Shared Meta webhook architecture for verification, authenticated events, customer identity resolution, product discovery, cart assistance, order status, payment links, abandoned-cart flows, support handoff, and message auditing.
-
-### Meta Ads
-
-Support connected business/ad accounts, catalog synchronization, Pixel/Conversions API, campaign and ad-set workflows, audiences, creative/copy variants, approval-before-publish, performance analytics, and automated optimization rules.
-
-### AI
-
-AI capabilities are advisory and policy-controlled: product discovery, recommendations, size/style assistance, customer support, product copy, SEO metadata, ad copy, creative briefs, campaign suggestions, and merchandising insights. Sensitive operations require explicit server-side authorization.
-
-## Admin Portal
-
-Dashboard, products, categories, collections, inventory, orders, customers, coupons, reviews, returns/refunds, shipping, payments, CMS, SEO, WhatsApp, Meta, ads, AI, analytics, reports, settings, users/roles/permissions, integrations, webhooks, and audit logs.
-
-## Suggested Structure
-
-```text
-src/
-  app/
-    (storefront)/
-    account/
-    checkout/
-    admin/
-    api/
-  components/
-  features/
-    auth/
-    catalog/
-    cart/
-    checkout/
-    orders/
-    payments/
-    wishlist/
-    reviews/
-    whatsapp/
-    marketing/
-    ads/
-    ai/
-  lib/
-    auth/
-    db/
-    payments/
-    meta/
-    whatsapp/
-    shipping/
-    analytics/
-  server/
-  types/
-  styles/
-
-tests/
-  unit/
-  integration/
-  e2e/
-
-.github/
-  workflows/
-
-.env.example
-README.md
-```
-
-## Engineering Principles
-
-1. Treat all browser input as untrusted.
-2. Keep business rules authoritative on the server.
-3. Never trust client-provided payment amounts or order state.
-4. Authenticate and verify external webhooks.
-5. Make payment, order, and webhook processing idempotent.
-6. Keep provider integrations behind explicit service boundaries.
-7. Never commit credentials or secrets.
-8. Enforce customer and administrator authorization server-side.
-9. Log security-sensitive and financial state transitions without exposing secrets.
-10. Test critical checkout, payment, authentication, authorization, and webhook flows end-to-end.
-
-## Delivery Roadmap
-
-1. Foundation: Next.js, TypeScript, UI system, database, configuration, CI.
-2. Commerce: catalog, inventory, cart, checkout, customers, orders.
-3. Security & payments: authentication, RBAC, Razorpay, webhooks, refunds.
-4. SEO & content: CMS primitives, structured data, metadata, sitemap, performance.
-5. WhatsApp & Meta: integrations, webhooks, catalog, conversational commerce, ads.
-6. AI & growth: shopping assistant, recommendations, creative/copy automation, analytics.
-7. Production hardening: observability, backups, resilience, security, E2E, deployment, monitoring.
-
-## Development
-
-The implementation will be added incrementally with small, reviewable commits. Provider credentials belong in deployment secrets or environment configuration and must never be committed to Git.
-
-## License
-
-Private/proprietary Priyasa project unless a different license is explicitly selected later.
+The foundation is intentionally provider-ready. Before launch, connect the real OTP provider, shipping/carrier provider, object storage/CDN, Meta WhatsApp/Ads credentials, AI provider, transactional email, Redis/queue worker, observability, backups and deployment environment. These integrations require real business credentials and cannot safely be fabricated in source code.
