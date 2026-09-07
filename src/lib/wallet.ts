@@ -1,8 +1,61 @@
-import {db} from '@/lib/db';
+import { db } from '@/lib/db';
 
-let ready:Promise<void>|null=null;
-export async function ensureWalletTables(){if(ready)return ready;ready=(async()=>{await db.$executeRawUnsafe(`CREATE TABLE IF NOT EXISTS priyasa_wallets (id VARCHAR(191) NOT NULL PRIMARY KEY, user_id VARCHAR(191) NOT NULL UNIQUE, balance INT NOT NULL DEFAULT 0, currency VARCHAR(3) NOT NULL DEFAULT 'INR', created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, INDEX idx_wallet_user (user_id)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4`);await db.$executeRawUnsafe(`CREATE TABLE IF NOT EXISTS priyasa_wallet_transactions (id VARCHAR(191) NOT NULL PRIMARY KEY, wallet_id VARCHAR(191) NOT NULL, type VARCHAR(30) NOT NULL, amount INT NOT NULL, balance_after INT NOT NULL, reference_type VARCHAR(60) NULL, reference_id VARCHAR(191) NULL, description VARCHAR(255) NULL, created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, INDEX idx_wallet_tx_wallet (wallet_id, created_at), INDEX idx_wallet_tx_reference (reference_type, reference_id)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4`);})();try{await ready}catch(e){ready=null;throw e}}
-export async function getWallet(userId:string){await ensureWalletTables();const rows=await db.$queryRawUnsafe<any[]>(`SELECT id,user_id as userId,balance,currency,created_at as createdAt,updated_at as updatedAt FROM priyasa_wallets WHERE user_id=? LIMIT 1`,userId);if(rows[0])return rows[0];const id=crypto.randomUUID();await db.$executeRawUnsafe(`INSERT INTO priyasa_wallets (id,user_id,balance,currency) VALUES (?,?,0,'INR')`,id,userId);return (await db.$queryRawUnsafe<any[]>(`SELECT id,user_id as userId,balance,currency,created_at as createdAt,updated_at as updatedAt FROM priyasa_wallets WHERE user_id=? LIMIT 1`,userId))[0]}
-export async function listWalletTransactions(userId:string){const wallet=await getWallet(userId);return {wallet,transactions:await db.$queryRawUnsafe<any[]>(`SELECT id,type,amount,balance_after as balanceAfter,reference_type as referenceType,reference_id as referenceId,description,created_at as createdAt FROM priyasa_wallet_transactions WHERE wallet_id=? ORDER BY created_at DESC LIMIT 100`,wallet.id)}}
-export async function debitWallet(userId:string,amount:number,referenceId:string,description:string,tx:any=db){if(amount<=0)throw new Error('Invalid wallet amount');await ensureWalletTables();const walletRows=await tx.$queryRawUnsafe<any[]>(`SELECT id,balance FROM priyasa_wallets WHERE user_id=? FOR UPDATE`,userId);if(!walletRows[0]){const id=crypto.randomUUID();await tx.$executeRawUnsafe(`INSERT INTO priyasa_wallets (id,user_id,balance,currency) VALUES (?,?,0,'INR')`,id,userId);walletRows.push({id,balance:0})}const wallet=walletRows[0];if(Number(wallet.balance)<amount)throw new Error('Insufficient Priyasa Wallet balance.');const balanceAfter=Number(wallet.balance)-amount;await tx.$executeRawUnsafe(`UPDATE priyasa_wallets SET balance=?,updated_at=CURRENT_TIMESTAMP WHERE id=?`,balanceAfter,wallet.id);await tx.$executeRawUnsafe(`INSERT INTO priyasa_wallet_transactions (id,wallet_id,type,amount,balance_after,reference_type,reference_id,description) VALUES (?,?,?,?,?,?,?,?)`,crypto.randomUUID(),wallet.id,'DEBIT',amount,balanceAfter,'ORDER',referenceId,description);return balanceAfter}
-export async function creditWallet(userId:string,amount:number,referenceType:string,referenceId:string,description:string,tx:any=db){if(amount<=0)throw new Error('Invalid wallet amount');await ensureWalletTables();const wallet=await getWallet(userId);const balanceAfter=Number(wallet.balance)+amount;await tx.$executeRawUnsafe(`UPDATE priyasa_wallets SET balance=?,updated_at=CURRENT_TIMESTAMP WHERE id=?`,balanceAfter,wallet.id);await tx.$executeRawUnsafe(`INSERT INTO priyasa_wallet_transactions (id,wallet_id,type,amount,balance_after,reference_type,reference_id,description) VALUES (?,?,?,?,?,?,?,?)`,crypto.randomUUID(),wallet.id,'CREDIT',amount,balanceAfter,referenceType,referenceId,description);return balanceAfter}
+let ready: Promise<void> | null = null;
+
+export async function ensureWalletTables() {
+  if (ready) return ready;
+  ready = (async () => {
+    await db.$executeRawUnsafe(`CREATE TABLE IF NOT EXISTS priyasa_wallets (id VARCHAR(191) NOT NULL PRIMARY KEY, user_id VARCHAR(191) NOT NULL UNIQUE, balance INT NOT NULL DEFAULT 0, currency VARCHAR(3) NOT NULL DEFAULT 'INR', created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, INDEX idx_wallet_user (user_id)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4`);
+    await db.$executeRawUnsafe(`CREATE TABLE IF NOT EXISTS priyasa_wallet_transactions (id VARCHAR(191) NOT NULL PRIMARY KEY, wallet_id VARCHAR(191) NOT NULL, type VARCHAR(30) NOT NULL, amount INT NOT NULL, balance_after INT NOT NULL, reference_type VARCHAR(60) NULL, reference_id VARCHAR(191) NULL, description VARCHAR(255) NULL, created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, INDEX idx_wallet_tx_wallet (wallet_id, created_at), INDEX idx_wallet_tx_reference (reference_type, reference_id)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4`);
+  })();
+  try {
+    await ready;
+  } catch (error) {
+    ready = null;
+    throw error;
+  }
+}
+
+export async function getWallet(userId: string) {
+  await ensureWalletTables();
+  const rows = await db.$queryRawUnsafe<any[]>(`SELECT id,user_id as userId,balance,currency,created_at as createdAt,updated_at as updatedAt FROM priyasa_wallets WHERE user_id=? LIMIT 1`, userId);
+  if (rows[0]) return rows[0];
+  const id = crypto.randomUUID();
+  await db.$executeRawUnsafe(`INSERT INTO priyasa_wallets (id,user_id,balance,currency) VALUES (?,?,0,'INR')`, id, userId);
+  return (await db.$queryRawUnsafe<any[]>(`SELECT id,user_id as userId,balance,currency,created_at as createdAt,updated_at as updatedAt FROM priyasa_wallets WHERE user_id=? LIMIT 1`, userId))[0];
+}
+
+export async function listWalletTransactions(userId: string) {
+  const wallet = await getWallet(userId);
+  return {
+    wallet,
+    transactions: await db.$queryRawUnsafe<any[]>(`SELECT id,type,amount,balance_after as balanceAfter,reference_type as referenceType,reference_id as referenceId,description,created_at as createdAt FROM priyasa_wallet_transactions WHERE wallet_id=? ORDER BY created_at DESC LIMIT 100`, wallet.id),
+  };
+}
+
+export async function debitWallet(userId: string, amount: number, referenceId: string, description: string, tx: any = db) {
+  if (amount <= 0) throw new Error('Invalid wallet amount');
+  await ensureWalletTables();
+  const walletRows = (await tx.$queryRawUnsafe(`SELECT id,balance FROM priyasa_wallets WHERE user_id=? FOR UPDATE`, userId)) as any[];
+  if (!walletRows[0]) {
+    const id = crypto.randomUUID();
+    await tx.$executeRawUnsafe(`INSERT INTO priyasa_wallets (id,user_id,balance,currency) VALUES (?,?,0,'INR')`, id, userId);
+    walletRows.push({ id, balance: 0 });
+  }
+  const wallet = walletRows[0];
+  if (Number(wallet.balance) < amount) throw new Error('Insufficient Priyasa Wallet balance.');
+  const balanceAfter = Number(wallet.balance) - amount;
+  await tx.$executeRawUnsafe(`UPDATE priyasa_wallets SET balance=?,updated_at=CURRENT_TIMESTAMP WHERE id=?`, balanceAfter, wallet.id);
+  await tx.$executeRawUnsafe(`INSERT INTO priyasa_wallet_transactions (id,wallet_id,type,amount,balance_after,reference_type,reference_id,description) VALUES (?,?,?,?,?,?,?,?)`, crypto.randomUUID(), wallet.id, 'DEBIT', amount, balanceAfter, 'ORDER', referenceId, description);
+  return balanceAfter;
+}
+
+export async function creditWallet(userId: string, amount: number, referenceType: string, referenceId: string, description: string, tx: any = db) {
+  if (amount <= 0) throw new Error('Invalid wallet amount');
+  await ensureWalletTables();
+  const wallet = await getWallet(userId);
+  const balanceAfter = Number(wallet.balance) + amount;
+  await tx.$executeRawUnsafe(`UPDATE priyasa_wallets SET balance=?,updated_at=CURRENT_TIMESTAMP WHERE id=?`, balanceAfter, wallet.id);
+  await tx.$executeRawUnsafe(`INSERT INTO priyasa_wallet_transactions (id,wallet_id,type,amount,balance_after,reference_type,reference_id,description) VALUES (?,?,?,?,?,?,?,?)`, crypto.randomUUID(), wallet.id, 'CREDIT', amount, balanceAfter, referenceType, referenceId, description);
+  return balanceAfter;
+}
