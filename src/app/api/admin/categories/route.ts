@@ -1,0 +1,7 @@
+import {NextResponse} from 'next/server';
+import {z} from 'zod';
+import {db} from '@/lib/db';
+import {requireAdminPermission} from '@/lib/auth';
+const schema=z.object({name:z.string().min(2).max(100),slug:z.string().regex(/^[a-z0-9-]+$/).max(100),description:z.string().max(500).optional(),imageUrl:z.string().url().optional(),parentId:z.string().optional()});
+export async function GET(){try{await requireAdminPermission('products.read');return NextResponse.json({data:await db.category.findMany({include:{_count:{select:{products:true}}},orderBy:{name:'asc'}})});}catch{return NextResponse.json({error:'Forbidden'},{status:403});}}
+export async function POST(req:Request){try{const s=await requireAdminPermission('products.write');const p=schema.safeParse(await req.json());if(!p.success)return NextResponse.json({error:'Invalid category',details:p.error.flatten()},{status:400});const c=await db.category.create({data:p.data});await db.auditLog.create({data:{userId:s.userId,action:'CREATE',entity:'Category',entityId:c.id}});return NextResponse.json({data:c},{status:201});}catch(e){return NextResponse.json({error:e instanceof Error&&e.message.includes('FORBIDDEN')?'Forbidden':'Unable to create category'},{status:e instanceof Error&&e.message.includes('FORBIDDEN')?403:409});}}
