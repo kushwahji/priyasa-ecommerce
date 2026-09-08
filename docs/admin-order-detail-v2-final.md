@@ -1,0 +1,1 @@
+Final note: the order detail page keeps its existing live database-backed record and operational controls; this step adds only the premium Commerce OS visual layer and responsive treatment.
