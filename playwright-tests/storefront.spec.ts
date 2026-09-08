@@ -16,6 +16,27 @@ const publicRoutes = [
   '/checkout',
 ];
 
+const adminControlRoutes = [
+  '/admin/orders',
+  '/admin/products',
+  '/admin/inventory',
+  '/admin/customers',
+  '/admin/marketing',
+  '/admin/automations',
+  '/admin/analytics',
+  '/admin/returns-refunds',
+  '/admin/cms',
+  '/admin/settings',
+  '/admin/reviews',
+  '/admin/seo',
+  '/admin/coupons-offers',
+  '/admin/products/woocommerce',
+  '/admin/products/import',
+  '/admin/meta-ads',
+  '/admin/whatsapp',
+  '/admin/audit-log',
+];
+
 test('public customer routes are reachable', async ({ page }) => {
   for (const route of publicRoutes) {
     const response = await page.goto(route, { waitUntil: 'domcontentloaded' });
@@ -53,6 +74,15 @@ test('admin redirects unauthenticated visitors', async ({ page }) => {
   await expect(page).toHaveURL(/admin\/login/);
 });
 
+test('all admin control routes are guarded without server errors', async ({ page }) => {
+  for (const route of adminControlRoutes) {
+    const response = await page.goto(route, { waitUntil: 'domcontentloaded' });
+    expect(response?.status(), `${route} returned an HTTP error`).toBeLessThan(500);
+    await expect(page).toHaveURL(/admin\/login/);
+    await expect(page.locator('body')).not.toContainText('Application error');
+  }
+});
+
 test.describe('mobile app-like navigation', () => {
   test.use({ viewport: devices['iPhone 13'].viewport, userAgent: devices['iPhone 13'].userAgent, isMobile: true });
 
@@ -66,5 +96,10 @@ test.describe('mobile app-like navigation', () => {
       const box = await links.nth(i).boundingBox();
       if (box) expect(box.height).toBeGreaterThanOrEqual(24);
     }
+  });
+
+  test('mobile admin shell presents compact navigation', async ({ page }) => {
+    await page.goto('/admin/reviews');
+    await expect(page).toHaveURL(/admin\/login/);
   });
 });
