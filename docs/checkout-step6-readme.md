@@ -1,0 +1,1 @@
+Step 6 is the checkout and payment reference pass. It is a presentation-only layer over the existing production checkout APIs.
