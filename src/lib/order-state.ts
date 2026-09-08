@@ -1,6 +1,7 @@
 import { db } from '@/lib/db';
 import { triggerAutomationEvent } from '@/lib/automation-engine';
 import { queueConnectionEvent, toNormalizedStatus } from '@/lib/custom-api';
+import { notifyOrderStatus } from '@/lib/customer-notifications';
 
 export async function recordOrderStatus(
   orderId: string,
@@ -35,6 +36,10 @@ export async function recordOrderStatus(
   await triggerAutomationEvent('order.status_changed', payload);
   await triggerAutomationEvent(`order.${toNormalizedStatus(result.updated.status)}`, payload);
 
+  // Customer notifications are best-effort: a provider outage must never roll back an order state change.
+  try { await notifyOrderStatus(orderId, String(result.updated.status), String(result.from), note); }
+  catch (error) { console.error('[PRIYASA notifications] order status delivery failed', error instanceof Error ? error.message : error); }
+
   if (emitExternal) {
     await queueConnectionEvent('order.updated', payload);
     await queueConnectionEvent(`order.${toNormalizedStatus(result.updated.status)}`, payload);
@@ -45,6 +50,6 @@ export async function recordOrderStatus(
 
 export async function recordFulfillmentStatus(orderId: string, status: any, note?: string) {
   const order = await db.order.update({ where: { id: orderId }, data: { fulfillmentStatus: status } });
-  await db.auditLog.create({ data: { action: 'FULFILLMENT_STATUS_CHANGED', entity: 'Order', entityId: orderId, metadata: { status, note } } });
+  await db.auditLog.create({ action: 'FULFILLMENT_STATUS_CHANGED', entity: 'Order', entityId: orderId, metadata: { status, note } });
   return order;
 }
