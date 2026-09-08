@@ -1,13 +1,8 @@
 /* Admin routes share the root layout, so keep storefront chrome completely out of the admin experience. */
-body:has(.admin-shell){padding-bottom:0;background:#f8f4f4}
-body:has(.admin-shell)>.announcement,
-body:has(.admin-shell)>.site-header,
-body:has(.admin-shell)>.footer,
-body:has(.admin-shell)>.thank-you-footer,
-body:has(.admin-shell)>.copyright,
-body:has(.admin-shell)>.mobile-bottom-nav{display:none!important}
-body:has(.admin-shell)>main{margin:0;min-height:100vh}
-body:has(.admin-shell) .admin-shell{min-height:100vh}
+body:has(.admin-shell),body:has(.dashboard-v2){padding-bottom:0;background:#f6f7f9}
+body:has(.admin-shell)>.announcement,body:has(.admin-shell)>.site-header,body:has(.admin-shell)>.footer,body:has(.admin-shell)>.thank-you-footer,body:has(.admin-shell)>.copyright,body:has(.admin-shell)>.mobile-bottom-nav,body:has(.dashboard-v2)>.announcement,body:has(.dashboard-v2)>.site-header,body:has(.dashboard-v2)>.footer,body:has(.dashboard-v2)>.thank-you-footer,body:has(.dashboard-v2)>.copyright,body:has(.dashboard-v2)>.mobile-bottom-nav{display:none!important}
+body:has(.admin-shell)>main,body:has(.dashboard-v2)>main{margin:0;min-height:100vh}
+body:has(.admin-shell) .admin-shell{min-height:100vh}.dashboard-v2{min-height:100vh}
 body:has(.admin-shell) .admin-main{min-width:0;overflow-x:hidden}
 body:has(.admin-shell) .section-head h1{margin-top:4px}
 body:has(.admin-shell) .admin-nav a{transition:background .15s ease,color .15s ease;border-radius:6px}
