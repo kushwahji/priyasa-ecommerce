@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
-import AdminAppShell from '@/components/AdminAppShell';
 
+/** Admin modules own their operational shell; the root stylesheet supplies the shared Priyasa design system. */
 export default function AdminLayout({ children }: { children: ReactNode }) {
-  return <AdminAppShell>{children}</AdminAppShell>;
+  return children;
 }
