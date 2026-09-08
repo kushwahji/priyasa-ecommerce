@@ -1,0 +1,1 @@
+Admin order detail styles are wired through the root stylesheet on the implementation branch.
