@@ -14,12 +14,14 @@ export function SafeImage({ src, alt, onError, ...props }: SafeImageProps) {
     setCurrentSrc(src || FALLBACK);
   }, [src]);
 
+  const isLocal = currentSrc.startsWith('/') || currentSrc.startsWith('./');
+
   return (
     <Image
       {...props}
       src={currentSrc}
       alt={alt}
-      unoptimized
+      unoptimized={!isLocal}
       onError={(event) => {
         if (currentSrc !== FALLBACK) setCurrentSrc(FALLBACK);
         onError?.(event);
