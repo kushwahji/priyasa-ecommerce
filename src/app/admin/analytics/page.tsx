@@ -1,4 +1,4 @@
-import Link from 'next/link';import {redirect} from 'next/navigation';import {db} from '@/lib/db';import {getSession} from '@/lib/auth';import AdminAnalyticsDashboard from '@/components/AdminAnalyticsDashboard';import '../admin-analytics.css';
+import Link from 'next/link';import {redirect} from 'next/navigation';import {db} from '@/lib/db';import {getSession} from '@/lib/auth';import AdminAnalyticsDashboard from '@/components/AdminAnalyticsDashboard';import '../../admin-analytics.css';
 
 export const dynamic='force-dynamic';
 const PAID=['CONFIRMED','PROCESSING','SHIPPED','DELIVERED'] as const;
