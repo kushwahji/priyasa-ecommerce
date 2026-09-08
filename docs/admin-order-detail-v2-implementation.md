@@ -1,0 +1,1 @@
+Order detail visual implementation is scoped to the Commerce OS shell and preserves the existing live operational data and actions.
