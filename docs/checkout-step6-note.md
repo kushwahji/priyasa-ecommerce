@@ -1,0 +1,1 @@
+This step changes checkout presentation only; transaction logic is preserved.
