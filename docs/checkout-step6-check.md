@@ -1,0 +1,1 @@
+Checkout styling is ready for review.
