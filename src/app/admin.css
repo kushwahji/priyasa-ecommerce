@@ -1,11 +1,12 @@
-/* Admin routes share the root layout, so keep storefront chrome completely out of the admin experience. */
-body:has(.admin-shell),body:has(.dashboard-v2){padding-bottom:0;background:#f6f7f9}
-body:has(.admin-shell)>.announcement,body:has(.admin-shell)>.site-header,body:has(.admin-shell)>.footer,body:has(.admin-shell)>.thank-you-footer,body:has(.admin-shell)>.copyright,body:has(.admin-shell)>.mobile-bottom-nav,body:has(.dashboard-v2)>.announcement,body:has(.dashboard-v2)>.site-header,body:has(.dashboard-v2)>.footer,body:has(.dashboard-v2)>.thank-you-footer,body:has(.dashboard-v2)>.copyright,body:has(.dashboard-v2)>.mobile-bottom-nav{display:none!important}
+/* Global admin chrome. Module pages keep their existing business logic but inherit a consistent modern control-center surface. */
+body:has(.admin-shell),body:has(.dashboard-v2){padding-bottom:0;background:#f6f7fb;color:#17181c}
 body:has(.admin-shell)>main,body:has(.dashboard-v2)>main{margin:0;min-height:100vh}
-body:has(.admin-shell) .admin-shell{min-height:100vh}.dashboard-v2{min-height:100vh}
-body:has(.admin-shell) .admin-main{min-width:0;overflow-x:hidden}
-body:has(.admin-shell) .section-head h1{margin-top:4px}
-body:has(.admin-shell) .admin-nav a{transition:background .15s ease,color .15s ease;border-radius:6px}
-body:has(.admin-shell) .admin-nav a:hover{background:rgba(255,255,255,.08);color:#fff}
-body:has(.admin-shell) .admin-nav a[href="/admin/products/woocommerce"]{color:#fff;font-weight:700;background:rgba(255,255,255,.1)}
-@media(max-width:760px){body:has(.admin-shell) .admin-nav{top:0;z-index:30;box-shadow:0 2px 12px rgba(40,15,20,.12)}body:has(.admin-shell) .admin-main{padding:24px 14px 40px}body:has(.admin-shell) .section-head>div:last-child{display:flex!important;flex-wrap:wrap;margin-top:14px}body:has(.admin-shell) .section-head>div:last-child .button{flex:1 1 160px}body:has(.admin-shell) .stats{gap:10px}body:has(.admin-shell) .stat{padding:16px}body:has(.admin-shell) .stat strong{font-size:23px}}
+body:has(.admin-shell)>.announcement,body:has(.admin-shell)>.site-header,body:has(.admin-shell)>.footer,body:has(.admin-shell)>.thank-you-footer,body:has(.admin-shell)>.copyright,body:has(.admin-shell)>.mobile-bottom-nav,body:has(.dashboard-v2)>.announcement,body:has(.dashboard-v2)>.site-header,body:has(.dashboard-v2)>.footer,body:has(.dashboard-v2)>.thank-you-footer,body:has(.dashboard-v2)>.copyright,body:has(.dashboard-v2)>.mobile-bottom-nav{display:none!important}
+body:has(.admin-shell) .admin-shell{min-height:100vh}body:has(.admin-shell) .admin-main{min-width:0;overflow-x:hidden}
+body:has(.admin-shell) .admin-nav a{transition:all .16s ease;border-radius:9px}body:has(.admin-shell) .admin-nav a:hover{background:#25262d;color:#fff}
+body:has(.admin-shell) .admin-card,body:has(.admin-shell) .stat,body:has(.admin-shell) .form,body:has(.admin-shell) .filters{border-radius:14px;border-color:#e4e5ea;box-shadow:0 7px 24px rgba(20,20,25,.035)}
+body:has(.admin-shell) .button{border-radius:10px}body:has(.admin-shell) .input,body:has(.admin-shell) select,body:has(.admin-shell) textarea{border-radius:9px;border-color:#dedfe5;background:#fff}
+body:has(.admin-shell) .table{border:1px solid #e5e6eb;border-radius:12px;overflow:hidden;background:#fff}body:has(.admin-shell) .table th{background:#fafafd;color:#7d8089;text-transform:uppercase;font-size:9px;letter-spacing:.6px}body:has(.admin-shell) .table td{font-size:11px}
+body:has(.admin-shell) .section-head h1{font:normal 32px/1.15 Georgia,serif;color:#17181c}body:has(.admin-shell) .section-head p{color:#7d8089}
+body:has(.admin-shell) .admin-module-grid{gap:10px}body:has(.admin-shell) .admin-module{border-radius:12px;border-color:#e5e6eb;background:#fff;transition:transform .16s,box-shadow .16s}body:has(.admin-shell) .admin-module:hover{transform:translateY(-2px);box-shadow:0 12px 28px rgba(20,20,25,.06)}
+@media(max-width:760px){body:has(.admin-shell) .admin-nav{top:0;z-index:30;box-shadow:0 2px 12px rgba(40,15,20,.12)}body:has(.admin-shell) .admin-main{padding:24px 14px 40px}body:has(.admin-shell) .stats{gap:10px}body:has(.admin-shell) .stat{padding:16px}}
