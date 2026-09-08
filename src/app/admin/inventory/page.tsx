@@ -26,7 +26,7 @@ export default async function Inventory() {
         </nav>
       </aside>
       <main className={styles.main}>
-        <header className={styles.top}><input className={styles.search} placeholder="Search the control center…" aria-label="Search control center"/><span className={styles.topSpacer}/><Link className={styles.topLink} href="/admin/products">Catalog</Link><Link className={styles.topLink} href="/admin/orders">Orders</Link><span className={styles.avatar}>{s.name?.slice(0,1).toUpperCase() || 'A'}</span></header>
+        <header className={styles.top}><input className={styles.search} placeholder="Search the control center…" aria-label="Search control center"/><span className={styles.topSpacer}/><Link className={styles.topLink} href="/admin/products">Catalog</Link><Link className={styles.topLink} href="/admin/orders">Orders</Link><span className={styles.avatar}>A</span></header>
         <div className={styles.content}>
           <div className={styles.head}><div><div className={styles.kicker}>Operations / Inventory</div><h1>Stock control</h1><p>Live variant availability, reservations and transactional adjustments.</p></div><div className={styles.headActions}><Link className={styles.secondary} href="/admin/products">Manage catalog</Link><Link className={styles.primary} href="/admin/orders">View orders</Link></div></div>
           <div className={styles.stats}>
