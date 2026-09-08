@@ -1,0 +1,27 @@
+/* Final mobile reference alignment for PRIYASA. Presentation only; commerce logic remains unchanged. */
+@media (max-width:760px){
+  .site-header{height:78px!important;grid-template-columns:58px 1fr auto!important;padding:0 12px!important;border-bottom:1px solid #eee8e9!important}
+  .mobile-menu{border:0!important;background:transparent!important;width:52px!important;height:52px!important;border-radius:0!important}
+  .mobile-menu svg{width:32px!important;height:32px!important}
+  .site-header .brand-lockup{justify-content:center!important}
+  .site-header .brand-lockup .priyasa-mark{display:none!important}
+  .site-header .brand-wordmark strong{font-family:Georgia,serif!important;font-size:25px!important;letter-spacing:4px!important;color:#c91650!important;font-weight:500!important}
+  .site-header .brand-wordmark small{font-size:6px!important;letter-spacing:2px!important;color:#8c6b77!important}
+  .site-header .actions{gap:3px!important}
+  .site-header .actions .header-icon{width:38px!important;height:48px!important;display:grid!important;place-items:center!important}
+  .site-header .actions .header-icon svg{width:25px!important;height:25px!important}
+  .site-header .actions .header-help{display:none!important}
+  .site-header .actions .header-account{display:grid!important}
+  .mobile-drawer{width:min(86vw,360px)!important;padding:0 24px 28px!important}
+  .mobile-drawer-head{height:88px!important}
+  .mobile-drawer-head strong{font-family:Georgia,serif!important;font-size:24px!important;letter-spacing:4px!important;color:#8b1738!important;font-weight:500!important}
+  .mobile-drawer-head small{font-size:9px!important;letter-spacing:2px!important}
+  .mobile-drawer-search{margin:20px 0 8px!important;border:0!important;border-bottom:1px solid #e9e1e3!important;border-radius:0!important;background:transparent!important}
+  .mobile-drawer-search a{padding:15px 0!important;font-size:14px!important}
+  .mobile-drawer nav a{padding:17px 0!important;font-size:15px!important}
+  .mobile-drawer-foot{margin-top:20px!important}
+  .mobile-bottom-nav{height:72px!important;padding:7px 8px 9px!important}
+  .mobile-bottom-nav svg{width:28px!important;height:28px!important}
+  .home-reference-v4{padding-bottom:0!important}
+}
+@media (min-width:761px){.site-header .actions .header-account{display:grid!important}}
