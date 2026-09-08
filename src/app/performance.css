@@ -1,0 +1,15 @@
+/* #12 Performance: keep below-the-fold storefront sections out of the initial render cost. */
+.storefront-page>.section:not(:first-child),
+.storefront-page>.related-products,
+.storefront-page>.recommendation-rail,
+.footer,
+.thank-you-footer{content-visibility:auto;contain-intrinsic-size:1px 520px}
+
+.product-grid,.category-grid,.feature-grid{contain:layout paint}
+
+img{height:auto}
+
+@media (prefers-reduced-motion: reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+}
