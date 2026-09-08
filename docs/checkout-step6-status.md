@@ -1,0 +1,1 @@
+Checkout reference styling is committed on step6-checkout-v4. CI validation remains required before merge.

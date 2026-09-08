@@ -1,0 +1,1 @@
+Step 6 checkout reference implementation is ready for CI validation.
