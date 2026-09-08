@@ -1,22 +1,38 @@
 import type { MetadataRoute } from 'next';
-import { getStorefrontProducts } from '@/lib/storefront-data';
+import { getStorefrontCategories, getStorefrontProducts } from '@/lib/storefront-data';
 
 export const dynamic = 'force-dynamic';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const base = process.env.NEXT_PUBLIC_APP_URL || 'https://staging.priyasa.in';
-  const products = await getStorefrontProducts();
-
+  const base = process.env.NEXT_PUBLIC_APP_URL || 'https://priyasa.com';
+  const [categories, products] = await Promise.all([
+    getStorefrontCategories(),
+    getStorefrontProducts({ limit: 10000 }),
+  ]);
+  const staticRoutes = [
+    '', '/shop', '/new-arrivals', '/offers', '/collections', '/about', '/contact',
+    '/size-guide', '/faq', '/help', '/track-order', '/shipping-policy',
+    '/return-refund-policy', '/cancellation-policy', '/privacy-policy', '/terms-and-conditions',
+  ];
+  const now = new Date();
   return [
-    { url: base, lastModified: new Date() },
-    { url: `${base}/shop`, lastModified: new Date() },
-    { url: `${base}/new-arrivals`, lastModified: new Date() },
-    { url: `${base}/offers`, lastModified: new Date() },
-    { url: `${base}/about`, lastModified: new Date() },
-    { url: `${base}/contact`, lastModified: new Date() },
-    ...products.map((p) => ({
-      url: `${base}/product/${p.slug}`,
-      lastModified: new Date(),
+    ...staticRoutes.map((path) => ({
+      url: `${base}${path}`,
+      lastModified: now,
+      changeFrequency: (path === '' ? 'daily' : 'weekly') as 'daily' | 'weekly',
+      priority: path === '' ? 1 : 0.6,
+    })),
+    ...categories.map((category) => ({
+      url: `${base}/category/${category.slug}`,
+      lastModified: now,
+      changeFrequency: 'daily' as const,
+      priority: 0.8,
+    })),
+    ...products.map((product) => ({
+      url: `${base}/product/${product.slug}`,
+      lastModified: now,
+      changeFrequency: 'daily' as const,
+      priority: 0.9,
     })),
   ];
 }
