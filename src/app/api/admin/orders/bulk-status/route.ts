@@ -11,7 +11,9 @@ export async function POST(req: Request) {
   try {
     const admin = await requireAdminPermission('orders.write');
     const body = await req.json();
-    const ids = Array.isArray(body.orderIds) ? [...new Set(body.orderIds.filter((x: unknown): x is string => typeof x === 'string' && x.length > 0))] : [];
+    const rawIds: unknown[] = Array.isArray(body.orderIds) ? body.orderIds : [];
+    const validIds = rawIds.filter((x: unknown): x is string => typeof x === 'string' && x.length > 0);
+    const ids = [...new Set<string>(validIds)];
     const status = typeof body.status === 'string' ? body.status : '';
     const note = typeof body.note === 'string' ? body.note.slice(0, 500) : undefined;
     if (!ids.length || ids.length > MAX) return NextResponse.json({error:`Select between 1 and ${MAX} orders`},{status:400});
