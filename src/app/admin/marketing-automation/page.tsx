@@ -1,0 +1,19 @@
+'use client';
+import Link from 'next/link';import {useEffect,useState} from 'react';
+
+type Segment={key:string;name:string;description:string;count:number|null};
+const presets=[
+ ['abandoned_cart','Abandoned cart recovery','cart_activity',['SEND_EMAIL','SEND_WHATSAPP']],
+ ['first_order','First-order offer','buyers',['SEND_EMAIL']],
+ ['repeat_buyer','Repeat customer','repeat_buyers',['SEND_WHATSAPP']],
+ ['winback','Win-back campaign','delivered_buyers',['SEND_EMAIL','SEND_WHATSAPP']]
+] as const;
+export default function MarketingAutomation(){const [segments,setSegments]=useState<Segment[]>([]);const [rules,setRules]=useState<any[]>([]);const [msg,setMsg]=useState('');const [busy,setBusy]=useState(false);
+ async function load(){const [s,a]=await Promise.all([fetch('/api/admin/marketing/segments',{cache:'no-store'}),fetch('/api/admin/automations',{cache:'no-store'})]);const sd=await s.json(),ad=await a.json();if(s.ok)setSegments(sd.data||[]);if(a.ok)setRules(ad.data||[]);else setMsg(ad.error||'Unable to load automations')}
+ useEffect(()=>{void load()},[]);
+ async function create(p:(typeof presets)[number]){setBusy(true);setMsg('');const segment=segments.find(x=>x.key===p[2]);try{const r=await fetch('/api/admin/automations',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:p[1],trigger:p[0],conditions:{segment:p[2]},actions:p[3].map(action=>({type:action,templateKey:p[0]})),enabled:true})});const d=await r.json();if(!r.ok)throw new Error(d.error||'Unable to create automation');setMsg(`${p[1]} automation created.`);await load()}catch(e){setMsg(e instanceof Error?e.message:'Unable to create automation')}finally{setBusy(false)}}
+ return <div className="admin-shell"><aside className="admin-nav"><h2>PRIYASA</h2><Link href="/admin">← Dashboard</Link><Link href="/admin/marketing">Marketing</Link><Link href="/admin/coupons-offers">Offers & Coupons</Link><Link href="/admin/automations">Automations</Link></aside><section className="admin-main"><div className="section-head"><div><span className="eyebrow dark">GROWTH ENGINE</span><h1>Marketing Automation</h1><p className="muted">Segment customers and launch repeatable lifecycle campaigns through the existing automation engine.</p></div><Link className="button" href="/admin/automations">Automation Engine →</Link></div>{msg&&<div className="checkout-status">{msg}</div>}
+ <div className="feature-grid" style={{marginTop:18}}>{segments.map(s=><div className="feature" key={s.key}><h3>{s.name}</h3><p>{s.description}</p><strong>{s.count===null?'Dynamic':s.count.toLocaleString('en-IN')} customers/activity</strong></div>)}</div>
+ <section className="admin-card" style={{marginTop:22}}><div className="admin-card-head"><div><h2>Campaign recipes</h2><p className="muted">One-click creation of safe lifecycle automation rules.</p></div></div><div className="feature-grid">{presets.map(p=><div className="feature" key={p[0]}><h3>{p[1]}</h3><p>Audience: {segments.find(s=>s.key===p[2])?.name||p[2]}</p><p>Channels: {p[3].join(' + ')}</p><button className="button dark-button" disabled={busy} onClick={()=>void create(p)}>Create automation</button></div>)}</div></section>
+ <section className="admin-card" style={{marginTop:22}}><div className="admin-card-head"><div><h2>Active workflows</h2><p className="muted">Existing rules and recent execution counts.</p></div></div>{rules.length?<div className="table-wrap"><table className="table"><thead><tr><th>Workflow</th><th>Trigger</th><th>Audience</th><th>Status</th><th>Runs</th></tr></thead><tbody>{rules.map(a=><tr key={a.id}><td><strong>{a.name}</strong></td><td>{a.trigger}</td><td>{a.conditions?.segment||'All'}</td><td>{a.enabled?'Enabled':'Disabled'}</td><td>{a.runs?.length??0} recent</td></tr>)}</tbody></table></div>:<div className="empty">No marketing workflows created yet.</div>}</section>
+ </section></div>}
