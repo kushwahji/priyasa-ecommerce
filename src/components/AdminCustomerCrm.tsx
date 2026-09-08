@@ -1,0 +1,9 @@
+'use client';
+import {useEffect,useState} from 'react';
+export default function AdminCustomerCrm({customerId}:{customerId:string}){
+ const [notes,setNotes]=useState<any[]>([]);const [body,setBody]=useState('');const [msg,setMsg]=useState('');const [busy,setBusy]=useState(false);
+ async function load(){const r=await fetch(`/api/admin/customers/${customerId}/notes`,{cache:'no-store'});const d=await r.json();if(r.ok)setNotes(d.data||[])}
+ useEffect(()=>{load()},[]);
+ async function add(e:React.FormEvent){e.preventDefault();if(!body.trim())return;setBusy(true);setMsg('');try{const r=await fetch(`/api/admin/customers/${customerId}/notes`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({body})});const d=await r.json();if(!r.ok)throw new Error(d.error||'Unable to save');setBody('');setMsg('Note added');await load()}catch(e){setMsg(e instanceof Error?e.message:'Unable to save')}finally{setBusy(false)}}
+ return <section className="admin-card" style={{marginTop:20}}><div className="section-head"><div><h2>CRM notes</h2><p className="muted">Internal customer context for support and operations.</p></div></div><form onSubmit={add} style={{display:'flex',gap:8,flexWrap:'wrap'}}><textarea className="input" value={body} onChange={e=>setBody(e.target.value)} placeholder="Add an internal note…" maxLength={2000} rows={3} style={{flex:'1 1 420px',minHeight:76}}/><button className="button dark-button" disabled={busy}>{busy?'Saving…':'Add note'}</button></form>{msg&&<small className="muted">{msg}</small>}<div style={{marginTop:14}}>{notes.map(n=><article key={n.id} style={{padding:'10px 0',borderTop:'1px solid #eee'}}><strong>{n.user?.name||n.user?.phone||'Admin'}</strong><small className="muted"> · {new Date(n.createdAt).toLocaleString('en-IN')}</small><p style={{margin:'6px 0 0',whiteSpace:'pre-wrap'}}>{n.metadata?.body||''}</p></article>)}{!notes.length&&<p className="muted">No internal notes yet.</p>}</div></section>
+}
