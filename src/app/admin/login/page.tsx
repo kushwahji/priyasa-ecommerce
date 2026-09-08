@@ -31,20 +31,19 @@ export default function AdminLogin() {
   }
 
   return (
-    <div className="page">
-      <form className="form" style={{ margin: '50px auto', maxWidth: 480 }} onSubmit={submit}>
-        <h1 style={{ font: 'normal 34px Georgia,serif' }}>PRIYASA Admin</h1>
-        <p className="muted">Sign in with your authorized admin email and password.</p>
-        <label>
-          Email
-          <input className="input" type="email" autoComplete="username" required value={email} onChange={e => setEmail(e.target.value)} />
-        </label>
-        <label>
-          Password
-          <input className="input" type="password" autoComplete="current-password" required value={password} onChange={e => setPassword(e.target.value)} />
-        </label>
-        {error && <p style={{ color: '#a00' }}>{error}</p>}
-        <button className="button" disabled={busy}>{busy ? 'Signing in…' : 'Sign In'}</button>
+    <div className="admin-login-page">
+      <div className="admin-login-brand"><span>P</span><div><strong>PRIYASA</strong><small>COMMERCE OS</small></div></div>
+      <section className="admin-login-hero"><span>PRIYASA COMMERCE OS</span><h1>Run your store<br/><em>beautifully.</em></h1><p>Products, orders, customers, marketing, fulfillment and finance — one control centre.</p><div className="admin-login-points"><b>✓ Live commerce operations</b><b>✓ Secure role-based access</b><b>✓ Mobile-ready workspace</b></div></section>
+      <form className="admin-login-card" onSubmit={submit}>
+        <div className="admin-login-mark">P</div>
+        <span className="eyebrow">ADMIN ACCESS</span>
+        <h1>Welcome back</h1>
+        <p>Sign in with your authorized admin account.</p>
+        <label>Email<input className="input" type="email" autoComplete="username" required value={email} onChange={e => setEmail(e.target.value)} /></label>
+        <label>Password<input className="input" type="password" autoComplete="current-password" required value={password} onChange={e => setPassword(e.target.value)} /></label>
+        {error && <p className="admin-login-error" role="alert">{error}</p>}
+        <button className="button" disabled={busy}>{busy ? 'Signing in…' : 'Sign in to Commerce OS →'}</button>
+        <small>Authorized personnel only · Priyasa Commerce</small>
       </form>
     </div>
   );
