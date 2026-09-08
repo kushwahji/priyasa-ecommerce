@@ -1,6 +1,9 @@
 import type { ReactNode } from 'react';
-import AdminAppShell from '@/components/AdminAppShell';
 
+/**
+ * Admin pages own their operational shell so legacy and modern modules can
+ * coexist while sharing the same global Priyasa reference styling.
+ */
 export default function AdminLayout({ children }: { children: ReactNode }) {
-  return <AdminAppShell>{children}</AdminAppShell>;
+  return children;
 }
