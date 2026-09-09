@@ -12,7 +12,18 @@ export type WhatsAppOrderStatusMessage = {
   freeTextMessage?: string;
 };
 
-function valuesFor(input: WhatsAppOrderStatusMessage) {
+type WhatsAppOrderStatusValues = {
+  orderId: string;
+  orderNumber: string;
+  status: string;
+  previousStatus: string;
+  customerName: string;
+  total: string;
+  trackingNumber: string;
+  trackingUrl: string;
+};
+
+function valuesFor(input: WhatsAppOrderStatusMessage): WhatsAppOrderStatusValues {
   return {
     orderId: String(input.order?.id || ''),
     orderNumber: String(input.order?.orderNumber || ''),
@@ -46,7 +57,7 @@ export async function sendOrderStatusWhatsApp(input: WhatsAppOrderStatusMessage)
   }
 
   if (!input.templateName) throw new Error(`No approved WhatsApp Utility template is mapped for order status ${input.status}`);
-  const parameters = (input.parameters || []).map((key) => values[key.replace(/[{}]/g, '').trim()] ?? key);
+  const parameters = (input.parameters || []).map((key) => values[key.replace(/[{}]/g, '').trim() as keyof WhatsAppOrderStatusValues] ?? key);
   const result = await sendMetaWhatsAppTemplate({ to: phone, templateName: input.templateName, languageCode: input.languageCode || 'en_US', bodyParameters: parameters, orderId: input.order.id });
   return { mode: 'UTILITY_TEMPLATE' as const, skipped: false, ...result };
 }
