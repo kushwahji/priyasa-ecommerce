@@ -20,14 +20,14 @@ function createPrismaClient() {
   const port = url.port ? Number(url.port) : 3306;
   if (!Number.isInteger(port) || port <= 0) throw new Error('DATABASE_URL contains an invalid database port');
 
-  // Keep pool sizing configurable because the correct limit depends on the hosting
-  // plan's MySQL/MariaDB max_connections and the number of app instances.
-  // Defaults are deliberately moderate for shared hosting while allowing production
-  // operators to increase capacity without changing application code.
-  const connectionLimit = positiveInteger(process.env.PRISMA_CONNECTION_LIMIT, 10);
-  const acquireTimeout = positiveInteger(process.env.PRISMA_ACQUIRE_TIMEOUT_MS, 20000);
-  const connectTimeout = positiveInteger(process.env.PRISMA_CONNECT_TIMEOUT_MS, 5000);
-  const idleTimeout = positiveInteger(process.env.PRISMA_IDLE_TIMEOUT_SECONDS, 300);
+  // Keep the application pool conservative for shared MySQL/MariaDB hosting.
+  // Total database usage is connectionLimit multiplied by the number of live app
+  // instances, so a large per-instance pool can exhaust a small managed database.
+  // All values remain configurable through environment variables.
+  const connectionLimit = positiveInteger(process.env.PRISMA_CONNECTION_LIMIT, 5);
+  const acquireTimeout = positiveInteger(process.env.PRISMA_ACQUIRE_TIMEOUT_MS, 60000);
+  const connectTimeout = positiveInteger(process.env.PRISMA_CONNECT_TIMEOUT_MS, 10000);
+  const idleTimeout = positiveInteger(process.env.PRISMA_IDLE_TIMEOUT_SECONDS, 120);
 
   const adapter = new PrismaMariaDb({
     host: url.hostname,
