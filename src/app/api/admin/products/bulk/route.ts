@@ -1,30 +1,3 @@
-import {NextResponse} from 'next/server';
-import {z} from 'zod';
-import {db} from '@/lib/db';
-import {requireAdminPermission} from '@/lib/auth';
-
+import {NextResponse} from 'next/server';import {z} from 'zod';import {db} from '@/lib/db';import {requireAdminPermission} from '@/lib/auth';import {revalidateStorefrontProducts} from '@/lib/storefront-revalidation';
 const schema=z.object({productIds:z.array(z.string().min(1)).min(1).max(100),action:z.enum(['ACTIVATE','DEACTIVATE','SET_PRICE','SET_DISCOUNT']),value:z.number().int().min(0).max(100000000).optional()});
-
-export async function PATCH(req:Request){
-  try{
-    const admin=await requireAdminPermission('products.write');
-    const parsed=schema.safeParse(await req.json());
-    if(!parsed.success)return NextResponse.json({error:'Invalid bulk product request',details:parsed.error.flatten()},{status:400});
-    const {productIds,action,value}=parsed.data;
-    if((action==='SET_PRICE'||action==='SET_DISCOUNT')&&value===undefined)return NextResponse.json({error:'Value is required'},{status:400});
-    const products=await db.product.findMany({where:{id:{in:productIds}},select:{id:true,mrp:true,salePrice:true}});
-    if(products.length!==productIds.length)return NextResponse.json({error:'One or more products were not found'},{status:404});
-    if(action==='SET_PRICE'&&products.some(p=>value!>p.mrp))return NextResponse.json({error:'Sale price cannot exceed MRP'},{status:400});
-    const result=await db.$transaction(async tx=>{
-      let count=0;
-      for(const p of products){
-        const data=action==='ACTIVATE'?{active:true}:action==='DEACTIVATE'?{active:false}:action==='SET_PRICE'?{salePrice:value!}:{salePrice:Math.max(1,Math.round(p.mrp*(1-value!/100)))};
-        await tx.product.update({where:{id:p.id},data});
-        await tx.auditLog.create({data:{userId:admin.userId,action:'BULK_UPDATE',entity:'Product',entityId:p.id,metadata:{operation:action,value:value??null}}});
-        count++;
-      }
-      return count;
-    });
-    return NextResponse.json({updated:result});
-  }catch(e){return NextResponse.json({error:e instanceof Error&&e.message.includes('FORBIDDEN')?'Forbidden':'Unable to update products'},{status:e instanceof Error&&e.message.includes('FORBIDDEN')?403:500});}
-}
+export async function PATCH(req:Request){try{const admin=await requireAdminPermission('products.write');const parsed=schema.safeParse(await req.json());if(!parsed.success)return NextResponse.json({error:'Invalid bulk product request',details:parsed.error.flatten()},{status:400});const {productIds,action,value}=parsed.data;if((action==='SET_PRICE'||action==='SET_DISCOUNT')&&value===undefined)return NextResponse.json({error:'Value is required'},{status:400});const products=await db.product.findMany({where:{id:{in:productIds}},select:{id:true,mrp:true,salePrice:true,slug:true}});if(products.length!==productIds.length)return NextResponse.json({error:'One or more products were not found'},{status:404});if(action==='SET_PRICE'&&products.some(p=>value!>p.mrp))return NextResponse.json({error:'Sale price cannot exceed MRP'},{status:400});const result=await db.$transaction(async tx=>{let count=0;for(const p of products){const data=action==='ACTIVATE'?{active:true}:action==='DEACTIVATE'?{active:false}:action==='SET_PRICE'?{salePrice:value!}:{salePrice:Math.max(1,Math.round(p.mrp*(1-value!/100)))};await tx.product.update({where:{id:p.id},data});await tx.auditLog.create({data:{userId:admin.userId,action:'BULK_UPDATE',entity:'Product',entityId:p.id,metadata:{operation:action,value:value??null}}});count++;}return count;});revalidateStorefrontProducts({productSlugs:products.map(p=>p.slug)});return NextResponse.json({updated:result});}catch(e){return NextResponse.json({error:e instanceof Error&&e.message.includes('FORBIDDEN')?'Forbidden':'Unable to update products'},{status:e instanceof Error&&e.message.includes('FORBIDDEN')?403:500});}}
