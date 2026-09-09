@@ -39,7 +39,13 @@ export default async function Home(){
   let servicePromisesPlaced=false;
   for(const section of orderedSections){const type=typeOf(section);if(used.has(section.id))continue;
    if(['hero','hero-slide'].includes(type)){const slides=sections.filter((s:any)=>['hero','hero-slide'].includes(typeOf(s))).sort((a:any,b:any)=>(Number(a.sortOrder)||0)-(Number(b.sortOrder)||0));slides.forEach((s:any)=>used.add(s.id));body.push(<section className="home-section home-hero-multi" key={`hero-${section.id}`}><HomeHeroCarousel slides={slides}/></section>);continue}
-   if(imageType(type)){const slides=sections.filter((s:any)=>imageType(typeOf(s))).sort((a:any,b:any)=>(Number(a.sortOrder)||0)-(Number(b.sortOrder)||0));slides.forEach((s:any)=>used.add(s.id));if(!servicePromisesPlaced){body.push(trustStrip());servicePromisesPlaced=true}body.push(<section className="home-section home-image-highlight-section" key={`images-${section.id}`}><HomeImageCarousel slides={slides}/></section>);if(!offerPlaced){body.push(<HomeOfferStrip key={`offer-after-images-${section.id}`}/>);offerPlaced=true}continue}
+   if(imageType(type)){const slides=sections.filter((s:any)=>imageType(typeOf(s))).sort((a:any,b:any)=>(Number(a.sortOrder)||0)-(Number(b.sortOrder)||0));slides.forEach((s:any)=>used.add(s.id));
+     // Ecomus-style home hierarchy: hero/banner → offer strip → image banner.
+     if(!offerPlaced){body.push(<HomeOfferStrip key={`offer-before-images-${section.id}`}/>);offerPlaced=true}
+     body.push(<section className="home-section home-image-highlight-section" key={`images-${section.id}`}><HomeImageCarousel slides={slides}/></section>);
+     if(!servicePromisesPlaced){body.push(trustStrip());servicePromisesPlaced=true}
+     continue;
+   }
    if(type==='category-grid'){used.add(section.id);body.push(categoriesMarkup(categories,section.title||'Shop by Category',section.subtitle||'Find your style, your way.'));continue}
    if(type==='products-all'||type==='products-grid-30'){used.add(section.id);body.push(await renderProductSection(section,await getCachedStorefrontProducts({limit:30})));continue}
    if(productType(type)){used.add(section.id);body.push(await renderProductSection(section));continue}
