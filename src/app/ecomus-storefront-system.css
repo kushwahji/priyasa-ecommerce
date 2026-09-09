@@ -1,0 +1,85 @@
+/* PRIYASA storefront design system — Ecomus-inspired, not admin UI. */
+:root{--eco-accent:#e9154f;--eco-accent-hover:#c80f43;--eco-ink:#1b1b1b;--eco-muted:#6b6870;--eco-border:#e7e5e7;--eco-surface:#fff;--eco-soft:#f7f6f7;--eco-radius:0px;--eco-control-h:48px;--eco-transition:180ms ease}
+
+/* Consistent customer-facing typography. Keep admin typography isolated. */
+.site-header,.site-header nav,.site-header nav a,.mega-panel,.announcement,.footer,.footer a,
+.product-card,.product-card a,.product-info,.product-info h3,.product-category,.product-rating,
+.purchase-panel,.purchase-panel button,.purchase-panel a,.option-block,.option-label,
+.cart-page,.checkout-page,.account-page,.category-page,.shop-page,.section,.breadcrumb,
+.quick-view-card,.quick-view-card button,.quick-view-card a{font-family:Arial,Helvetica,sans-serif}
+
+/* Header / navigation */
+.site-header{height:72px;background:#fff;border-bottom:1px solid var(--eco-border);color:var(--eco-ink)}
+.site-header nav{gap:28px}
+.site-header nav>a,.site-header nav>details>summary{font-size:12px;font-weight:600;letter-spacing:.04em;text-transform:none;color:var(--eco-ink);transition:color var(--eco-transition)}
+.site-header nav>a:hover,.site-header nav>details>summary:hover{color:var(--eco-accent)}
+
+/* Shared Ecomus-style controls: restrained radius, strong hierarchy, no random button variants. */
+.product-card .button,.product-card button.button,.quick-view-card .button,
+.purchase-panel .button,.cart-page .button,.checkout-page .button,
+.account-page .button{min-height:var(--eco-control-h);border-radius:var(--eco-radius);border:1px solid var(--eco-ink);font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;transition:background var(--eco-transition),color var(--eco-transition),border-color var(--eco-transition),transform var(--eco-transition)}
+.product-card .button:hover,.quick-view-card .button:hover,.purchase-panel .button:hover,.cart-page .button:hover,.checkout-page .button:hover,.account-page .button:hover{transform:translateY(-1px)}
+.product-card .button:not(.dark-button),.purchase-panel .pdp-add-button,.cart-page .button:not(.dark-button),.checkout-page .button:not(.dark-button){background:#fff;color:var(--eco-ink);border-color:var(--eco-ink)}
+.product-card .button:not(.dark-button):hover,.purchase-panel .pdp-add-button:hover,.cart-page .button:not(.dark-button):hover,.checkout-page .button:not(.dark-button):hover{background:var(--eco-ink);color:#fff}
+.dark-button,.purchase-panel .pdp-buy-button{background:var(--eco-ink)!important;color:#fff!important;border-color:var(--eco-ink)!important}
+.dark-button:hover,.purchase-panel .pdp-buy-button:hover{background:var(--eco-accent)!important;border-color:var(--eco-accent)!important}
+
+/* Product cards: same action vocabulary and hierarchy everywhere. */
+.product-card .product-category{font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--eco-muted)}
+.product-card .product-info h3{font-size:13px;line-height:1.45;font-weight:500;color:var(--eco-ink)}
+.product-card .product-info h3 a{color:inherit}
+.product-card .price{font-size:14px;font-weight:700;color:var(--eco-ink)}
+.product-card .mrp{font-size:12px;color:#8a878c}
+.product-card .discount-text{font-size:10px;font-weight:700;letter-spacing:.04em;color:var(--eco-accent);text-transform:uppercase}
+.product-card .product-rating{font-size:11px;color:var(--eco-ink)}
+.product-card .product-rating small{color:var(--eco-muted)}
+.product-card .product-quick-view{text-transform:uppercase;letter-spacing:.08em;font-weight:700}
+.product-card .quick-add .button{width:100%}
+
+/* PDP option system: Color / Size / Quantity use the same labels and controls. */
+.purchase-panel{color:var(--eco-ink)}
+.purchase-heading-row strong{font-size:16px;font-weight:600;letter-spacing:.01em}
+.purchase-kicker{font-size:10px;font-weight:700;letter-spacing:.12em;color:var(--eco-muted)}
+.option-label strong,.quantity-row>strong{font-size:12px;font-weight:700;letter-spacing:.05em;text-transform:uppercase}
+.option-label>span,.size-guide-link{font-size:11px;color:var(--eco-muted)}
+.color-options{gap:10px}
+.color-chip{width:28px!important;height:28px!important;border:1px solid #d8d5d8!important;border-radius:50%!important;padding:2px!important;background:#fff!important}
+.color-chip.active{border:2px solid var(--eco-ink)!important;outline:1px solid #fff;box-shadow:0 0 0 1px var(--eco-ink)}
+.size-options{gap:8px}
+.size-options button{min-width:52px;min-height:40px;border:1px solid #d8d5d8;background:#fff;color:var(--eco-ink);border-radius:0;font-size:12px;font-weight:600;transition:all var(--eco-transition)}
+.size-options button:hover:not(:disabled),.size-options button.active{background:var(--eco-ink);border-color:var(--eco-ink);color:#fff}
+.size-options button:disabled{color:#aaa;background:#f5f4f5;text-decoration:line-through;cursor:not-allowed}
+.qty-control{border:1px solid #d8d5d8;border-radius:0;height:42px}
+.qty-control button{width:40px;height:40px;border:0;background:#fff;color:var(--eco-ink);font-size:16px}
+.qty-control span{font-size:12px;font-weight:600}
+.purchase-actions{gap:8px}
+.purchase-actions .button{flex:1}
+.whatsapp-order-button{min-height:44px!important;border:1px solid var(--eco-border)!important;border-radius:0!important;background:#fff!important;color:var(--eco-ink)!important;font-size:11px!important;font-weight:700!important;letter-spacing:.06em;text-transform:uppercase}
+.whatsapp-order-button:hover{border-color:var(--eco-ink)!important;background:var(--eco-soft)!important}
+
+/* Shared forms / notices / dialogs on customer pages. */
+.quick-view-card{border-radius:0;box-shadow:0 24px 80px rgba(0,0,0,.18)}
+.quick-view-card h2{font-size:24px;font-weight:600;line-height:1.2;color:var(--eco-ink)}
+.quick-view-price b{font-size:18px;color:var(--eco-ink)}
+.quick-view-price strong{color:var(--eco-accent);font-size:11px;letter-spacing:.05em}
+.storefront-toast{border-radius:0!important;border:1px solid var(--eco-ink)!important;background:#fff!important;color:var(--eco-ink)!important;font-size:12px!important;box-shadow:0 12px 35px rgba(0,0,0,.12)!important}
+
+/* Links, focus and interaction consistency. */
+.site-header a:focus-visible,.product-card a:focus-visible,.product-card button:focus-visible,
+.purchase-panel a:focus-visible,.purchase-panel button:focus-visible,.quick-view-card a:focus-visible,
+.quick-view-card button:focus-visible,.cart-page a:focus-visible,.cart-page button:focus-visible,
+.checkout-page a:focus-visible,.checkout-page button:focus-visible{outline:2px solid var(--eco-accent);outline-offset:3px}
+
+@media(max-width:760px){
+ .site-header{height:70px}
+ .site-header nav>a,.site-header nav>details>summary{font-size:11px}
+ .product-card .product-info h3{font-size:12px}
+ .product-card .price{font-size:13px}
+ .purchase-actions .button{min-height:46px}
+ .size-options button{min-width:48px;min-height:38px}
+}
+
+@media(prefers-reduced-motion:reduce){
+ .product-card .button,.quick-view-card .button,.purchase-panel .button,.cart-page .button,.checkout-page .button,.account-page .button{transition:none}
+ .product-card .button:hover,.quick-view-card .button:hover,.purchase-panel .button:hover,.cart-page .button:hover,.checkout-page .button:hover,.account-page .button:hover{transform:none}
+}
