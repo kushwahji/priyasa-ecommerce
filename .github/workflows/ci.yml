@@ -35,7 +35,7 @@ jobs:
       - run: npm run db:prepare:mysql
       - run: npx prisma validate --schema prisma/schema.mysql.prisma
       - run: npx prisma generate --schema prisma/schema.mysql.prisma
-      - run: npx prisma db push --schema prisma/schema.mysql.prisma --skip-generate
+      - run: npx prisma db push --schema prisma/schema.mysql.prisma
       - run: npx tsc --noEmit
       - run: npm test
       - run: npm run build
