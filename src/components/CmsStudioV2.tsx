@@ -11,6 +11,12 @@ type Slide = { key: string; title: string; subtitle: string; imageUrl: string; m
 
 const blankSlide = (i: number): Slide => ({ key: `home.carousel.${Date.now()}.${i}`, title: '', subtitle: 'PRIYASA EDIT', imageUrl: '', mobileImageUrl: '', ctaLabel: 'Shop now', ctaHref: '/shop', active: true, sortOrder: i });
 
+function modeForSection(type: string): 'banner' | 'carousel' | 'section' {
+  if (['image-carousel', 'image-slide', 'carousel'].includes(type)) return 'carousel';
+  if (['feature', 'casual-grid', 'festival-grid', 'category-grid', 'text'].includes(type)) return 'section';
+  return 'banner';
+}
+
 export default function CmsStudioV2() {
   const [sections, setSections] = useState<Section[]>([]);
   const [categories, setCategories] = useState<Target[]>([]);
@@ -41,14 +47,16 @@ export default function CmsStudioV2() {
   useEffect(() => { void load(); }, []);
 
   function startBanner(section?: Section) {
-    setMode('banner');
+    const nextMode = section ? modeForSection(section.type) : 'banner';
+    setMode(nextMode);
     if (section) setSlides([{ key: section.key, title: section.title || '', subtitle: section.subtitle || 'PRIYASA EDIT', imageUrl: section.imageUrl || '', mobileImageUrl: section.mobileImageUrl || '', ctaLabel: section.ctaLabel || 'Shop now', ctaHref: section.ctaHref || '/shop', active: section.active, sortOrder: section.sortOrder }]);
     else setSlides([blankSlide(0)]);
     setEditing(section || null);
+    setUploadTarget(0);
   }
 
-  function startCarousel() { setMode('carousel'); setEditing(null); setSlides([blankSlide(0), blankSlide(1), blankSlide(2)]); }
-  function startSection() { setMode('section'); setEditing(null); setSlides([blankSlide(0)]); }
+  function startCarousel() { setMode('carousel'); setEditing(null); setUploadTarget(null); setSlides([blankSlide(0), blankSlide(1), blankSlide(2)]); }
+  function startSection() { setMode('section'); setEditing(null); setUploadTarget(0); setSlides([blankSlide(0)]); }
 
   async function uploadFiles(files: FileList | null) {
     if (!files?.length) return;
@@ -88,7 +96,7 @@ export default function CmsStudioV2() {
         const response = await fetch('/api/admin/cms', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
         const data = await response.json();
         if (!response.ok) throw new Error(data.error || 'Unable to save storefront content');
-        if (mode === 'banner' && editing?.id) break;
+        if (mode !== 'carousel' && editing?.id) break;
       }
       setMessage(mode === 'carousel' ? `${payloads.length} carousel slides published.` : 'Storefront content saved successfully.');
       await load();
@@ -121,7 +129,7 @@ export default function CmsStudioV2() {
       <div className="cmsV2Editor"><div className="cmsV2EditorHead"><div><span>{mode === 'banner' ? 'BANNER BUILDER' : mode === 'carousel' ? 'CAROUSEL BUILDER' : 'SECTION BUILDER'}</span><h2>{mode === 'banner' ? 'Create or update a hero banner' : mode === 'carousel' ? 'Build a multi-image carousel' : 'Add a homepage feature block'}</h2></div><button className="cmsV2Primary" disabled={busy} onClick={() => void save()}>{busy ? 'Saving…' : 'Publish changes'}</button></div>
         {mode === 'carousel' && <div className="cmsV2UploadBar"><div><strong>Multiple image upload</strong><small>Select several images at once. Each image becomes a carousel slide.</small></div><button className="cmsV2Light" disabled={busy} onClick={() => { setUploadTarget(null); fileRef.current?.click(); }}>＋ Upload multiple</button></div>}
         <input ref={fileRef} hidden type="file" accept="image/jpeg,image/png,image/webp,image/avif,image/gif" multiple={mode === 'carousel'} onChange={(e) => { void uploadFiles(e.target.files); e.currentTarget.value = ''; }} />
-        <div className="cmsV2Slides">{slides.map((slide, index) => <article className="cmsV2Slide" key={slide.key}><div className="cmsV2SlideNumber">{index + 1}</div><div className="cmsV2Preview" style={{ backgroundImage: `linear-gradient(90deg,rgba(20,15,18,.62),rgba(20,15,18,.05)),url(${slide.imageUrl || '/images/product-placeholder.svg'})` }}><div><small>{slide.subtitle || 'PRIYASA EDIT'}</small><strong>{slide.title || 'Your headline'}</strong><span>{slide.ctaLabel || 'Shop now'} →</span></div></div><div className="cmsV2Fields"><label>Image URL<input value={slide.imageUrl} onChange={(e) => updateSlide(index, { imageUrl: e.target.value })} placeholder="https://…" /></label><label>Upload<input type="file" accept="image/jpeg,image/png,image/webp,image/avif,image/gif" onChange={(e) => { const f = e.target.files?.[0]; if (f) { setUploadTarget(index); void uploadFiles(e.target.files); } e.currentTarget.value = ''; }} /></label><label>Headline<input value={slide.title} onChange={(e) => updateSlide(index, { title: e.target.value })} placeholder="New season" /></label><label>Subtitle<input value={slide.subtitle} onChange={(e) => updateSlide(index, { subtitle: e.target.value })} placeholder="PRIYASA EDIT" /></label><label>CTA label<input value={slide.ctaLabel} onChange={(e) => updateSlide(index, { ctaLabel: e.target.value })} /></label><label>Redirect to<select value={slide.ctaHref} onChange={(e) => updateSlide(index, { ctaHref: e.target.value })}>{destinationOptions()}</select></label><label>Mobile image URL<input value={slide.mobileImageUrl} onChange={(e) => updateSlide(index, { mobileImageUrl: e.target.value })} placeholder="Optional mobile creative" /></label><label className="cmsV2Check"><input type="checkbox" checked={slide.active} onChange={(e) => updateSlide(index, { active: e.target.checked })} /> Publish this slide</label></div><div className="cmsV2SlideActions">{mode === 'carousel' && <button onClick={() => setSlides((current) => current.filter((_, i) => i !== index))}>Remove slide</button>}<button onClick={() => fileRef.current?.click()}>Replace image</button></div></article>)}</div>{mode === 'carousel' && <button className="cmsV2AddSlide" onClick={() => setSlides((current) => [...current, blankSlide(current.length)])}>＋ Add another slide</button>}
+        <div className="cmsV2Slides">{slides.map((slide, index) => <article className="cmsV2Slide" key={slide.key}><div className="cmsV2SlideNumber">{index + 1}</div><div className="cmsV2Preview" style={{ backgroundImage: `linear-gradient(90deg,rgba(20,15,18,.62),rgba(20,15,18,.05)),url(${slide.imageUrl || '/images/product-placeholder.svg'})` }}><div><small>{slide.subtitle || 'PRIYASA EDIT'}</small><strong>{slide.title || 'Your headline'}</strong><span>{slide.ctaLabel || 'Shop now'} →</span></div></div><div className="cmsV2Fields"><label>Image URL<input value={slide.imageUrl} onChange={(e) => updateSlide(index, { imageUrl: e.target.value })} placeholder="https://…" /></label><label>Upload<input type="file" accept="image/jpeg,image/png,image/webp,image/avif,image/gif" onChange={(e) => { const f = e.target.files?.[0]; if (f) { setUploadTarget(index); void uploadFiles(e.target.files); } e.currentTarget.value = ''; }} /></label><label>Headline<input value={slide.title} onChange={(e) => updateSlide(index, { title: e.target.value })} placeholder="New season" /></label><label>Subtitle<input value={slide.subtitle} onChange={(e) => updateSlide(index, { subtitle: e.target.value })} placeholder="PRIYASA EDIT" /></label><label>CTA label<input value={slide.ctaLabel} onChange={(e) => updateSlide(index, { ctaLabel: e.target.value })} /></label><label>Redirect to<select value={slide.ctaHref} onChange={(e) => updateSlide(index, { ctaHref: e.target.value })}>{destinationOptions()}</select></label><label>Mobile image URL<input value={slide.mobileImageUrl} onChange={(e) => updateSlide(index, { mobileImageUrl: e.target.value })} placeholder="Optional mobile creative" /></label><label className="cmsV2Check"><input type="checkbox" checked={slide.active} onChange={(e) => updateSlide(index, { active: e.target.checked })} /> Publish this slide</label></div><div className="cmsV2SlideActions">{mode === 'carousel' && <button onClick={() => setSlides((current) => current.filter((_, i) => i !== index))}>Remove slide</button>}<button onClick={() => { setUploadTarget(index); fileRef.current?.click(); }}>Replace image</button></div></article>)}</div>{mode === 'carousel' && <button className="cmsV2AddSlide" onClick={() => setSlides((current) => [...current, blankSlide(current.length)])}>＋ Add another slide</button>}
       </div>
     </section>
 
