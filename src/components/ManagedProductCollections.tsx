@@ -24,7 +24,10 @@ export default function ManagedProductCollections() {
   useEffect(() => { void load(); }, []);
 
   function edit(section: Section) { setDraft({ ...section }); }
-  function add(type: CollectionType) { setDraft({ key: `home.products.${type === 'products-sale' ? 'sale' : 'latest'}`, ...defaults[type] }); }
+  function add(type: CollectionType) {
+    const { type: _type, ...rest } = defaults[type];
+    setDraft({ key: `home.products.${type === 'products-sale' ? 'sale' : 'latest'}`, ...rest, type });
+  }
 
   async function save() {
     setBusy(true); setMessage('Saving collection…');
@@ -49,7 +52,7 @@ export default function ManagedProductCollections() {
     <div className="managed-product-head"><div><span>PRODUCT MERCHANDISING</span><h2>Flash Sale & Latest Launch</h2><p>Control the two homepage product rails. Each rail automatically uses live active products, current price and stock. The storefront displays up to 12 products.</p></div><div className="managed-product-actions"><button onClick={() => add('products-sale')}>＋ Flash Sale</button><button onClick={() => add('products-latest')}>＋ Latest Launch</button></div></div>
     {message && <div className="managed-product-message" role="status">{message}</div>}
     <div className="managed-product-editor">
-      <label>Rail<select value={draft.type} onChange={(e) => { const type=e.target.value as CollectionType; setDraft((d) => ({ ...d, ...defaults[type], type, key:`home.products.${type === 'products-sale' ? 'sale' : 'latest'}` })); }}><option value="products-sale">Flash Sale</option><option value="products-latest">Latest Launch</option></select></label>
+      <label>Rail<select value={draft.type} onChange={(e) => { const type=e.target.value as CollectionType; const { type: _type, ...rest } = defaults[type]; setDraft((d) => ({ ...d, ...rest, type, key:`home.products.${type === 'products-sale' ? 'sale' : 'latest'}` })); }}><option value="products-sale">Flash Sale</option><option value="products-latest">Latest Launch</option></select></label>
       <label>Title<input value={draft.title || ''} onChange={(e) => setDraft((d) => ({ ...d, title:e.target.value }))} /></label>
       <label>Subtitle<input value={draft.subtitle || ''} onChange={(e) => setDraft((d) => ({ ...d, subtitle:e.target.value }))} /></label>
       <label>CTA label<input value={draft.ctaLabel || ''} onChange={(e) => setDraft((d) => ({ ...d, ctaLabel:e.target.value }))} /></label>
