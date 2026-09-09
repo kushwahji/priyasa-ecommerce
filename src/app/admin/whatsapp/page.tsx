@@ -1,0 +1,113 @@
+'use client';
+
+import Link from 'next/link';
+import { useEffect, useState } from 'react';
+import styles from '../admin-modern.module.css';
+import './whatsapp-reference-v1.css';
+
+type MetaStatus = { connected: boolean; configured: boolean; phoneNumberId?: string; wabaId?: string; message?: string };
+type Template = { name: string; language?: string; status?: string; category?: string };
+
+const orderStatuses = [
+  ['CONFIRMED', 'Order confirmed', 'order_confirmed'],
+  ['PROCESSING', 'Processing', 'order_processing'],
+  ['SHIPPED', 'Shipped', 'order_shipped'],
+  ['DELIVERED', 'Delivered', 'order_delivered'],
+  ['CANCELLED', 'Cancelled', 'order_cancelled'],
+  ['RETURN_REQUESTED', 'Return requested', 'order_return_requested'],
+  ['RETURNED', 'Returned', 'order_returned'],
+  ['REFUNDED', 'Refunded', 'order_refunded'],
+] as const;
+
+export default function WhatsAppCommerce() {
+  const [meta, setMeta] = useState<MetaStatus>({ connected: false, configured: false });
+  const [templates, setTemplates] = useState<Template[]>([]);
+  const [message, setMessage] = useState('');
+  const [busy, setBusy] = useState(false);
+
+  async function load() {
+    try {
+      const r = await fetch('/api/admin/whatsapp/meta/status', { cache: 'no-store' });
+      const d = await r.json();
+      setMeta(d);
+    } catch { setMessage('Unable to read Meta connection status.'); }
+  }
+  useEffect(() => { void load(); }, []);
+
+  async function syncTemplates() {
+    setBusy(true); setMessage('');
+    try {
+      const r = await fetch('/api/admin/whatsapp/meta/templates/sync', { method: 'POST' });
+      const d = await r.json();
+      if (!r.ok) throw new Error(d.error || 'Template sync failed');
+      setTemplates(d.templates || []);
+      setMessage(`Synced ${d.templates?.length || 0} WhatsApp templates from Meta.`);
+    } catch (e) { setMessage(e instanceof Error ? e.message : 'Template sync failed'); }
+    finally { setBusy(false); }
+  }
+
+  async function createStatusWorkflow(status: string, templateKey: string, label: string) {
+    setBusy(true); setMessage('');
+    try {
+      const r = await fetch('/api/admin/automations', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: `WhatsApp · ${label}`,
+          trigger: `order.${status.toLowerCase()}`,
+          conditions: { status: status.toLowerCase() },
+          actions: [{ type: 'SEND_WHATSAPP', templateKey }],
+          enabled: true,
+        }),
+      });
+      const d = await r.json();
+      if (!r.ok) throw new Error(d.error || 'Unable to create workflow');
+      setMessage(`${label} WhatsApp workflow is enabled in the automation engine.`);
+    } catch (e) { setMessage(e instanceof Error ? e.message : 'Unable to create workflow'); }
+    finally { setBusy(false); }
+  }
+
+  return <div className={styles.shell}>
+    <aside className={styles.side}>
+      <div className={styles.brand}><div className={styles.brandMark}>P</div><div className={styles.brandText}>PRIYASA<span>Commerce OS</span></div></div>
+      <div className={styles.navTitle}>CONVERSATION</div>
+      <nav className={styles.nav}>
+        <Link href="/admin">Overview</Link><Link href="/admin/marketing">Growth center</Link>
+        <Link className={styles.active} href="/admin/whatsapp">WhatsApp Commerce</Link>
+        <Link href="/admin/marketing-automation">Automation</Link><Link href="/admin/orders">Orders</Link>
+      </nav>
+    </aside>
+    <main className={styles.main}>
+      <header className={styles.top}><div className={styles.topSpacer}/><Link className={styles.topLink} href="/admin">Dashboard</Link><div className={styles.avatar}>P</div></header>
+      <div className={styles.content}>
+        <div className={styles.head}>
+          <div><div className={styles.kicker}>WHATSAPP COMMERCE · META CLOUD API</div><h1>Conversation command center</h1><p>Connect Meta, sync approved message templates and automate customer notifications from real Priyasa order-status transitions.</p></div>
+          <div className={styles.headActions}><Link className={styles.secondary} href="/admin/orders">Manage orders</Link><button className={styles.primary} onClick={()=>void load()}>↻ Check connection</button></div>
+        </div>
+
+        {message && <div className="wa-notice">{message}</div>}
+
+        <section className={styles.section}>
+          <div className={styles.panelHead}><div><h2>Meta connection</h2><p>Meta WhatsApp Business Platform credentials stay server-side. The browser never receives the access token.</p></div><span className={`${styles.pill} ${meta.connected ? 'wa-good' : ''}`}>{meta.connected ? 'CONNECTED' : 'NOT CONNECTED'}</span></div>
+          <div className="wa-connect-grid">
+            <div className="wa-card"><span className={styles.kicker}>BUSINESS ACCOUNT</span><strong>{meta.wabaId || 'Not configured'}</strong><small>WhatsApp Business Account ID</small></div>
+            <div className="wa-card"><span className={styles.kicker}>PHONE NUMBER</span><strong>{meta.phoneNumberId || 'Not configured'}</strong><small>Cloud API phone number ID</small></div>
+            <div className="wa-card"><span className={styles.kicker}>WEBHOOK</span><strong>{meta.configured ? 'Server configured' : 'Needs configuration'}</strong><small>Inbound delivery/status events</small></div>
+          </div>
+          <div className="wa-actions"><button className={styles.primary} onClick={()=>void load()}>Connect / verify Meta</button><span>Set the Meta credentials in Hostinger environment variables; verification is performed server-side.</span></div>
+        </section>
+
+        <section className={styles.section}>
+          <div className={styles.panelHead}><div><h2>Template sync</h2><p>Pull the current approved templates from the connected WhatsApp Business Account before assigning them to automations.</p></div><button className={styles.secondary} disabled={!meta.connected || busy} onClick={()=>void syncTemplates()}>↻ Sync templates</button></div>
+          {templates.length ? <div className="wa-template-grid">{templates.map(t=><div className="wa-template" key={`${t.name}-${t.language}`}><div><strong>{t.name}</strong><span>{t.language || 'default language'}</span></div><b>{t.status || 'UNKNOWN'}</b><small>{t.category || 'WhatsApp template'}</small></div>)}</div> : <div className="wa-empty">No templates loaded in this session. Connect Meta and sync to read the live approved template catalogue.</div>}
+        </section>
+
+        <section className={styles.section}>
+          <div className={styles.panelHead}><div><h2>Order-status automation</h2><p>Choose which real order transitions should trigger WhatsApp messages. The workflow engine remains the source of execution and audit history.</p></div><span className={styles.pill}>8 STATUS FLOWS</span></div>
+          <div className="wa-status-list">{orderStatuses.map(([status,label,templateKey])=><div className="wa-status-row" key={status}><div><strong>{label}</strong><span>order.{status.toLowerCase()} → WhatsApp</span></div><code>{templateKey}</code><button className={styles.secondary} disabled={!meta.connected || busy} onClick={()=>void createStatusWorkflow(status, templateKey, label)}>Enable</button></div>)}</div>
+        </section>
+
+        <div className={styles.footerNote}>Order-status events are already normalized by the commerce automation layer; successful transitions can emit order-status automation runs and custom webhook events. fileciteturn517file0L2-L2</div>
+      </div>
+    </main>
+  </div>;
+}
