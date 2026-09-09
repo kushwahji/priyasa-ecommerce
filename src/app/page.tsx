@@ -35,9 +35,10 @@ export default async function Home(){
   if(fallbackBest.length)body.push(await renderProductSection({id:'best',type:'products-best',title:'Best Sellers',subtitle:'MOST LOVED',ctaHref:'/shop',ctaLabel:'View All'},fallbackBest));if(categories.length)body.push(categoriesMarkup(categories));
  }else{
   const orderedSections=[...sections].sort((a:any,b:any)=>{const priority=sectionPriority(a)-sectionPriority(b);if(priority!==0)return priority;return (Number(a.sortOrder)||0)-(Number(b.sortOrder)||0);});
+  let offerPlaced=false;
   for(const section of orderedSections){const type=typeOf(section);if(used.has(section.id))continue;
-   if(['hero','hero-slide'].includes(type)){const slides=sections.filter((s:any)=>['hero','hero-slide'].includes(typeOf(s))).sort((a:any,b:any)=>(Number(a.sortOrder)||0)-(Number(b.sortOrder)||0));slides.forEach((s:any)=>used.add(s.id));body.push(<section className="home-section home-hero-multi" key={`hero-${section.id}`}><HomeHeroCarousel slides={slides}/></section>);body.push(<HomeOfferStrip key={`offer-${section.id}`}/>);continue}
-   if(imageType(type)){const slides=sections.filter((s:any)=>imageType(typeOf(s))).sort((a:any,b:any)=>(Number(a.sortOrder)||0)-(Number(b.sortOrder)||0));slides.forEach((s:any)=>used.add(s.id));body.push(<section className="home-section" key={`images-${section.id}`}><HomeImageCarousel slides={slides}/></section>);continue}
+   if(['hero','hero-slide'].includes(type)){const slides=sections.filter((s:any)=>['hero','hero-slide'].includes(typeOf(s))).sort((a:any,b:any)=>(Number(a.sortOrder)||0)-(Number(b.sortOrder)||0));slides.forEach((s:any)=>used.add(s.id));body.push(<section className="home-section home-hero-multi" key={`hero-${section.id}`}><HomeHeroCarousel slides={slides}/></section>);continue}
+   if(imageType(type)){const slides=sections.filter((s:any)=>imageType(typeOf(s))).sort((a:any,b:any)=>(Number(a.sortOrder)||0)-(Number(b.sortOrder)||0));slides.forEach((s:any)=>used.add(s.id));body.push(<section className="home-section home-image-highlight-section" key={`images-${section.id}`}><HomeImageCarousel slides={slides}/></section>);if(!offerPlaced){body.push(<HomeOfferStrip key={`offer-after-images-${section.id}`}/>);offerPlaced=true}continue}
    if(type==='category-grid'){used.add(section.id);body.push(categoriesMarkup(categories,section.title||'Shop by Category',section.subtitle||'Find your style, your way.'));continue}
    if(type==='products-all'||type==='products-grid-30'){used.add(section.id);body.push(await renderProductSection(section,await getCachedStorefrontProducts({limit:30})));continue}
    if(productType(type)){used.add(section.id);body.push(await renderProductSection(section));continue}
@@ -48,6 +49,7 @@ export default async function Home(){
    if(featureType(type)){const group=sections.filter((s:any)=>featureType(typeOf(s))).sort((a:any,b:any)=>(Number(a.sortOrder)||0)-(Number(b.sortOrder)||0));group.forEach((s:any)=>used.add(s.id));body.push(<section className="home-section" key={`feature-${section.id}`}><div className="home-section-head"><div><span className="home-kicker">{section.subtitle||'PRIYASA EDIT'}</span><h2>{section.title||'Style for Every You'}</h2></div></div><div className="feature-grid feature-grid-editorial">{group.map((s:any)=><a key={s.id} href={s.ctaHref||'/shop'} className="feature" style={{backgroundImage:`linear-gradient(180deg,rgba(0,0,0,.03),rgba(0,0,0,.62)),url(${s.imageUrl||''})`}}><span className="eyebrow">{s.subtitle||'THE EDIT'}</span><h3>{s.title||'Explore the edit'}</h3><span>{s.ctaLabel||'Shop Now'} →</span></a>)}</div></section>);continue}
    used.add(section.id);body.push(<HomeCmsSection key={section.id} section={section}/>);
   }
+  if(!offerPlaced)body.splice(1,0,<HomeOfferStrip key="offer-fallback-position"/>);
  }
  return <div className="home-reference-v4"><SiteStructuredData />{body.filter(Boolean)}<div className="home-centre-design"><h2>Style for Every You</h2><p>Curated fashion, thoughtful details and beautiful everyday moments — the Priyasa way.</p></div><PersonalizedRecommendations/></div>;
 }
