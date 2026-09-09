@@ -7,12 +7,14 @@ import './whatsapp-reference-v1.css';
 
 type MetaStatus = { connected: boolean; configured: boolean; phoneNumberId?: string; phoneNumber?: string; wabaId?: string; businessName?: string };
 type Template = { name: string; language?: string; status?: string; category?: string };
+type Delivery = { providerMessageId: string; orderId?: string; recipient: string; templateName: string; status: string; error?: string; updatedAt?: string };
 const orderStatuses = [['CREATED','Order created'],['PAYMENT_PENDING','Payment pending'],['CONFIRMED','Order confirmed'],['PROCESSING','Processing'],['SHIPPED','Shipped'],['DELIVERED','Delivered'],['CANCELLED','Cancelled'],['RETURN_REQUESTED','Return requested'],['RETURNED','Returned'],['REFUNDED','Refunded']] as const;
 
 export default function WhatsAppCommerce() {
   const [meta, setMeta] = useState<MetaStatus>({ connected: false, configured: false });
   const [templates, setTemplates] = useState<Template[]>([]);
   const [mapping, setMapping] = useState<Record<string, string>>({});
+  const [deliveries, setDeliveries] = useState<Delivery[]>([]);
   const [message, setMessage] = useState('');
   const [busy, setBusy] = useState(false);
   const showMessage = useCallback((value: string) => setMessage(value), []);
@@ -27,7 +29,10 @@ export default function WhatsAppCommerce() {
       if (params.get('meta') === 'callback_failed') setMessage(params.get('reason') || 'Meta connection could not be completed.');
     } catch { setMessage('Unable to read Meta connection status.'); }
   }
-  useEffect(() => { void load(); }, []);
+  async function loadDeliveries() {
+    try { const r = await fetch('/api/admin/whatsapp/meta/messages', { cache: 'no-store' }); if (r.ok) setDeliveries((await r.json()).messages || []); } catch { /* monitoring must not block commerce controls */ }
+  }
+  useEffect(() => { void load(); void loadDeliveries(); const timer = window.setInterval(() => void loadDeliveries(), 15000); return () => window.clearInterval(timer); }, []);
 
   async function syncTemplates() {
     setBusy(true); setMessage('');
@@ -55,6 +60,8 @@ export default function WhatsAppCommerce() {
     finally { setBusy(false); }
   }
 
+  const deliveryStats = deliveries.reduce((a, d) => { a[d.status] = (a[d.status] || 0) + 1; return a; }, {} as Record<string, number>);
+
   return <div className={styles.shell}>
     <aside className={styles.side}><div className={styles.brand}><div className={styles.brandMark}>P</div><div className={styles.brandText}>PRIYASA<span>Commerce OS</span></div></div><div className={styles.navTitle}>CONVERSATION</div><nav className={styles.nav}><Link href="/admin">Overview</Link><Link href="/admin/marketing">Growth center</Link><Link className={styles.active} href="/admin/whatsapp">WhatsApp Commerce</Link><Link href="/admin/marketing-automation">Automation</Link><Link href="/admin/orders">Orders</Link></nav></aside>
     <main className={styles.main}><header className={styles.top}><div className={styles.topSpacer}/><Link className={styles.topLink} href="/admin">Dashboard</Link><div className={styles.avatar}>P</div></header>
@@ -64,6 +71,7 @@ export default function WhatsAppCommerce() {
         <section className={styles.section}><div className={styles.panelHead}><div><h2>One-click Meta connection</h2><p>Admins authorize Priyasa through Meta Embedded Signup. No customer-side API token, WABA ID or phone-number credentials are entered here.</p></div><span className={`${styles.pill} ${meta.connected ? 'wa-good' : ''}`}>{meta.connected ? 'CONNECTED' : 'NOT CONNECTED'}</span></div><div className="wa-connect-grid"><div className="wa-card"><span className={styles.kicker}>BUSINESS ACCOUNT</span><strong>{meta.businessName || meta.wabaId || 'Connect through Meta'}</strong><small>{meta.wabaId ? `WABA ${meta.wabaId}` : 'Discovered after authorization'}</small></div><div className="wa-card"><span className={styles.kicker}>PHONE NUMBER</span><strong>{meta.phoneNumber || meta.phoneNumberId || 'Connect through Meta'}</strong><small>{meta.phoneNumberId ? `Phone ID ${meta.phoneNumberId}` : 'Discovered from WABA'}</small></div><div className="wa-card"><span className={styles.kicker}>WEBHOOK</span><strong>{meta.configured ? 'Connected' : 'Auto setup after onboarding'}</strong><small>Inbound delivery and status events</small></div></div><div className="wa-actions"><span>Use the Meta button above to authorize. Meta hosts the authorization screen; Priyasa exchanges the temporary code server-side and keeps the resulting token encrypted.</span></div></section>
         <section className={styles.section}><div className={styles.panelHead}><div><h2>Meta template sync</h2><p>Read the live template catalogue from the connected WABA and use only APPROVED templates for customer messaging.</p></div><button className={styles.secondary} disabled={!meta.connected || busy} onClick={() => void syncTemplates()}>↻ Sync templates</button></div>{templates.length ? <div className="wa-template-grid">{templates.map(t => <div className="wa-template" key={`${t.name}-${t.language}`}><div><strong>{t.name}</strong><span>{t.language || 'default language'}</span></div><b>{t.status || 'UNKNOWN'}</b><small>{t.category || 'WhatsApp template'}</small></div>)}</div> : <div className="wa-empty">Connect Meta first, then sync to fetch the live approved template catalogue.</div>}</section>
         <section className={styles.section}><div className={styles.panelHead}><div><h2>Manage order-status messages</h2><p>Map each real commerce status to a synced Meta template, then create the corresponding automation rule.</p></div><span className={styles.pill}>{orderStatuses.length} STATUS FLOWS</span></div><div className="wa-status-list">{orderStatuses.map(([status, label]) => <div className="wa-status-row" key={status}><div><strong>{label}</strong><span>order.{status.toLowerCase()} → WhatsApp</span></div><select value={mapping[status] || ''} onChange={e => setMapping(m => ({ ...m, [status]: e.target.value }))} disabled={!templates.length || busy}><option value="">Select approved template…</option>{templates.filter(t => t.status === 'APPROVED').map(t => <option key={`${t.name}-${t.language}`} value={t.name}>{t.name} · {t.language || 'default'}</option>)}</select><button className={styles.secondary} disabled={!meta.connected || busy || !mapping[status]} onClick={() => void enable(status, label)}>Enable</button></div>)}</div></section>
+        <section className={styles.section}><div className={styles.panelHead}><div><h2>Live delivery monitoring</h2><p>Meta delivery webhooks update each message after the API accepts it: sent, delivered, read or failed.</p></div><span className={styles.pill}>{deliveries.length} RECENT</span></div><div className="wa-connect-grid"><div className="wa-card"><span className={styles.kicker}>SENT</span><strong>{deliveryStats.SENT || 0}</strong><small>Accepted by Meta</small></div><div className="wa-card"><span className={styles.kicker}>DELIVERED</span><strong>{deliveryStats.DELIVERED || 0}</strong><small>Delivered to recipient</small></div><div className="wa-card"><span className={styles.kicker}>READ / FAILED</span><strong>{(deliveryStats.READ || 0) + (deliveryStats.FAILED || 0)}</strong><small>{deliveryStats.READ || 0} read · {deliveryStats.FAILED || 0} failed</small></div></div>{deliveries.length ? <div className="wa-template-grid">{deliveries.slice(0, 12).map(d => <div className="wa-template" key={d.providerMessageId}><div><strong>{d.templateName}</strong><span>{d.recipient}</span></div><b>{d.status}</b><small>{d.error || (d.orderId ? `Order ${d.orderId}` : 'WhatsApp message')}</small></div>)}</div> : <div className="wa-empty">No WhatsApp messages have been sent yet.</div>}</section>
         <div className={styles.footerNote}>Meta Embedded Signup is hosted by Meta. Priyasa uses the Facebook JavaScript SDK to launch the authorization dialog, receives a short-lived authorization code, and completes the server-side exchange; the connected store never needs to enter a Meta API token.</div>
       </div>
     </main>
