@@ -31,6 +31,31 @@ test.describe('admin ↔ storefront data boundary', () => {
     }
   });
 
+  test('catalog and storefront-search surfaces agree on the same live product identity', async ({ request }) => {
+    const [catalogResponse, searchResponse] = await Promise.all([
+      request.get('/api/products?limit=12'),
+      request.get('/api/storefront/search?limit=12'),
+    ]);
+    expect(catalogResponse.status()).toBe(200);
+    expect(searchResponse.status()).toBe(200);
+
+    const catalog = await catalogResponse.json();
+    const search = await searchResponse.json();
+    const catalogProducts = catalog?.data ?? [];
+    const searchProducts = search?.data?.products ?? [];
+    expect(Array.isArray(catalogProducts)).toBeTruthy();
+    expect(Array.isArray(searchProducts)).toBeTruthy();
+
+    const catalogById = new Map(catalogProducts.map((product: any) => [product.id, product]));
+    for (const product of searchProducts) {
+      const source = catalogById.get(product.id);
+      if (!source) continue;
+      expect(product.slug).toBe(source.slug);
+      expect(product.name).toBe(source.name);
+      expect(Number(product.price)).toBe(Number(source.salePrice ?? source.price));
+    }
+  });
+
   test('public catalog payload keeps pricing and variant inventory coherent', async ({ request }) => {
     const response = await request.get('/api/products');
     expect(response.status()).toBe(200);
