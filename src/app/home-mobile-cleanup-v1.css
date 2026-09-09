@@ -1,0 +1,18 @@
+/* Mobile storefront cleanup: edge-to-edge campaign banners, no visual scrollbar chrome. */
+html,body{overflow-x:hidden!important}
+.home-reference-v4 .home-hero-multi{width:100%!important;max-width:none!important;margin:0!important;padding:0!important}
+.home-reference-v4 .premium-home-hero{width:100%!important;max-width:none!important;border-radius:0!important;box-shadow:none!important}
+.home-reference-v4 .home-image-highlight-section{width:100%!important;max-width:none!important;margin:0!important;padding:0!important}
+.home-reference-v4 .home-image-highlight-section .campaign-carousel{width:100%!important;max-width:none!important;margin:0!important;padding-left:0!important;padding-right:0!important}
+.home-reference-v4 .home-image-highlight-section .campaign-carousel-track{width:100%!important;margin:0!important;padding:0!important}
+.home-reference-v4 .home-image-highlight-section .campaign-carousel-card{min-width:0!important}
+.home-reference-v4 .home-centre-design{display:none!important}
+.home-reference-v4 .home-promo-board,.home-reference-v4 .affiliate-home,.home-reference-v4 .home-flash-sale,.home-reference-v4 .home-delivery-banner,.home-reference-v4 .home-festival-wrap{overflow-x:hidden!important}
+*{scrollbar-width:none!important;-ms-overflow-style:none!important}
+*::-webkit-scrollbar{display:none!important;width:0!important;height:0!important}
+@media(max-width:760px){
+ .home-reference-v4 .premium-home-hero{height:auto!important;min-height:0!important;max-height:none!important;aspect-ratio:1.48/1!important}
+ .home-reference-v4 .home-image-highlight-section .campaign-carousel-track{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important}
+ .home-reference-v4 .home-image-highlight-section .campaign-carousel-card{width:100%!important;aspect-ratio:3/4!important}
+ .home-reference-v4 .home-image-highlight-section .campaign-carousel-control{z-index:8!important}
+}
