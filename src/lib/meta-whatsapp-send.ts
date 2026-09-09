@@ -23,7 +23,7 @@ export async function sendMetaWhatsAppText(input: { to: string; body: string; or
   const body = input.body.trim();
   if (!body) throw new Error('WhatsApp text message is required');
   const result = await graphSend({ to: input.to, payload: { type: 'text', text: { preview_url: false, body } } });
-  await markWhatsAppOutbound(result.connection.phoneNumberId, result.to, body || 'WhatsApp message sent');
+  await markWhatsAppOutbound(result.connection.phoneNumberId, result.to, body);
   return { messageId: result.messageId, response: result.response, mode: 'FREE_WINDOW' as const };
 }
 
