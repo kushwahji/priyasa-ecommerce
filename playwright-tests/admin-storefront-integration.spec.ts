@@ -14,17 +14,27 @@ test.describe('admin ↔ storefront data boundary', () => {
     }
   });
 
+  test('public catalog payload keeps pricing and variant inventory coherent', async ({ request }) => {
+    const response = await request.get('/api/products');
+    expect(response.status()).toBe(200);
+    const payload = await response.json();
+    for (const product of payload.data) {
+      expect(Number(product.salePrice ?? product.price)).toBeGreaterThanOrEqual(0);
+      expect(Number(product.mrp ?? product.salePrice ?? product.price)).toBeGreaterThanOrEqual(Number(product.salePrice ?? product.price));
+      for (const variant of product.variants) {
+        expect(variant).toHaveProperty('id');
+        expect(Number(variant.stock)).toBeGreaterThanOrEqual(0);
+        expect(Number(variant.reserved ?? 0)).toBeGreaterThanOrEqual(0);
+      }
+    }
+  });
+
   test('admin catalog API never becomes a public mutation surface', async ({ request }) => {
     const response = await request.post('/api/admin/products', {
       data: {
-        name: 'E2E unauthorized product',
-        slug: 'e2e-unauthorized-product',
-        description: 'This request must never create a catalog record.',
-        categoryId: 'invalid-e2e-category',
-        mrp: 1999,
-        salePrice: 999,
-        active: true,
-        images: [],
+        name: 'E2E unauthorized product', slug: 'e2e-unauthorized-product',
+        description: 'This request must never create a catalog record.', categoryId: 'invalid-e2e-category',
+        mrp: 1999, salePrice: 999, active: true, images: [],
         variants: [{ sku: 'E2E-UNAUTH-001', size: 'M', color: 'Black', stock: 1 }],
       },
     });
@@ -33,9 +43,7 @@ test.describe('admin ↔ storefront data boundary', () => {
   });
 
   test('checkout quote rejects a non-existent variant before order creation', async ({ request }) => {
-    const response = await request.post('/api/checkout/quote', {
-      data: { items: [{ variantId: 'invalid-e2e-variant', quantity: 1 }] },
-    });
+    const response = await request.post('/api/checkout/quote', { data: { items: [{ variantId: 'invalid-e2e-variant', quantity: 1 }] } });
     expect(response.status()).toBe(409);
     const payload = await response.json();
     expect(payload.error).toMatch(/no longer available|available/i);
@@ -50,5 +58,14 @@ test.describe('admin ↔ storefront data boundary', () => {
     const response = await page.goto(href!);
     expect(response?.status()).toBeLessThan(500);
     await expect(page.locator('body')).not.toContainText('Application error');
+    await expect(page.getByRole('button', { name: /Add to Cart/i }).first()).toBeVisible({ timeout: 10000 });
+  });
+
+  test('public product page does not expose admin management UI', async ({ page }) => {
+    await page.goto('/shop');
+    const link = page.locator('a[href*="/product/"]').first();
+    await expect(link).toBeVisible({ timeout: 10000 });
+    await link.click();
+    await expect(page.locator('body')).not.toContainText(/Product command center|Catalog workspace|Commerce Control/i);
   });
 });
