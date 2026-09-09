@@ -1,12 +1,13 @@
 import { db } from '@/lib/db';
 import { sendMetaWhatsAppTemplate } from '@/lib/meta-whatsapp-send';
+import { sendOrderStatusWhatsApp } from '@/lib/whatsapp-order-status';
 
 function get(obj: any, path: string) { return path.split('.').reduce((v, k) => v == null ? undefined : v[k], obj); }
 function matches(conditions: any, payload: any) {
   if (!conditions || typeof conditions !== 'object') return true;
   return Object.entries(conditions).every(([k, v]) => { const actual = get(payload, k); if (Array.isArray(v)) return v.map(String).includes(String(actual)); return String(actual) === String(v); });
 }
-type AutomationAction = { type?: string; url?: string; message?: string; templateKey?: string; languageCode?: string; parameters?: unknown; [key: string]: unknown };
+type AutomationAction = { type?: string; url?: string; message?: string; freeTextMessage?: string; templateKey?: string; languageCode?: string; parameters?: unknown; [key: string]: unknown };
 function asActions(value: unknown): AutomationAction[] { if (!Array.isArray(value)) return []; return value.filter((item): item is AutomationAction => !!item && typeof item === 'object' && !Array.isArray(item)) as AutomationAction[]; }
 function templateValue(key: string, order: any, payload: any) {
   const normalized = key.replace(/[{}]/g, '').trim();
@@ -15,11 +16,18 @@ function templateValue(key: string, order: any, payload: any) {
 }
 async function executeWhatsApp(action: AutomationAction, run: any) {
   const templateKey = typeof action.templateKey === 'string' ? action.templateKey.trim() : '';
-  if (!templateKey) throw new Error('SEND_WHATSAPP requires templateKey');
   const orderId = typeof run.payload?.orderId === 'string' ? run.payload.orderId : '';
   if (!orderId) throw new Error('SEND_WHATSAPP requires payload.orderId');
   const order = await db.order.findUnique({ where: { id: orderId }, include: { user: true, shipment: true } });
   if (!order?.user?.phone) throw new Error('Order customer has no WhatsApp phone number');
+  const isOrderStatus = typeof run.automation.trigger === 'string' && run.automation.trigger.toLowerCase().startsWith('order.');
+  if (isOrderStatus) {
+    if (!templateKey) throw new Error('Order-status WhatsApp automation requires an approved Utility template for the outside-24h fallback');
+    const configuredParameters = Array.isArray(action.parameters) ? action.parameters.map(String) : [];
+    const parameters = configuredParameters.length ? configuredParameters : ['orderNumber', 'status'];
+    return sendOrderStatusWhatsApp({ order, status: String(run.payload?.status || ''), previousStatus: typeof run.payload?.previousStatus === 'string' ? run.payload.previousStatus : undefined, templateName: templateKey, languageCode: typeof action.languageCode === 'string' ? action.languageCode : undefined, parameters, freeTextMessage: typeof action.freeTextMessage === 'string' ? action.freeTextMessage : (typeof action.message === 'string' ? action.message : undefined) });
+  }
+  if (!templateKey) throw new Error('SEND_WHATSAPP requires templateKey');
   const configuredParameters = Array.isArray(action.parameters) ? action.parameters.map(String) : [];
   const bodyParameters = configuredParameters.length ? configuredParameters.map((key) => String(templateValue(key, order, run.payload))) : [String(order.orderNumber), String(run.payload?.status || '')];
   return sendMetaWhatsAppTemplate({ to: order.user.phone, templateName: templateKey, languageCode: typeof action.languageCode === 'string' ? action.languageCode : undefined, bodyParameters, orderId, automationRunId: run.id });
@@ -42,7 +50,7 @@ export async function processAutomationRuns(limit = 25) {
         }
         if (action.type === 'SEND_WHATSAPP') {
           const result = await executeWhatsApp(action, run);
-          await db.auditLog.create({ data: { action: 'WHATSAPP_MESSAGE_SENT', entity: 'AutomationRun', entityId: run.id, metadata: { templateKey: action.templateKey, providerMessageId: result.messageId, orderId: run.payload && typeof run.payload === 'object' ? (run.payload as any).orderId : null } } });
+          await db.auditLog.create({ data: { action: 'WHATSAPP_MESSAGE_SENT', entity: 'AutomationRun', entityId: run.id, metadata: { templateKey: action.templateKey || null, mode: (result as any).mode || 'UTILITY_TEMPLATE', providerMessageId: (result as any).messageId || null, orderId: run.payload && typeof run.payload === 'object' ? (run.payload as any).orderId : null } } });
         }
         if (action.type === 'log') await db.auditLog.create({ data: { action: 'AUTOMATION_ACTION', entity: 'AutomationRun', entityId: run.id, metadata: { message: typeof action.message === 'string' ? action.message : '', payload: run.payload } } });
       }
