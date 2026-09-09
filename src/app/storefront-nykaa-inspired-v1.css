@@ -1,0 +1,35 @@
+/* Priyasa storefront — Nykaa-inspired retail header treatment.
+ * Inspiration only: Priyasa branding, navigation and live commerce flows remain original.
+ */
+.site-header{height:72px!important;min-height:72px!important;padding:0 28px!important;display:flex!important;align-items:center!important;gap:26px!important;background:#fff!important;border-bottom:1px solid #eee8ea!important;box-shadow:0 2px 12px rgba(25,16,20,.035)!important}
+.site-header>.brand-logo-link{display:flex!important;align-items:center!important;min-width:184px!important}
+.site-header .brand-logo-full{width:184px!important;height:auto!important;max-height:50px!important}
+.site-header>nav{height:100%!important;display:flex!important;align-items:center!important;gap:25px!important;white-space:nowrap!important}
+.site-header>nav a,.site-header>nav summary{font-size:12px!important;font-weight:600!important;color:#262126!important}
+.site-header>nav a:first-child{color:#e9154f!important}
+.site-header>nav a:after{bottom:-24px!important;height:2px!important}
+.site-header .actions{margin-left:auto!important;display:flex!important;align-items:center!important;gap:18px!important}
+.site-header .actions .header-icon{width:28px!important;height:42px!important;display:grid!important;place-items:center!important}
+.site-header .actions svg{width:20px!important;height:20px!important;stroke-width:1.7!important}
+.site-header .header-login{width:28px!important;height:42px!important}
+.site-header .search-trigger,.site-header .header-search{width:min(270px,24vw)!important}
+.mega-panel{border-radius:0 0 12px 12px!important;border-top:2px solid #f51f55!important}
+
+/* Mobile: icon-only Priyasa logo, exactly as requested. */
+@media(max-width:900px){
+  .site-header{height:70px!important;min-height:70px!important;padding:0 12px!important;gap:0!important}
+  .site-header>.brand-logo-link{position:absolute!important;left:50%!important;top:50%!important;transform:translate(-50%,-50%)!important;min-width:0!important;height:46px!important}
+  .site-header>.brand-logo-link .brand-logo-full{display:none!important}
+  .site-header>.brand-logo-link .brand-logo-mobile{display:block!important;width:44px!important;height:44px!important}
+  .site-header>nav{display:none!important}
+  .site-header .actions{margin-left:auto!important;gap:4px!important}
+  .site-header .actions .header-icon{width:34px!important;height:42px!important}
+  .site-header .actions svg{width:21px!important;height:21px!important}
+  .mobile-menu{width:44px!important;height:44px!important;border:0!important;border-radius:0!important;background:transparent!important;display:grid!important;place-items:center!important}
+}
+@media(max-width:480px){
+  .site-header{height:66px!important;min-height:66px!important}
+  .site-header>.brand-logo-link .brand-logo-mobile{width:40px!important;height:40px!important}
+  .site-header .actions .header-icon{width:31px!important}
+  .mobile-menu{width:40px!important;height:40px!important}
+}
