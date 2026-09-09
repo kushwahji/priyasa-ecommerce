@@ -10,7 +10,7 @@ declare global {
   interface Window { FB?: FacebookSdk; fbAsyncInit?: () => void; }
 }
 
-export default function MetaWhatsAppEmbeddedSignup({ onMessage }: { onMessage?: (message: string) => void }) {
+export default function MetaWhatsAppEmbeddedSignup({ onMessage, className }: { onMessage?: (message: string) => void; className?: string }) {
   const [config, setConfig] = useState<EmbeddedConfig | null>(null);
   const [ready, setReady] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -90,7 +90,7 @@ export default function MetaWhatsAppEmbeddedSignup({ onMessage }: { onMessage?: 
     }
   }
 
-  return <button type="button" onClick={() => void launch()} disabled={busy || !ready} aria-busy={busy}>
+  return <button className={className} type="button" onClick={() => void launch()} disabled={busy || !ready} aria-busy={busy}>
     {busy ? 'Connecting…' : ready ? 'Continue with Meta →' : 'Loading Meta…'}
   </button>;
 }
