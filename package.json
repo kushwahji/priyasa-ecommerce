@@ -15,7 +15,7 @@
     "db:seed": "node scripts/use-mysql-schema.mjs && prisma generate --schema prisma/schema.mysql.prisma && tsx prisma/seed.ts",
     "storefront:cleanup-demo": "node scripts/use-mysql-schema.mjs && prisma generate --schema prisma/schema.mysql.prisma && tsx scripts/cleanup-demo-storefront.ts",
     "woocommerce:import": "node scripts/use-mysql-schema.mjs && prisma generate --schema prisma/schema.mysql.prisma && tsx scripts/import-woocommerce.ts",
-    "woocommerce:sync": "node scripts/use-mysql-schema.mjs && prisma generate --schema prisma/schema.mysql.prisma && tsx scripts/import-woocommerce.ts sync",
+    "woocommerce:sync": "node scripts/use-mysql-schema.mjs && prisma generate --schema prisma/schema.mysql.schema && tsx scripts/import-woocommerce.ts sync",
     "test": "vitest run tests/unit",
     "test:e2e": "playwright test"
   },
