@@ -1,0 +1,128 @@
+/* Priyasa responsive commerce polish v2. Nykaa-inspired interaction patterns, Priyasa branding. */
+:root{--p2-pink:#e5006d;--p2-ink:#17222d;--p2-muted:#737b82;--p2-line:#e8e8eb;--p2-bg:#f7f7f8}
+
+/* Product cards */
+.nykaa-product-card{position:relative!important;background:#fff!important;border:0!important;border-radius:0!important;overflow:visible!important;box-shadow:none!important;transition:transform .18s ease!important}
+.nykaa-product-media{position:relative!important;background:#f5f5f5!important;border-radius:6px!important;overflow:hidden!important;aspect-ratio:3/4!important}
+.nykaa-product-image-link{display:block!important;width:100%!important;height:100%!important}
+.nykaa-product-image-link img{display:block!important;width:100%!important;height:100%!important;object-fit:cover!important;transition:transform .45s cubic-bezier(.2,.7,.2,1),opacity .2s ease!important}
+.nykaa-product-card:hover .nykaa-product-image-link img{transform:scale(1.025)!important}
+.nykaa-product-badges{position:absolute!important;left:8px!important;top:8px!important;z-index:5!important;display:flex!important;flex-direction:column!important;align-items:flex-start!important;gap:5px!important}
+.nykaa-discount-badge{background:#e5006d!important;color:#fff!important;border-radius:2px!important;padding:5px 7px!important;font-size:10px!important;font-weight:800!important;letter-spacing:.02em!important;line-height:1!important}
+.nykaa-editorial-badge{background:#fff!important;color:#30353a!important;border-radius:2px!important;padding:5px 7px!important;font-size:9px!important;font-weight:750!important;box-shadow:0 1px 5px rgba(0,0,0,.08)!important}
+.nykaa-product-actions{position:absolute!important;right:8px!important;top:8px!important;z-index:6!important;display:flex!important;flex-direction:column!important;gap:7px!important;align-items:flex-end!important}
+.nykaa-wishlist{width:34px!important;height:34px!important;border-radius:50%!important;background:rgba(255,255,255,.96)!important;color:#24282c!important;border:0!important;display:grid!important;place-items:center!important;font-size:22px!important;line-height:1!important;box-shadow:0 2px 9px rgba(0,0,0,.1)!important;cursor:pointer!important}
+.nykaa-wishlist.is-active{color:var(--p2-pink)!important}
+.nykaa-quick{opacity:0!important;transform:translateY(-3px)!important;transition:opacity .18s ease,transform .18s ease!important;border:0!important;border-radius:3px!important;background:#fff!important;color:#24282c!important;padding:7px 9px!important;font-size:9px!important;font-weight:800!important;box-shadow:0 2px 9px rgba(0,0,0,.12)!important;cursor:pointer!important}
+.nykaa-product-card:hover .nykaa-quick{opacity:1!important;transform:none!important}
+.nykaa-quick-add{position:absolute!important;left:8px!important;right:8px!important;bottom:8px!important;z-index:5!important;opacity:0!important;transform:translateY(5px)!important;transition:opacity .2s ease,transform .2s ease!important}
+.nykaa-product-card:hover .nykaa-quick-add{opacity:1!important;transform:none!important}
+.nykaa-quick-add button,.nykaa-quick-add a{width:100%!important;min-height:38px!important;border-radius:3px!important;background:#fff!important;color:#222!important;border:1px solid #ddd!important;font-size:10px!important;font-weight:800!important;text-transform:uppercase!important;letter-spacing:.06em!important;box-shadow:0 2px 10px rgba(0,0,0,.08)!important}
+.nykaa-product-info{padding:9px 2px 14px!important}
+.nykaa-product-info .product-category{font-size:9px!important;color:#8b9197!important;text-transform:uppercase!important;letter-spacing:.07em!important;margin-bottom:4px!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}
+.nykaa-product-info h3{font-size:13px!important;line-height:1.35!important;font-weight:500!important;margin:0 0 6px!important;min-height:35px!important}
+.nykaa-product-info h3 a{color:#222!important;text-decoration:none!important}
+.nykaa-product-info .product-rating{display:flex!important;align-items:center!important;gap:5px!important;margin:0 0 6px!important;font-size:10px!important}
+.nykaa-product-info .product-rating span{color:#ef9b20!important;font-size:11px!important}
+.nykaa-product-info .product-rating small{color:#6d7378!important;font-size:10px!important}
+.nykaa-price-row{display:flex!important;align-items:baseline!important;gap:6px!important;flex-wrap:wrap!important}
+.nykaa-price-row .price{font-size:15px!important;color:#161b20!important;font-weight:800!important}
+.nykaa-price-row .mrp{font-size:11px!important;color:#969b9f!important;text-decoration:line-through!important}
+.nykaa-price-row .discount-text{font-size:10px!important;color:#008a4b!important;font-weight:750!important}
+.nykaa-color-swatches{display:flex!important;gap:5px!important;margin-top:8px!important;align-items:center!important}
+.nykaa-color-swatch{width:13px!important;height:13px!important;border-radius:50%!important;border:1px solid rgba(0,0,0,.13)!important;display:block!important}
+.nykaa-color-swatches .ecomus-color-more{font-size:9px!important;color:#777!important}
+
+/* Shared motion/performance: animate compositor-friendly properties only. */
+.product-card,.category-card,.home-casual-card,.offer-row,.checkout-card,.cart-product{will-change:auto}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition-duration:.01ms!important;animation-duration:.01ms!important;animation-iteration-count:1!important}}
+
+/* Cart */
+@media(min-width:681px){.nykaa-cart-v1 .cart-layout{max-width:1180px!important;margin:0 auto!important}.nykaa-cart-v1 .cart-items{background:#fff!important;border-radius:12px!important;overflow:hidden!important}.nykaa-cart-v1 .cart-product{transition:background .15s ease!important}.nykaa-cart-v1 .cart-product:hover{background:#fffafd!important}.nykaa-cart-v1 .cart-summary{position:sticky!important;top:88px!important;align-self:start!important;border-radius:12px!important}.nykaa-cart-v1 .nykaa-offers-v1,.nykaa-cart-v1 .nykaa-price-card{max-width:1180px!important;margin-left:auto!important;margin-right:auto!important}}
+@media(max-width:680px){
+ .nykaa-cart-v1{padding-bottom:86px!important;background:#f5f5f6!important}
+ .nykaa-cart-v1 .nykaa-mobile-head{height:58px!important;position:sticky!important;top:0!important;background:#fff!important;box-shadow:0 1px 0 #e6e6e8!important}
+ .nykaa-cart-v1 .nykaa-mobile-head h1{font-size:18px!important}
+ .nykaa-cart-v1 .cart-layout{gap:8px!important}
+ .nykaa-cart-v1 .cart-items{margin:0!important}
+ .nykaa-cart-v1 .cart-product{margin:0!important;padding:14px 12px!important;border-bottom:1px solid #eee!important;border-radius:0!important;grid-template-columns:82px minmax(0,1fr)!important;gap:12px!important}
+ .nykaa-cart-v1 .cart-product-image{width:82px!important;height:108px!important;border-radius:5px!important}
+ .nykaa-cart-v1 .cart-product-info h3{font-size:14px!important;margin-right:24px!important}
+ .nykaa-cart-v1 .cart-product-info p{font-size:12px!important;color:#222!important;font-weight:700!important}
+ .nykaa-cart-v1 .cart-product-bottom{grid-column:2!important;margin-top:7px!important}
+ .nykaa-cart-v1 .cart-product-bottom>strong{font-size:15px!important}
+ .nykaa-cart-v1 .qty-control{height:32px!important;border-radius:3px!important;background:#fff!important;border:1px solid #dedfe2!important}
+ .nykaa-cart-v1 .qty-control button{height:30px!important;width:30px!important}
+ .nykaa-cart-v1 .cart-remove{font-size:0!important}
+ .nykaa-cart-v1 .cart-remove:after{font-size:24px!important}
+ .nykaa-delivery-head{margin:0!important;border-radius:0!important;padding:13px 14px!important}
+ .nykaa-delivery-head strong{font-size:16px!important}
+ .nykaa-cart-payline{margin:0!important;border-radius:0!important;padding:13px 14px!important}
+ .nykaa-cart-payline>span{font-size:16px!important}.nykaa-cart-payline strong{font-size:18px!important}
+ .nykaa-offers-v1{margin:8px 0 0!important;border-radius:0!important;padding:18px 14px!important}
+ .nykaa-offers-v1 h2{font-size:18px!important}
+ .nykaa-price-card{margin:8px 0 0!important;border-radius:0!important}
+ .nykaa-price-row{padding:16px 14px!important;font-size:16px!important}.nykaa-price-row strong{font-size:18px!important}
+ .nykaa-save{font-size:13px!important}
+ .nykaa-cart-v1 .cart-checkout{left:auto!important;right:10px!important;bottom:10px!important;width:calc(100% - 20px)!important;height:52px!important;border-radius:5px!important;font-size:16px!important}
+ .nykaa-cart-v1 .cart-checkout:after{font-size:23px!important;margin-left:12px!important}
+}
+
+/* Checkout: clean two-stage mobile flow and spacious desktop cards. */
+.checkout-page{font-variant-numeric:tabular-nums}
+.checkout-page .checkout-card,.checkout-page .checkout-summary{transition:box-shadow .18s ease,border-color .18s ease}
+.checkout-page .payment-method-select{transition:border-color .16s ease,box-shadow .16s ease,transform .16s ease!important}
+.checkout-page .payment-method-select:hover:not(:disabled){transform:translateY(-1px)!important}
+@media(min-width:681px){.checkout-page{background:#f6f7f8!important}.checkout-page .checkout-layout{max-width:1180px!important;margin:0 auto!important;display:grid!important;grid-template-columns:minmax(0,1fr) 360px!important;align-items:start!important;gap:22px!important}.checkout-page .checkout-form{display:flex!important;flex-direction:column!important;gap:14px!important}.checkout-page .checkout-summary{position:sticky!important;top:90px!important}.checkout-page .payment-method-grid-premium{grid-template-columns:repeat(3,minmax(0,1fr))!important}}
+@media(max-width:680px){
+ .checkout-page{padding-bottom:78px!important;background:#f5f5f6!important}
+ .checkout-page .breadcrumbs{height:58px!important;padding:0 14px!important;font-size:18px!important;position:sticky!important;top:0!important;z-index:120!important}
+ .checkout-page .checkout-layout{gap:8px!important}
+ .checkout-page .checkout-card{margin:0!important;border-radius:0!important;padding:16px 14px!important}
+ .checkout-page .checkout-card-head h1,.checkout-page .checkout-card-head h2{font-size:19px!important}
+ .checkout-page .checkout-card-head{margin-bottom:8px!important}
+ .checkout-page .saved-addresses{margin-bottom:10px!important}
+ .checkout-page .saved-address{padding:12px!important}
+ .checkout-page .form-grid{gap:10px!important}
+ .checkout-page .input{min-height:48px!important;font-size:15px!important}
+ .checkout-page .payment-preview{padding-bottom:16px!important}
+ .checkout-page .payment-method-grid-premium{display:grid!important;grid-template-columns:1fr 1fr!important;gap:8px!important}
+ .checkout-page .payment-method-select{min-height:88px!important;padding:11px!important;text-align:left!important}
+ .checkout-page .payment-method-select svg{width:24px!important;height:24px!important}
+ .checkout-page .payment-method-select .payment-method-copy strong{font-size:13px!important}
+ .checkout-page .payment-method-select .payment-method-copy small{font-size:10px!important}
+ .checkout-page .checkout-summary{margin:0!important;border-radius:0!important}
+ .checkout-page .checkout-summary h2{font-size:18px!important}
+ .checkout-page .payment-submit{height:62px!important;box-shadow:0 -5px 18px rgba(0,0,0,.08)!important}
+}
+
+/* PDP mobile/desktop consistency */
+@media(min-width:681px){.ecomus-pdp{background:#fff!important}.ecomus-pdp .pdp-main-image{border-radius:5px!important}.ecomus-pdp .pdp-info{position:relative}.ecomus-pdp .premium-purchase-panel{box-shadow:0 4px 20px rgba(20,37,54,.04)!important}}
+@media(max-width:680px){
+ .ecomus-pdp{padding-bottom:74px!important}
+ .ecomus-pdp .pdp-mobile-head{height:58px!important;display:flex!important;position:sticky!important;top:0!important;z-index:130!important;background:#fff!important;border-bottom:1px solid #e5e6e8!important}
+ .ecomus-pdp .pdp-mobile-head h1{font-size:17px!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}
+ .ecomus-pdp .pdp-gallery{background:#fff!important}
+ .ecomus-pdp .pdp-gallery .pdp-main-image{height:calc(100vw + 30px)!important;max-height:570px!important}
+ .ecomus-pdp .pdp-mobile-slider{height:auto!important}
+ .ecomus-pdp .pdp-info{padding:16px 14px 0!important}
+ .ecomus-pdp .pdp-info h1{font-size:20px!important;font-weight:600!important}
+ .ecomus-pdp .pdp-price{padding-bottom:14px!important}.ecomus-pdp .pdp-price strong{font-size:22px!important}
+ .ecomus-pdp .pdp-description{font-size:13px!important}
+ .ecomus-pdp .premium-purchase-panel{padding-bottom:0!important}
+ .ecomus-pdp .pdp-wishlist{border:1px solid #ddd!important;border-radius:20px!important;padding:8px 13px!important;background:#fff!important}
+ .ecomus-pdp .purchase-actions{gap:8px!important}
+ .ecomus-pdp .pdp-add-button,.ecomus-pdp .pdp-buy-button{height:48px!important;font-size:14px!important;border-radius:4px!important}
+ .ecomus-pdp .delivery-promises{margin-top:10px!important}
+ .ecomus-pdp .premium-product-details{margin-top:12px!important}
+}
+
+/* Home rails: one alignment system across phone/tablet/desktop. */
+.home-reference-v4 .home-section{box-sizing:border-box!important}
+@media(min-width:761px){.home-reference-v4 .home-section{max-width:1280px!important;margin-left:auto!important;margin-right:auto!important;padding-left:28px!important;padding-right:28px!important}.home-reference-v4 .home-hero-multi{max-width:none!important;padding-left:0!important;padding-right:0!important}}
+@media(min-width:1100px){.home-reference-v4 .home-flash-sale .home-product-grid{grid-template-columns:repeat(4,minmax(0,1fr))!important}.home-reference-v4 .home-casual-grid{grid-template-columns:repeat(4,minmax(0,1fr))!important}}
+@media(min-width:761px) and (max-width:1099px){.home-reference-v4 .home-flash-sale .home-product-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important}.home-reference-v4 .home-casual-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important}}
+@media(max-width:760px){.home-reference-v4 .home-section{width:100%!important;box-sizing:border-box!important}.home-reference-v4 .home-section-head{min-width:0!important}.home-reference-v4 .home-section-head>div{min-width:0!important}.home-reference-v4 .home-section-head h2{word-break:normal!important}.home-reference-v4 .home-flash-sale .home-product-grid,.home-reference-v4 .home-product-section:not(.home-flash-sale) .home-product-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
+
+/* Mobile fixed navigation always stays above page content, below PDP/cart CTAs. */
+@media(max-width:680px){.mobile-bottom-nav{z-index:180!important}.nykaa-product-card .nykaa-quick{display:none!important}.nykaa-product-card .nykaa-quick-add{display:none!important}.nykaa-product-info{min-width:0!important}}
