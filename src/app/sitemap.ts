@@ -1,7 +1,9 @@
 import type { MetadataRoute } from 'next';
 import { getStorefrontCategories, getStorefrontProducts } from '@/lib/storefront-data';
 
-export const dynamic = 'force-dynamic';
+// Sitemap data is public and changes much less frequently than orders or inventory.
+// Rebuild at most hourly instead of querying the catalog on every sitemap request.
+export const revalidate = 3600;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const base = process.env.NEXT_PUBLIC_APP_URL || 'https://priyasa.com';
