@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, devices } from '@playwright/test';
 
 test.describe('admin ↔ storefront data boundary', () => {
   test('public catalog API exposes only active storefront products', async ({ request }) => {
@@ -11,6 +11,23 @@ test.describe('admin ↔ storefront data boundary', () => {
       expect(product).toHaveProperty('slug');
       expect(product).toHaveProperty('active', true);
       expect(Array.isArray(product.variants)).toBeTruthy();
+    }
+  });
+
+  test('storefront search payload is backed by live catalog records', async ({ request }) => {
+    const response = await request.get('/api/storefront/search?limit=12');
+    expect(response.status()).toBeLessThan(500);
+    if (!response.ok()) return;
+    const payload = await response.json();
+    const products = payload?.data?.products ?? [];
+    expect(Array.isArray(products)).toBeTruthy();
+    for (const product of products.slice(0, 5)) {
+      expect(product.id).toBeTruthy();
+      expect(product.slug).toBeTruthy();
+      expect(product.name).toBeTruthy();
+      expect(Number(product.price)).toBeGreaterThanOrEqual(0);
+      expect(Array.isArray(product.colors)).toBeTruthy();
+      expect(Array.isArray(product.sizes)).toBeTruthy();
     }
   });
 
@@ -30,14 +47,7 @@ test.describe('admin ↔ storefront data boundary', () => {
   });
 
   test('admin catalog API never becomes a public mutation surface', async ({ request }) => {
-    const response = await request.post('/api/admin/products', {
-      data: {
-        name: 'E2E unauthorized product', slug: 'e2e-unauthorized-product',
-        description: 'This request must never create a catalog record.', categoryId: 'invalid-e2e-category',
-        mrp: 1999, salePrice: 999, active: true, images: [],
-        variants: [{ sku: 'E2E-UNAUTH-001', size: 'M', color: 'Black', stock: 1 }],
-      },
-    });
+    const response = await request.post('/api/admin/products', { data: { name: 'E2E unauthorized product', slug: 'e2e-unauthorized-product', description: 'Must never create a catalog record.', categoryId: 'invalid-e2e-category', mrp: 1999, salePrice: 999, active: true, images: [], variants: [{ sku: 'E2E-UNAUTH-001', size: 'M', color: 'Black', stock: 1 }] } });
     expect([401, 403, 409]).toContain(response.status());
     expect(response.status()).not.toBe(201);
   });
@@ -67,5 +77,30 @@ test.describe('admin ↔ storefront data boundary', () => {
     await expect(link).toBeVisible({ timeout: 10000 });
     await link.click();
     await expect(page.locator('body')).not.toContainText(/Product command center|Catalog workspace|Commerce Control/i);
+  });
+
+  test('admin catalog is protected while storefront remains public', async ({ page }) => {
+    const storefront = await page.goto('/shop', { waitUntil: 'domcontentloaded' });
+    expect(storefront?.status()).toBeLessThan(500);
+    await expect(page.locator('body')).not.toContainText('Application error');
+    await page.goto('/admin/products', { waitUntil: 'domcontentloaded' });
+    await expect(page).toHaveURL(/admin\/login/);
+  });
+});
+
+test.describe('responsive catalog surfaces', () => {
+  test.use({ viewport: devices['iPhone 13'].viewport, userAgent: devices['iPhone 13'].userAgent, isMobile: true });
+
+  test('mobile storefront catalog has no document overflow', async ({ page }) => {
+    await page.goto('/shop', { waitUntil: 'domcontentloaded' });
+    const dimensions = await page.evaluate(() => ({ width: document.documentElement.scrollWidth, viewport: window.innerWidth }));
+    expect(dimensions.width).toBeLessThanOrEqual(dimensions.viewport + 2);
+    await expect(page.locator('body')).not.toContainText('Application error');
+  });
+
+  test('mobile admin catalog redirects cleanly', async ({ page }) => {
+    await page.goto('/admin/products', { waitUntil: 'domcontentloaded' });
+    await expect(page).toHaveURL(/admin\/login/);
+    await expect(page.locator('body')).not.toContainText('Application error');
   });
 });
