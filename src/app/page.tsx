@@ -1,4 +1,5 @@
-import { getBestSellers, getHomeCms, getLatestLaunches, getProductsForHomeSection, getStorefrontCategories, getStorefrontProducts } from '@/lib/storefront-data';
+import { getBestSellers, getProductsForHomeSection } from '@/lib/storefront-data';
+import { getCachedHomeCms, getCachedStorefrontCategories, getCachedStorefrontProducts } from '@/lib/storefront-cache';
 import HomeHeroCarousel from '@/components/HomeHeroCarousel';
 import HomeImageCarousel from '@/components/HomeImageCarousel';
 import HomeCmsSection from '@/components/HomeCmsSection';
@@ -6,7 +7,9 @@ import HomeProductGrid from '@/components/HomeProductGrid';
 import AffiliateHomeSection from '@/components/AffiliateHomeSection';
 import PersonalizedRecommendations from '@/components/PersonalizedRecommendations';
 import { TruckIcon, ShieldIcon, ReturnIcon, GiftIcon } from '@/components/StorefrontIcons';
-export const dynamic='force-dynamic';
+import { SiteStructuredData } from '@/app/seo-schema';
+
+export const revalidate = 120;
 const cleanText=(value:unknown)=>String(value??'').replace(/<[^>]*>/g,' ').replace(/&amp;/g,'&').replace(/&quot;/g,'"').replace(/&#39;|&apos;/g,"'").replace(/\s+/g,' ').trim();
 const typeOf=(s:any)=>String(s.type||'').toLowerCase();
 const productType=(type:string)=>!['products-all','products-grid-30'].includes(type)&&(type.startsWith('products-')||['latest','latest-collection','best-sellers','trending','sale'].includes(type));
@@ -21,7 +24,7 @@ const categoriesMarkup=(categories:any[],title='Shop by Category',subtitle='Find
 const promoCards=(categories:any[])=>{const cards=categories.slice(0,3);if(!cards.length)return null;return <section className="home-promo-board"><div className="home-promo-heading"><span>SHOP THE EDIT</span><h2>Find Your Favourite</h2><p>Curated styles for every mood, moment and occasion.</p></div><div className="home-promo-grid">{cards.map((c:any)=><a className="home-promo-card" key={c.id} href={`/category/${c.slug}`}><div className="home-promo-image" style={{backgroundImage:`url(${c.imageUrl||c.products?.[0]?.images?.[0]?.url||'/images/product-placeholder.svg'})`}}/><div className="home-promo-copy"><small>PRIYASA EDIT</small><strong>{c.name}</strong><span>SHOP NOW →</span></div></a>)}</div></section>};
 const trustStrip=()=> <section className="home-delivery-banner"><div className="home-delivery-inner"><div className="home-delivery-item"><TruckIcon/><div><strong>Free Shipping</strong><small>On orders above ₹999</small></div></div><div className="home-delivery-item"><GiftIcon/><div><strong>COD Available</strong><small>Cash on delivery</small></div></div><div className="home-delivery-item"><ReturnIcon/><div><strong>Easy Returns</strong><small>Hassle free</small></div></div><div className="home-delivery-item"><ShieldIcon/><div><strong>Secure Payments</strong><small>100% safe & trusted</small></div></div></div></section>;
 export default async function Home(){
- const [categories,sections,latest]=await Promise.all([getStorefrontCategories(),getHomeCms(),getLatestLaunches(30)]);const fallbackBest=await getBestSellers(30);const fallbackSale=await getProductsForHomeSection('products-sale',30);const festivalSlug=categories.find((c:any)=>['festival','festive','diwali','navratri','eid','wedding'].some((k:string)=>String(c.slug).toLowerCase().includes(k)))?.slug;const festivalProducts=festivalSlug?await getStorefrontProducts({categorySlug:festivalSlug,limit:30}):[];const hasCms=sections.length>0;const used=new Set<string>();
+ const [categories,sections,latest]=await Promise.all([getCachedStorefrontCategories(),getCachedHomeCms(),getCachedStorefrontProducts({limit:30})]);const fallbackBest=await getBestSellers(30);const fallbackSale=await getProductsForHomeSection('products-sale',30);const festivalSlug=categories.find((c:any)=>['festival','festive','diwali','navratri','eid','wedding'].some((k:string)=>String(c.slug).toLowerCase().includes(k)))?.slug;const festivalProducts=festivalSlug?await getCachedStorefrontProducts({categorySlug:festivalSlug,limit:30}):[];const hasCms=sections.length>0;const used=new Set<string>();
  const renderProductSection=async(section:any,productsOverride?:any[],className='')=>{const products=productsOverride||await getProductsForHomeSection(typeOf(section),30);if(!products.length)return null;return <section className={`home-section home-product-section ${className}`.trim()} key={section.id}><div className="home-section-head"><div><span className="home-kicker">{section.subtitle||'PRIYASA EDIT'}</span><h2>{section.title||'Curated for you'}</h2>{section.subtitle&&<p>{cleanText(section.subtitle)}</p>}</div>{section.ctaHref&&<a className="home-view-all" href={section.ctaHref}>{section.ctaLabel||'View All'} →</a>}</div><HomeProductGrid products={products} initialVisible={10} step={10}/></section>};
  const body:any[]=[];
  if(!hasCms){
@@ -35,7 +38,7 @@ export default async function Home(){
    if(['hero','hero-slide'].includes(type)){const slides=sections.filter((s:any)=>['hero','hero-slide'].includes(typeOf(s))).sort((a:any,b:any)=>(Number(a.sortOrder)||0)-(Number(b.sortOrder)||0));slides.forEach((s:any)=>used.add(s.id));body.push(<section className="home-section home-hero-multi" key={`hero-${section.id}`}><HomeHeroCarousel slides={slides}/></section>);continue}
    if(imageType(type)){const slides=sections.filter((s:any)=>imageType(typeOf(s))).sort((a:any,b:any)=>(Number(a.sortOrder)||0)-(Number(b.sortOrder)||0));slides.forEach((s:any)=>used.add(s.id));body.push(<section className="home-section" key={`images-${section.id}`}><HomeImageCarousel slides={slides}/></section>);continue}
    if(type==='category-grid'){used.add(section.id);body.push(categoriesMarkup(categories,section.title||'Shop by Category',section.subtitle||'Find your style, your way.'));continue}
-   if(type==='products-all'||type==='products-grid-30'){used.add(section.id);body.push(await renderProductSection(section,await getStorefrontProducts({limit:30})));continue}
+   if(type==='products-all'||type==='products-grid-30'){used.add(section.id);body.push(await renderProductSection(section,await getCachedStorefrontProducts({limit:30})));continue}
    if(productType(type)){used.add(section.id);body.push(await renderProductSection(section));continue}
    if(festivalType(type)){used.add(section.id);body.push(<section className="home-festival-wrap" key={section.id}><section className="home-section"><div className="home-section-head"><div><span className="home-kicker">{section.subtitle||'FESTIVAL EDIT'}</span><h2>{section.title||'Festival Collection'}</h2></div>{section.ctaHref&&<a className="home-view-all" href={section.ctaHref}>{section.ctaLabel||'Shop Collection'} →</a>}</div><div className="home-festival-grid">{(festivalProducts.length?festivalProducts:latest).slice(0,4).map((p:any)=><a className="home-festival-card" key={p.id} href={`/product/${p.slug}`} style={{backgroundImage:`url(${p.image})`}}><div className="home-festival-copy"><strong>{p.name}</strong><span>SHOP NOW →</span></div></a>)}</div></section></section>);continue}
    if(deliveryType(type)){used.add(section.id);body.push(trustStrip());continue}
@@ -45,5 +48,5 @@ export default async function Home(){
    used.add(section.id);body.push(<HomeCmsSection key={section.id} section={section}/>);
   }
  }
- return <div className="home-reference-v4">{body.filter(Boolean)}<div className="home-centre-design"><h2>Style for Every You</h2><p>Curated fashion, thoughtful details and beautiful everyday moments — the Priyasa way.</p></div><PersonalizedRecommendations/></div>;
+ return <div className="home-reference-v4"><SiteStructuredData />{body.filter(Boolean)}<div className="home-centre-design"><h2>Style for Every You</h2><p>Curated fashion, thoughtful details and beautiful everyday moments — the Priyasa way.</p></div><PersonalizedRecommendations/></div>;
 }
