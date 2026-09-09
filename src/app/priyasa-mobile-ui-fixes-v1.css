@@ -1,0 +1,64 @@
+/* Mobile UI fixes driven by production screenshots. Keep the desktop Ecomus system unchanged. */
+@media(max-width:760px){
+  html,body{overflow-x:hidden!important}
+
+  /* Never expose the browser scrollbar on the mobile category drawer. Touch scrolling remains enabled. */
+  .mobile-drawer,.mobile-drawer nav,.mobile-menu-panel{scrollbar-width:none!important;-ms-overflow-style:none!important}
+  .mobile-drawer::-webkit-scrollbar,.mobile-drawer nav::-webkit-scrollbar,.mobile-menu-panel::-webkit-scrollbar{width:0!important;height:0!important;display:none!important}
+
+  /* Hero: remove the decorative progress/scroll bars visible beneath the banner. Keep swipe, arrows and accessible tabs. */
+  .premium-home-hero .hero-progress{display:none!important}
+  .premium-home-hero .home-hero-dots{display:none!important}
+  .premium-home-hero{margin-bottom:0!important}
+
+  /* Do not leave a fake horizontal scrollbar under image-led homepage sections. */
+  .home-reference-v4 .home-promo-grid,
+  .home-reference-v4 .home-festival-wrap .home-festival-grid,
+  .home-reference-v4 .home-flash-sale .home-product-grid,
+  .home-reference-v4 .home-image-carousel{
+    scrollbar-width:none!important;
+    -ms-overflow-style:none!important;
+  }
+  .home-reference-v4 .home-promo-grid::-webkit-scrollbar,
+  .home-reference-v4 .home-festival-wrap .home-festival-grid::-webkit-scrollbar,
+  .home-reference-v4 .home-flash-sale .home-product-grid::-webkit-scrollbar,
+  .home-reference-v4 .home-image-carousel::-webkit-scrollbar{display:none!important;width:0!important;height:0!important}
+
+  /* Casual edit: exactly two image cards in the mobile viewport. No sideways page scrolling. */
+  .home-reference-v4 .home-casual-grid{
+    display:grid!important;
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    gap:10px!important;
+    width:100%!important;
+    overflow:visible!important;
+    padding:0!important;
+  }
+  .home-reference-v4 .home-casual-card{
+    min-width:0!important;
+    width:100%!important;
+    aspect-ratio:3/4!important;
+    scroll-snap-align:none!important;
+  }
+  .home-reference-v4 .home-casual-copy{left:12px!important;right:10px!important;bottom:12px!important}
+  .home-reference-v4 .home-casual-copy strong{font-size:15px!important;line-height:1.15!important}
+  .home-reference-v4 .home-casual-copy span{font-size:8px!important}
+
+  /* The fixed mobile navigation should sit cleanly below content rather than visually merging into a banner/trust strip. */
+  .mobile-bottom-nav{z-index:100!important}
+  main{padding-bottom:0!important}
+  .home-delivery-banner{margin-bottom:0!important}
+
+  /* Compact, non-overlapping mobile hero controls. */
+  .premium-home-hero .home-hero-control{z-index:8!important}
+  .premium-home-hero .home-hero-prev{left:8px!important}
+  .premium-home-hero .home-hero-next{right:8px!important}
+}
+
+@media(max-width:480px){
+  .home-reference-v4 .home-casual-grid{gap:8px!important}
+  .home-reference-v4 .home-casual-copy strong{font-size:14px!important}
+}
+
+@media(prefers-reduced-motion:reduce){
+  .premium-home-hero .home-hero-media .home-hero-image{transition:none!important}
+}
