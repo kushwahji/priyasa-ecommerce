@@ -44,18 +44,16 @@ type Connection = {
   updatedAt: Date;
 };
 
-const SELECT = `SELECT id, user_id as userId, access_token_encrypted as accessTokenEncrypted, waba_id as wabaId, phone_number_id as phoneNumberId, phone_number as phoneNumber, business_name as businessName, status, connected_at as connectedAt, updated_at as updatedAt FROM ${TABLE}`;
-
 export async function getMetaWhatsAppConnection(userId: string) {
   await ensureMetaWhatsAppTable();
-  const rows = await db.$queryRawUnsafe<Connection[]>(`${SELECT} WHERE user_id = ? LIMIT 1`, userId);
+  const rows = await db.$queryRaw<Connection[]>`SELECT id, user_id as userId, access_token_encrypted as accessTokenEncrypted, waba_id as wabaId, phone_number_id as phoneNumberId, phone_number as phoneNumber, business_name as businessName, status, connected_at as connectedAt, updated_at as updatedAt FROM ${TABLE_SQL} WHERE user_id = ${userId} LIMIT 1`;
   return rows[0] ?? null;
 }
 
 /** Single-store fallback: delivery workers do not run in an admin session, so use the latest connected store account. */
 export async function getAnyMetaWhatsAppConnection() {
   await ensureMetaWhatsAppTable();
-  const rows = await db.$queryRawUnsafe<Connection[]>(`${SELECT} WHERE status = 'CONNECTED' ORDER BY connectedAt DESC LIMIT 1`);
+  const rows = await db.$queryRaw<Connection[]>`SELECT id, user_id as userId, access_token_encrypted as accessTokenEncrypted, waba_id as wabaId, phone_number_id as phoneNumberId, phone_number as phoneNumber, business_name as businessName, status, connected_at as connectedAt, updated_at as updatedAt FROM ${TABLE_SQL} WHERE status = 'CONNECTED' ORDER BY connected_at DESC LIMIT 1`;
   return rows[0] ?? null;
 }
 
