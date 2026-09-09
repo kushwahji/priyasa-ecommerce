@@ -33,10 +33,16 @@ export default function WhatsAppCommerce() {
       const ar = await fetch('/api/admin/automations', { cache: 'no-store' });
       if (ar.ok) {
         const data = await ar.json();
-        const rules = Array.isArray(data.automations) ? data.automations : [];
+        const rules = Array.isArray(data.data) ? data.data : [];
         const next: Record<string, boolean> = {};
-        for (const rule of rules) if (typeof rule.trigger === 'string' && rule.trigger.startsWith('order.')) next[rule.trigger.replace('order.','').toUpperCase()] = !!rule.enabled;
-        setEnabled(next);
+        const configs: Record<string, FlowConfig> = {};
+        for (const rule of rules) if (typeof rule.trigger === 'string' && rule.trigger.startsWith('order.')) {
+          const status = rule.trigger.replace('order.','').toUpperCase();
+          next[status] = !!rule.enabled;
+          const action = Array.isArray(rule.actions) ? rule.actions.find((x: any) => x?.type === 'SEND_WHATSAPP') : null;
+          if (action) configs[status] = { template: action.templateKey, language: action.languageCode, freeText: action.freeTextMessage || action.message, parameters: Array.isArray(action.parameters) ? action.parameters.map(String) : ['orderNumber','status'] };
+        }
+        setEnabled(next); setFlows(configs);
       }
     } catch { setMessage('Unable to read Meta connection status.'); }
   }
@@ -57,11 +63,7 @@ export default function WhatsAppCommerce() {
     } catch (e) { setMessage(e instanceof Error ? e.message : 'Template sync failed'); }
     finally { setBusy(false); }
   }
-
-  function setFlow(status: string, patch: Partial<FlowConfig>) {
-    setFlows(current => ({ ...current, [status]: { ...current[status], ...patch } }));
-  }
-
+  function setFlow(status: string, patch: Partial<FlowConfig>) { setFlows(current => ({ ...current, [status]: { ...current[status], ...patch } })); }
   async function enable(status: string, label: string) {
     const flow = flows[status] || {};
     const templateKey = flow.template;
@@ -70,15 +72,14 @@ export default function WhatsAppCommerce() {
     if (selected?.category && selected.category.toUpperCase() !== 'UTILITY') { setMessage(`${templateKey} is ${selected.category}, not Utility. Choose an approved Utility template for order-status notifications.`); return; }
     setBusy(true); setMessage('');
     try {
-      const r = await fetch('/api/admin/automations', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name: `WhatsApp · ${label}`, trigger: `order.${status.toLowerCase()}`, conditions: { status: status.toLowerCase() }, actions: [{ type: 'SEND_WHATSAPP', templateKey, languageCode: flow.language || selected?.language || 'en_US', parameters: flow.parameters?.length ? flow.parameters : ['orderNumber','status'], freeTextMessage: flow.freeText || defaultText(label) }], enabled: true }) });
+      const r = await fetch('/api/admin/automations', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ upsert: true, name: `WhatsApp · ${label}`, trigger: `order.${status.toLowerCase()}`, conditions: { status: status.toLowerCase() }, actions: [{ type: 'SEND_WHATSAPP', templateKey, languageCode: flow.language || selected?.language || 'en_US', parameters: flow.parameters?.length ? flow.parameters : ['orderNumber','status'], freeTextMessage: flow.freeText || defaultText(label) }], enabled: true }) });
       const d = await r.json();
-      if (!r.ok) throw new Error(d.error || 'Unable to create workflow');
+      if (!r.ok) throw new Error(d.error || 'Unable to save workflow');
       setEnabled(current => ({ ...current, [status]: true }));
-      setMessage(`${label} workflow is enabled. Inside 24h it sends the free-form message; after 24h it falls back to the approved Utility template.`);
-    } catch (e) { setMessage(e instanceof Error ? e.message : 'Unable to create workflow'); }
+      setMessage(`${label} workflow saved. Inside 24h it sends the free-form message; after 24h it falls back to the approved Utility template.`);
+    } catch (e) { setMessage(e instanceof Error ? e.message : 'Unable to save workflow'); }
     finally { setBusy(false); }
   }
-
   const deliveryStats = deliveries.reduce((a, d) => { a[d.status] = (a[d.status] || 0) + 1; return a; }, {} as Record<string, number>);
   const approvedUtility = templates.filter(t => t.status === 'APPROVED' && (!t.category || t.category.toUpperCase() === 'UTILITY'));
 
@@ -90,18 +91,7 @@ export default function WhatsAppCommerce() {
         {message && <div className="wa-notice">{message}</div>}
         <section className={styles.section}><div className={styles.panelHead}><div><h2>One-click Meta connection</h2><p>Admins authorize Priyasa through Meta Embedded Signup. No customer-side API token, WABA ID or phone-number credentials are entered here.</p></div><span className={`${styles.pill} ${meta.connected ? 'wa-good' : ''}`}>{meta.connected ? 'CONNECTED' : 'NOT CONNECTED'}</span></div><div className="wa-connect-grid"><div className="wa-card"><span className={styles.kicker}>BUSINESS ACCOUNT</span><strong>{meta.businessName || meta.wabaId || 'Connect through Meta'}</strong><small>{meta.wabaId ? `WABA ${meta.wabaId}` : 'Discovered after authorization'}</small></div><div className="wa-card"><span className={styles.kicker}>PHONE NUMBER</span><strong>{meta.phoneNumber || meta.phoneNumberId || 'Connect through Meta'}</strong><small>{meta.phoneNumberId ? `Phone ID ${meta.phoneNumberId}` : 'Discovered from WABA'}</small></div><div className="wa-card"><span className={styles.kicker}>WEBHOOK</span><strong>{meta.configured ? 'Connected' : 'Auto setup after onboarding'}</strong><small>Inbound delivery and status events</small></div></div></section>
         <section className={styles.section}><div className={styles.panelHead}><div><h2>Meta template sync</h2><p>Use only live APPROVED Utility templates for the outside-24h fallback.</p></div><button className={styles.secondary} disabled={!meta.connected || busy} onClick={() => void syncTemplates()}>↻ Sync templates</button></div>{templates.length ? <div className="wa-template-grid">{templates.map(t => <div className="wa-template" key={`${t.name}-${t.language}`}><div><strong>{t.name}</strong><span>{t.language || 'default language'}</span></div><b>{t.status || 'UNKNOWN'}</b><small>{t.category || 'WhatsApp template'}</small></div>)}</div> : <div className="wa-empty">Connect Meta first, then sync the live template catalogue.</div>}</section>
-        <section className={styles.section}><div className={styles.panelHead}><div><h2>24-hour order-status automation</h2><p>Configure both paths once. If the customer messaged Priyasa within the last 24 hours, the workflow sends a free-form status update. When that window is closed, the same event automatically uses the approved Utility template.</p></div><span className={styles.pill}>{approvedUtility.length} UTILITY TEMPLATES</span></div>
-          <div className="wa-status-list">{orderStatuses.map(([status, label]) => { const flow = flows[status] || {}; const preview = (flow.freeText || defaultText(label)).replace(/\{\{customerName\}\}/g,'Aarav').replace(/\{\{orderNumber\}\}/g,'PRY-1048').replace(/\{\{trackingNumber\}\}/g,'TRK123456'); return <div className="wa-status-row wa-status-row--editor" key={status}>
-            <div className="wa-flow-title"><strong>{label}</strong><span>order.{status.toLowerCase()} → policy-aware WhatsApp</span><em className={enabled[status] ? 'wa-flow-on' : ''}>{enabled[status] ? 'ENABLED' : 'DRAFT'}</em></div>
-            <div className="wa-flow-controls">
-              <label>Approved Utility fallback<select value={flow.template || ''} onChange={e => { const t = templates.find(x => x.name === e.target.value && x.status === 'APPROVED'); setFlow(status, { template: e.target.value, language: t?.language || 'en_US' }); }} disabled={!approvedUtility.length || busy}><option value="">Select Utility template…</option>{approvedUtility.map(t => <option key={`${t.name}-${t.language}`} value={t.name}>{t.name} · {t.language || 'default'}</option>)}</select></label>
-              <label>Template variables<select multiple value={flow.parameters || ['orderNumber','status']} onChange={e => setFlow(status, { parameters: Array.from(e.target.selectedOptions).map(o => o.value) })} disabled={busy}>{variables.map(v => <option key={v} value={v}>{`{{${v}}}`}</option>)}</select></label>
-              <label>Free-form message inside 24h<textarea value={flow.freeText ?? defaultText(label)} onChange={e => setFlow(status, { freeText: e.target.value })} disabled={busy} rows={3}/></label>
-              <div className="wa-flow-preview"><span>LIVE PREVIEW</span><p>{preview}</p></div>
-              <button className={styles.secondary} disabled={!meta.connected || busy || !flow.template} onClick={() => void enable(status, label)}>{enabled[status] ? 'Update workflow' : 'Enable workflow'}</button>
-            </div>
-          </div>; })}</div>
-        </section>
+        <section className={styles.section}><div className={styles.panelHead}><div><h2>24-hour order-status automation</h2><p>Configure both paths once. If the customer messaged Priyasa within the last 24 hours, the workflow sends a free-form status update. When that window is closed, the same event automatically uses the approved Utility template.</p></div><span className={styles.pill}>{approvedUtility.length} UTILITY TEMPLATES</span></div><div className="wa-status-list">{orderStatuses.map(([status, label]) => { const flow = flows[status] || {}; const preview = (flow.freeText || defaultText(label)).replace(/\{\{customerName\}\}/g,'Aarav').replace(/\{\{orderNumber\}\}/g,'PRY-1048').replace(/\{\{trackingNumber\}\}/g,'TRK123456'); return <div className="wa-status-row wa-status-row--editor" key={status}><div className="wa-flow-title"><strong>{label}</strong><span>order.{status.toLowerCase()} → policy-aware WhatsApp</span><em className={enabled[status] ? 'wa-flow-on' : ''}>{enabled[status] ? 'ENABLED' : 'DRAFT'}</em></div><div className="wa-flow-controls"><label>Approved Utility fallback<select value={flow.template || ''} onChange={e => { const t = templates.find(x => x.name === e.target.value && x.status === 'APPROVED'); setFlow(status, { template: e.target.value, language: t?.language || 'en_US' }); }} disabled={!approvedUtility.length || busy}><option value="">Select Utility template…</option>{approvedUtility.map(t => <option key={`${t.name}-${t.language}`} value={t.name}>{t.name} · {t.language || 'default'}</option>)}</select></label><label>Template variables<select multiple value={flow.parameters || ['orderNumber','status']} onChange={e => setFlow(status, { parameters: Array.from(e.target.selectedOptions).map(o => o.value) })} disabled={busy}>{variables.map(v => <option key={v} value={v}>{`{{${v}}}`}</option>)}</select></label><label>Free-form message inside 24h<textarea value={flow.freeText ?? defaultText(label)} onChange={e => setFlow(status, { freeText: e.target.value })} disabled={busy} rows={3}/></label><div className="wa-flow-preview"><span>LIVE PREVIEW</span><p>{preview}</p></div><button className={styles.secondary} disabled={!meta.connected || busy || !flow.template} onClick={() => void enable(status, label)}>{enabled[status] ? 'Update workflow' : 'Enable workflow'}</button></div></div>; })}</div></section>
         <section className={styles.section}><div className={styles.panelHead}><div><h2>Live delivery monitoring</h2><p>Meta delivery webhooks update accepted messages as sent, delivered, read or failed.</p></div><span className={styles.pill}>{deliveries.length} RECENT</span></div><div className="wa-connect-grid"><div className="wa-card"><span className={styles.kicker}>SENT</span><strong>{deliveryStats.SENT || 0}</strong><small>Accepted by Meta</small></div><div className="wa-card"><span className={styles.kicker}>DELIVERED</span><strong>{deliveryStats.DELIVERED || 0}</strong><small>Delivered to recipient</small></div><div className="wa-card"><span className={styles.kicker}>READ / FAILED</span><strong>{(deliveryStats.READ || 0) + (deliveryStats.FAILED || 0)}</strong><small>{deliveryStats.READ || 0} read · {deliveryStats.FAILED || 0} failed</small></div></div>{deliveries.length ? <div className="wa-template-grid">{deliveries.slice(0, 12).map(d => <div className="wa-template" key={d.providerMessageId}><div><strong>{d.templateName}</strong><span>{d.recipient}</span></div><b>{d.status}</b><small>{d.error || (d.orderId ? `Order ${d.orderId}` : 'WhatsApp message')}</small></div>)}</div> : <div className="wa-empty">No WhatsApp messages have been sent yet.</div>}</section>
         <div className={styles.footerNote}>The 24-hour policy is enforced server-side. An order-status automation cannot silently send a free-form message outside the customer-service window; it requires the configured approved Utility fallback.</div>
       </div>
