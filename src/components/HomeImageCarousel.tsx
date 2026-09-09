@@ -20,10 +20,10 @@ export default function HomeImageCarousel({slides}:{slides:Slide[]}){
  const touchStart=(e:React.TouchEvent)=>{const t=e.changedTouches[0];startX.current=t.clientX;startY.current=t.clientY};
  const touchEnd=(e:React.TouchEvent)=>{if(startX.current===null||startY.current===null)return;const t=e.changedTouches[0],dx=t.clientX-startX.current,dy=t.clientY-startY.current;startX.current=null;startY.current=null;if(Math.abs(dx)<40||Math.abs(dx)<Math.abs(dy))return;dx<0?next():prev()};
  const imageError=(e:React.SyntheticEvent<HTMLImageElement>)=>{const img=e.currentTarget;if(img.dataset.fallback)return;img.dataset.fallback='1';img.src='/images/product-placeholder.svg'};
- return <section className="campaign-carousel" onTouchStart={touchStart} onTouchEnd={touchEnd} aria-roledescription="carousel" aria-label="Priyasa campaign collections">
+ return <section className="campaign-carousel home-image-carousel home-image-carousel-grid" onTouchStart={touchStart} onTouchEnd={touchEnd} aria-roledescription="carousel" aria-label="Priyasa campaign collections">
    <div className="campaign-carousel-viewport">
     <div className="campaign-carousel-track" style={{'--campaign-columns':perView} as React.CSSProperties}>
-     {visible.map((s,i)=><article className="campaign-carousel-card" key={`${s.id}-${page}-${i}`}>
+     {visible.map((s,i)=><article className="campaign-carousel-card home-image-carousel-card" key={`${s.id}-${page}-${i}`}>
        <Link href={s.ctaHref||'/shop'} className="campaign-carousel-link" aria-label={s.title||'Explore Priyasa collection'}>
         <picture className="campaign-carousel-picture"><source media="(max-width:760px)" srcSet={s.mobileImageUrl||s.imageUrl||'/images/product-placeholder.svg'}/><img className="campaign-carousel-image" src={s.imageUrl||'/images/product-placeholder.svg'} alt={s.title||'Priyasa collection'} loading={i<2?'eager':'lazy'} onError={imageError}/></picture>
         <div className="campaign-carousel-copy"><span>{s.subtitle||'PRIYASA EDIT'}</span><strong>{s.title||'Explore the edit'}</strong>{s.ctaLabel&&<small>{s.ctaLabel} →</small>}</div>
