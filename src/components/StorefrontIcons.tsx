@@ -10,6 +10,7 @@ export const BagIcon=(p:Props)=><Icon {...p}><path d="M5 8.5h14l-1 11H6l-1-11Z"/
 export const MenuIcon=(p:Props)=><Icon {...p}><path d="M4 7h16M4 12h16M4 17h16"/></Icon>;
 export const CloseIcon=(p:Props)=><Icon {...p}><path d="m6 6 12 12M18 6 6 18"/></Icon>;
 export const ChevronIcon=(p:Props)=><Icon {...p}><path d="m9 6 6 6-6 6"/></Icon>;
+export const GridIcon=(p:Props)=><Icon {...p}><rect x="4" y="4" width="6" height="6" rx="1"/><rect x="14" y="4" width="6" height="6" rx="1"/><rect x="4" y="14" width="6" height="6" rx="1"/><rect x="14" y="14" width="6" height="6" rx="1"/></Icon>;
 export const TruckIcon=(p:Props)=><Icon {...p}><path d="M3 6h11v10H3zM14 10h4l3 3v3h-7z"/><circle cx="7" cy="18" r="1.5"/><circle cx="18" cy="18" r="1.5"/></Icon>;
 export const ShieldIcon=(p:Props)=><Icon {...p}><path d="M12 3 19 6v5c0 4.4-2.8 8-7 10-4.2-2-7-5.6-7-10V6l7-3Z"/><path d="m9 12 2 2 4-4"/></Icon>;
 export const ReturnIcon=(p:Props)=><Icon {...p}><path d="M8 7H4l4-4"/><path d="M4 7h9a6 6 0 1 1-6 6"/></Icon>;
