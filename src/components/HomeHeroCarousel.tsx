@@ -1,5 +1,5 @@
 'use client';
-import Link from 'next/link';import {useEffect,useRef,useState} from 'react';
+import Link from 'next/link';import {useEffect,useRef,useState}from'react';
 type Slide={id:string;title?:string|null;subtitle?:string|null;imageUrl?:string|null;mobileImageUrl?:string|null;ctaLabel?:string|null;ctaHref?:string|null};
 export default function HomeHeroCarousel({slides}:{slides:Slide[]}){
  const[active,setActive]=useState(0),[paused,setPaused]=useState(false);const startX=useRef<number|null>(null);const startY=useRef<number|null>(null);
@@ -8,7 +8,7 @@ export default function HomeHeroCarousel({slides}:{slides:Slide[]}){
  const slide=slides[active];const next=()=>setActive(v=>(v+1)%slides.length);const prev=()=>setActive(v=>(v-1+slides.length)%slides.length);const image=slide.imageUrl||'/images/product-placeholder.svg';const mobileImage=slide.mobileImageUrl||image;
  const touchStart=(e:React.TouchEvent)=>{const t=e.changedTouches[0];startX.current=t.clientX;startY.current=t.clientY};
  const touchEnd=(e:React.TouchEvent)=>{if(startX.current===null||startY.current===null)return;const t=e.changedTouches[0],dx=t.clientX-startX.current,dy=t.clientY-startY.current;startX.current=null;startY.current=null;if(Math.abs(dx)<45||Math.abs(dx)<Math.abs(dy))return;dx<0?next():prev()};
- const imageError=(e:React.SyntheticEvent<HTMLImageElement>)=>{if(e.currentTarget.dataset.fallback)return;e.currentTarget.dataset.fallback='1';e.currentTarget.src='/images/product-placeholder.svg'};
+ const imageError=(e:React.SyntheticEvent<HTMLImageElement>)=>{const img=e.currentTarget;if(img.dataset.fallback)return;img.dataset.fallback='1';const picture=img.closest('picture');const source=picture?.querySelector('source');if(source)source.removeAttribute('srcset');img.src='/images/product-placeholder.svg'};
  return <section className="home-hero-carousel premium-home-hero" onMouseEnter={()=>setPaused(true)} onMouseLeave={()=>setPaused(false)} onFocus={()=>setPaused(true)} onBlur={e=>{if(!e.currentTarget.contains(e.relatedTarget as Node))setPaused(false)}} onTouchStart={touchStart} onTouchEnd={touchEnd} aria-roledescription="carousel" aria-label="Priyasa featured collections">
   <div className="home-hero-media"><picture><source media="(max-width:760px)" srcSet={mobileImage}/><img key={`${slide.id}-hero`} src={image} alt={slide.title||'Priyasa collection'} className="home-hero-image" onError={imageError}/></picture><div className="home-hero-shade"/></div>
   <div className="home-hero-copy"><span className="eyebrow">{slide.subtitle||'PRIYASA COLLECTIONS'}</span><h1>{slide.title||'Discover your style'}</h1>{slide.subtitle&&<p>{slide.subtitle}</p>}{slide.ctaHref&&<Link className="button" href={slide.ctaHref}>{slide.ctaLabel||'Shop Now'} →</Link>}</div>
