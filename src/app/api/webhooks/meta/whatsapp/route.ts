@@ -8,9 +8,10 @@ export async function GET(req: NextRequest) {
   const token = url.searchParams.get('hub.verify_token');
   const challenge = url.searchParams.get('hub.challenge');
   const expected = process.env.META_WHATSAPP_WEBHOOK_VERIFY_TOKEN;
-  if (mode === 'subscribe' && token && expected && crypto.timingSafeEqual(Buffer.from(token), Buffer.from(expected)) && challenge) {
-    return new NextResponse(challenge, { status: 200 });
-  }
+  const tokenBytes = token ? Buffer.from(token) : null;
+  const expectedBytes = expected ? Buffer.from(expected) : null;
+  const valid = Boolean(tokenBytes && expectedBytes && tokenBytes.length === expectedBytes.length && crypto.timingSafeEqual(tokenBytes, expectedBytes));
+  if (mode === 'subscribe' && valid && challenge) return new NextResponse(challenge, { status: 200 });
   return NextResponse.json({ error: 'Webhook verification failed' }, { status: 403 });
 }
 
