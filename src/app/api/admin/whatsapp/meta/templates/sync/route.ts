@@ -1,12 +1,12 @@
 import { NextResponse } from 'next/server';
 import { getSession } from '@/lib/auth';
-import { decryptMetaToken, getMetaWhatsAppConnection } from '@/lib/meta-whatsapp';
+import { decryptMetaToken, getAnyMetaWhatsAppConnection, getMetaWhatsAppConnection } from '@/lib/meta-whatsapp';
 
 export async function POST() {
   const session = await getSession();
   if (!session || !['ADMIN', 'STAFF'].includes(session.role)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   try {
-    const connection = await getMetaWhatsAppConnection(session.userId);
+    const connection = await getMetaWhatsAppConnection(session.userId) || await getAnyMetaWhatsAppConnection();
     if (!connection?.wabaId) return NextResponse.json({ error: 'Connect Meta WhatsApp before syncing templates.' }, { status: 409 });
     const token = decryptMetaToken(connection.accessTokenEncrypted);
     const version = process.env.META_GRAPH_API_VERSION || 'v23.0';
