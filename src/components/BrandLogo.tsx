@@ -6,22 +6,30 @@ type BrandLogoProps = {
   className?: string;
 };
 
-/**
- * Priyasa wordmark lockup.
- *
- * The previous implementation rendered an invented square “P” badge. The
- * storefront reference uses the PRIYASA wordmark, so the fake badge is
- * intentionally removed until the canonical brand SVG/PNG is supplied.
- */
+/** Canonical Priyasa brand lockup: full wordmark on desktop, icon-only on mobile. */
 export function BrandLogo({ href = '/', compact = false, className = '' }: BrandLogoProps) {
   const content = (
     <span className={`brand-lockup ${compact ? 'brand-lockup--compact' : ''} ${className}`}>
-      <span className="brand-wordmark" aria-label="PRIYASA">
-        <strong>PRIYASA</strong>
-        {!compact && <small>Every You, Beautiful</small>}
-      </span>
+      <img
+        className="brand-logo-full"
+        src="/images/priyasa-logo.svg"
+        alt="PRIYASA"
+        width={184}
+        height={48}
+      />
+      <img
+        className="brand-logo-mobile"
+        src="/images/priyasa-icon.svg"
+        alt="PRIYASA"
+        width={42}
+        height={42}
+      />
     </span>
   );
 
-  return href ? <Link href={href} className="brand-logo-link" aria-label="PRIYASA home">{content}</Link> : content;
+  return href ? (
+    <Link href={href} className="brand-logo-link" aria-label="PRIYASA home">
+      {content}
+    </Link>
+  ) : content;
 }
