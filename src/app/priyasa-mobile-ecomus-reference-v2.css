@@ -1,0 +1,78 @@
+/* Priyasa mobile reference v2 — visual layer for the supplied mobile reference.
+ * Presentation-only: keeps navigation, cart, wishlist and account behavior intact.
+ */
+@media (max-width:760px){
+  :root{--mobile-pink:#f51b68;--mobile-pink-dark:#a3164b;--mobile-ink:#151216;--mobile-muted:#777074;--mobile-line:#ece7e9;--mobile-soft:#fff5f8}
+
+  /* Reference proportions: compact white header followed by a short editorial hero. */
+  .site-header{height:72px!important;min-height:72px!important;padding:0 14px!important;box-shadow:none!important;border-bottom:1px solid #eee!important}
+  .site-header .brand img{width:46px!important;height:46px!important}
+  .site-header .mobile-menu{width:46px!important;height:46px!important}
+  .site-header .mobile-menu svg{width:29px!important;height:29px!important;stroke-width:2.25!important}
+  .site-header .actions .header-icon{width:42px!important;height:48px!important}
+  .site-header .actions .header-icon svg{width:25px!important;height:25px!important;stroke-width:2.1!important}
+
+  /* Hero behaves like an image banner, not a full-screen landing page. Aspect ratio is
+     intentionally close to the supplied ~1.68:1 mobile banner and remains fluid. */
+  .home-hero-multi{padding:10px 12px 0!important}
+  .home-reference-v4 .premium-home-hero{height:auto!important;min-height:0!important;max-height:none!important;aspect-ratio:1.68/1!important;border-radius:0!important;box-shadow:none!important}
+  .premium-home-hero .home-hero-media{height:100%!important}
+  .premium-home-hero .home-hero-media .home-hero-image{object-fit:cover!important;object-position:center center!important}
+  .premium-home-hero .home-hero-copy{left:0!important;right:0!important;bottom:0!important;width:100%!important;max-width:none!important;padding:22px 18px 18px!important;background:linear-gradient(180deg,transparent,rgba(20,10,14,.7))!important;text-shadow:none!important}
+  .premium-home-hero .home-hero-copy .eyebrow,.premium-home-hero .home-hero-copy h1,.premium-home-hero .home-hero-copy p{display:none!important}
+  .premium-home-hero .home-hero-copy .button{min-height:36px!important;padding:0 15px!important;font-size:10px!important}
+  .premium-home-hero .home-hero-control{top:50%!important;bottom:auto!important;width:38px!important;height:38px!important;font-size:27px!important;background:rgba(255,255,255,.94)!important;border-color:rgba(255,255,255,.94)!important;color:#111!important;box-shadow:0 4px 14px rgba(0,0,0,.12)!important}
+  .premium-home-hero .home-hero-prev{left:10px!important}
+  .premium-home-hero .home-hero-next{right:10px!important}
+  .premium-home-hero .home-hero-dots{bottom:10px!important;left:50%!important;right:auto!important;transform:translateX(-50%)!important}
+  .premium-home-hero .hero-slide-meta{display:none!important}
+  .premium-home-hero .hero-progress{height:2px!important}
+
+  /* Two-up casual cards, matching the supplied compact mobile editorial layout. */
+  .home-reference-v4 .home-casual-grid{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important;overflow:visible!important}
+  .home-reference-v4 .home-casual-card{min-width:0!important;width:100%!important;aspect-ratio:.72/1!important;min-height:0!important;border-radius:0!important;background-position:center top!important}
+  .home-reference-v4 .home-casual-copy{padding:12px 10px!important}
+  .home-reference-v4 .home-casual-copy strong{font-size:13px!important;line-height:1.05!important}
+  .home-reference-v4 .home-casual-copy span{font-size:8px!important;letter-spacing:.8px!important}
+
+  /* Keep other campaign tiles dense and two-up where they are image-led. */
+  .home-reference-v4 .home-promo-grid{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important;overflow:visible!important}
+  .home-reference-v4 .home-promo-card{min-width:0!important;width:100%!important;min-height:0!important;aspect-ratio:.78/1!important}
+
+  /* Ecomus-like mobile drawer: clean white canvas, restrained pink accent,
+     large section rows and a compact utility footer. */
+  .mobile-menu-backdrop{background:rgba(17,12,15,.42)!important;backdrop-filter:blur(2px)!important;z-index:510!important}
+  .mobile-drawer{position:fixed!important;left:0!important;top:0!important;bottom:0!important;width:min(390px,88vw)!important;padding:0!important;background:#fff!important;color:var(--mobile-ink)!important;box-shadow:12px 0 36px rgba(0,0,0,.16)!important;border:0!important;overflow:hidden!important;z-index:520!important}
+  .mobile-drawer-head{min-height:70px!important;height:70px!important;padding:0 18px!important;display:flex!important;align-items:center!important;justify-content:space-between!important;border-bottom:1px solid var(--mobile-line)!important}
+  .mobile-drawer-brand{display:flex!important;align-items:center!important;gap:10px!important;color:var(--mobile-ink)!important;text-decoration:none!important}
+  .mobile-drawer-brand img{width:42px!important;height:42px!important;object-fit:contain!important}
+  .mobile-drawer-brand span{font:500 10px/1 Arial,sans-serif!important;letter-spacing:1.8px!important;text-transform:uppercase!important;color:var(--mobile-muted)!important}
+  .mobile-drawer-head>button{width:40px!important;height:40px!important;padding:0!important;border:0!important;background:transparent!important;color:#111!important;display:grid!important;place-items:center!important}
+  .mobile-drawer-head>button svg{width:22px!important;height:22px!important;stroke-width:1.8!important}
+  .mobile-drawer-search{padding:15px 18px 13px!important;background:#fff!important}
+  .mobile-drawer-search a{min-height:46px!important;display:flex!important;align-items:center!important;gap:10px!important;padding:0 13px!important;border:1px solid #ddd7da!important;border-radius:0!important;background:#fff!important;color:#777!important;text-decoration:none!important;font:400 12px/1 Arial,sans-serif!important}
+  .mobile-drawer-search svg{width:19px!important;height:19px!important;color:#111!important}
+  .mobile-drawer nav{padding:0 18px!important;overflow:auto!important;max-height:calc(100vh - 270px)!important}
+  .mobile-drawer nav a{min-height:49px!important;padding:0 3px!important;display:flex!important;align-items:center!important;justify-content:space-between!important;border-bottom:1px solid #f0ecee!important;color:#181417!important;text-decoration:none!important;font:500 14px/1 Arial,sans-serif!important;letter-spacing:.05px!important}
+  .mobile-drawer nav a:first-child{border-top:1px solid #f0ecee!important}
+  .mobile-drawer nav a:first-child span,.mobile-drawer nav a:last-child span{font-weight:700!important}
+  .mobile-drawer nav a svg{width:15px!important;height:15px!important;color:#aaa!important;stroke-width:1.7!important}
+  .mobile-drawer-foot{position:absolute!important;left:0!important;right:0!important;bottom:0!important;display:grid!important;grid-template-columns:repeat(4,1fr)!important;padding:11px 10px calc(11px + env(safe-area-inset-bottom))!important;background:#fff!important;border-top:1px solid var(--mobile-line)!important;box-shadow:0 -4px 15px rgba(0,0,0,.04)!important}
+  .mobile-drawer-foot a{min-height:50px!important;display:grid!important;place-items:center!important;align-content:center!important;gap:5px!important;color:#272126!important;text-decoration:none!important;font:500 9px/1 Arial,sans-serif!important;text-align:center!important}
+  .mobile-drawer-foot a svg{width:21px!important;height:21px!important;stroke-width:1.8!important}
+  .mobile-drawer-foot a:hover,.mobile-drawer nav a:hover{color:var(--mobile-pink)!important}
+
+  /* Bottom navigation stays four-up like the reference; active state is Priyasa pink. */
+  .mobile-bottom-nav{height:82px!important;min-height:82px!important;padding:8px 7px calc(8px + env(safe-area-inset-bottom))!important}
+  .mobile-bottom-nav a{font-size:11px!important;gap:4px!important}
+  .mobile-bottom-nav svg{width:28px!important;height:28px!important;stroke-width:2!important}
+  .mobile-bottom-nav a.is-active{color:var(--mobile-pink)!important}
+}
+
+@media(max-width:480px){
+  .site-header{height:70px!important;min-height:70px!important;padding:0 10px!important}
+  .home-hero-multi{padding:8px 10px 0!important}
+  .home-reference-v4 .premium-home-hero{aspect-ratio:1.68/1!important}
+  .premium-home-hero .home-hero-control{width:36px!important;height:36px!important}
+  .mobile-drawer{width:88vw!important}
+}
