@@ -50,5 +50,7 @@ export async function getMetaWhatsAppConnection(userId: string) {
 
 export async function saveMetaWhatsAppConnection(input: Omit<Connection, 'updatedAt'>) {
   await ensureMetaWhatsAppTable();
-  await db.$executeRawUnsafe(`INSERT INTO ${TABLE} (id, user_id, access_token_encrypted, waba_id, phone_number_id, phone_number, business_name, status, connected_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE access_token_encrypted = VALUES(access_token_encrypted), waba_id = VALUES(waba_id), phone_number_id = VALUES(phone_number_id), phone_number = VALUES(phone_number), business_name = VALUES(business_name), status = VALUES(status), connected_at = VALUES(connected_at), updated_at = VALUES(updated_at)`, input.id, input.userId, input.accessTokenEncrypted, input.wabaId, input.phoneNumberId, input.phoneNumber, input.businessName, input.status, input.connectedAt, new Date());
+  const now = new Date();
+  await db.$executeRawUnsafe(`DELETE FROM ${TABLE} WHERE user_id = ?`, input.userId);
+  await db.$executeRawUnsafe(`INSERT INTO ${TABLE} (id, user_id, access_token_encrypted, waba_id, phone_number_id, phone_number, business_name, status, connected_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, input.id, input.userId, input.accessTokenEncrypted, input.wabaId, input.phoneNumberId, input.phoneNumber, input.businessName, input.status, input.connectedAt, now);
 }
