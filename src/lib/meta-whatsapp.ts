@@ -1,7 +1,9 @@
 import crypto from 'node:crypto';
+import { Prisma } from '@prisma/client';
 import { db } from '@/lib/db';
 
 const TABLE = 'PriyasaMetaWhatsAppConnection';
+const TABLE_SQL = Prisma.raw(TABLE);
 
 function key() {
   const secret = process.env.SESSION_SECRET?.trim();
@@ -44,13 +46,13 @@ type Connection = {
 
 export async function getMetaWhatsAppConnection(userId: string) {
   await ensureMetaWhatsAppTable();
-  const rows = await db.$queryRaw<Connection[]>`SELECT id, user_id as userId, access_token_encrypted as accessTokenEncrypted, waba_id as wabaId, phone_number_id as phoneNumberId, phone_number as phoneNumber, business_name as businessName, status, connected_at as connectedAt, updated_at as updatedAt FROM ${db.$unsafe(TABLE)} WHERE user_id = ${userId} LIMIT 1`;
+  const rows = await db.$queryRaw<Connection[]>`SELECT id, user_id as userId, access_token_encrypted as accessTokenEncrypted, waba_id as wabaId, phone_number_id as phoneNumberId, phone_number as phoneNumber, business_name as businessName, status, connected_at as connectedAt, updated_at as updatedAt FROM ${TABLE_SQL} WHERE user_id = ${userId} LIMIT 1`;
   return rows[0] ?? null;
 }
 
 export async function saveMetaWhatsAppConnection(input: Omit<Connection, 'updatedAt'>) {
   await ensureMetaWhatsAppTable();
   const now = new Date();
-  await db.$executeRaw`DELETE FROM ${db.$unsafe(TABLE)} WHERE user_id = ${input.userId}`;
-  await db.$executeRaw`INSERT INTO ${db.$unsafe(TABLE)} (id, user_id, access_token_encrypted, waba_id, phone_number_id, phone_number, business_name, status, connected_at, updated_at) VALUES (${input.id}, ${input.userId}, ${input.accessTokenEncrypted}, ${input.wabaId}, ${input.phoneNumberId}, ${input.phoneNumber}, ${input.businessName}, ${input.status}, ${input.connectedAt}, ${now})`;
+  await db.$executeRaw`DELETE FROM ${TABLE_SQL} WHERE user_id = ${input.userId}`;
+  await db.$executeRaw`INSERT INTO ${TABLE_SQL} (id, user_id, access_token_encrypted, waba_id, phone_number_id, phone_number, business_name, status, connected_at, updated_at) VALUES (${input.id}, ${input.userId}, ${input.accessTokenEncrypted}, ${input.wabaId}, ${input.phoneNumberId}, ${input.phoneNumber}, ${input.businessName}, ${input.status}, ${input.connectedAt}, ${now})`;
 }
