@@ -1,0 +1,44 @@
+/* E6 — Shared Ecomus-style category + search discovery experience. */
+.ecomus-discovery{background:#fff;color:#171717}
+.ecomus-discovery .storefront-inner{max-width:1440px!important;padding-left:40px!important;padding-right:40px!important}
+.ecomus-discovery .breadcrumbs{padding:22px 0;font-size:10px;color:#777;border-bottom:1px solid #eee}
+.ecomus-discovery .breadcrumbs a{color:#777}
+.ecomus-discovery .collection-intro{display:flex;align-items:flex-end;justify-content:space-between;gap:30px;padding:38px 0 30px;border-bottom:1px solid #eee}
+.ecomus-discovery .collection-intro .eyebrow{font-size:10px;letter-spacing:.16em;font-weight:700;color:#777}
+.ecomus-discovery .collection-intro h1{margin:9px 0 0;font-size:38px;line-height:1.1;font-weight:600;letter-spacing:-.035em}
+.ecomus-discovery .collection-intro p{max-width:520px;margin:0;color:#777;font-size:12px;line-height:1.7}
+.ecomus-discovery .search-experience{padding-top:18px}
+.ecomus-discovery .search-hero{padding:34px 0 38px;text-align:center;border-bottom:1px solid #eee}
+.ecomus-discovery .search-hero .eyebrow{font-size:10px;letter-spacing:.16em;font-weight:700;color:#777}
+.ecomus-discovery .search-hero h1{margin:10px 0 24px;font-size:34px;font-weight:600;letter-spacing:-.03em}
+.ecomus-discovery .search-input-wrap{position:relative;width:min(700px,100%);margin:auto}
+.ecomus-discovery .search-input-wrap input{width:100%;height:52px;border:1px solid #171717;border-radius:0;padding:0 48px 0 16px;font-size:13px;outline:0}
+.ecomus-discovery .search-input-wrap>button{position:absolute;right:0;top:0;height:52px;width:48px;border:0;background:transparent;font-size:22px;cursor:pointer}
+.ecomus-discovery .search-suggestion-panel{position:absolute;z-index:40;left:0;right:0;top:58px;text-align:left;background:#fff;border:1px solid #ddd;box-shadow:0 18px 50px rgba(0,0,0,.12);padding:16px}
+.ecomus-discovery .search-suggestion-panel>b{display:block;margin:8px 0;font-size:9px;text-transform:uppercase;letter-spacing:.12em;color:#777}
+.ecomus-discovery .search-suggestion-panel>button{display:block;width:100%;padding:9px 4px;border:0;background:#fff;text-align:left;font-size:11px;cursor:pointer}
+.ecomus-discovery .search-suggestion-panel>button:hover{background:#f7f7f7}
+.ecomus-discovery .search-suggestion-panel.live a{padding:9px 4px;color:#171717;text-decoration:none}
+.ecomus-discovery .search-chips{display:flex;justify-content:center;align-items:center;gap:8px;flex-wrap:wrap;margin-top:16px}
+.ecomus-discovery .search-chips span{font-size:10px;color:#777}
+.ecomus-discovery .search-chips button{border:0;background:#f5f5f5;border-radius:0;padding:7px 11px;font-size:9px;letter-spacing:.06em;cursor:pointer}
+.ecomus-discovery .search-toolbar{height:62px;margin:0!important;border-top:0!important;border-bottom:1px solid #eee!important;display:flex;align-items:center;justify-content:space-between}
+.ecomus-discovery .search-toolbar strong{font-size:11px;font-weight:500}
+.ecomus-discovery .search-toolbar-actions{display:flex;align-items:center;gap:18px}
+.ecomus-discovery .filter-toggle{height:36px;border:1px solid #171717;background:#fff;padding:0 14px;border-radius:0;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;cursor:pointer}
+.ecomus-discovery .filter-toggle b{margin-left:5px}
+.ecomus-discovery .sort-control{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.08em}
+.ecomus-discovery .sort-control select{height:36px;border:0;background:#fff;min-width:125px;font-size:10px;outline:0}
+.ecomus-discovery .search-filter-panel{display:grid;grid-template-columns:repeat(4,1fr);gap:0;padding:0;margin:0;border:0;border-bottom:1px solid #eee;background:#fff}
+.ecomus-discovery .search-filter-panel>div{padding:18px;border-right:1px solid #eee}
+.ecomus-discovery .search-filter-panel b{display:block;margin-bottom:9px;font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:#777}
+.ecomus-discovery .search-filter-panel select,.ecomus-discovery .price-inputs input{width:100%;height:38px;border:1px solid #ddd;background:#fff;padding:0 9px;border-radius:0;font-size:11px}
+.ecomus-discovery .price-inputs{display:flex;gap:6px}
+.ecomus-discovery .clear-filter{border:0;background:#171717;color:#fff;margin:18px;align-self:end;height:38px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;cursor:pointer}
+.ecomus-discovery .search-results-section{padding:32px 0 70px}
+.ecomus-discovery .search-results-section .product-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:42px 18px}
+.ecomus-discovery .search-empty{text-align:center;padding:90px 20px;border-top:1px solid #eee}
+.ecomus-discovery .zero-result-suggestions{display:flex;justify-content:center;gap:8px;flex-wrap:wrap}
+.ecomus-discovery .zero-result-suggestions button{border:1px solid #ddd;background:#fff;padding:8px 12px;font-size:10px;cursor:pointer}
+@media(max-width:1000px){.ecomus-discovery .storefront-inner{padding-left:24px!important;padding-right:24px!important}.ecomus-discovery .search-results-section .product-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.ecomus-discovery .search-filter-panel{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:700px){.ecomus-discovery .storefront-inner{padding-left:16px!important;padding-right:16px!important}.ecomus-discovery .breadcrumbs{padding:16px 0}.ecomus-discovery .collection-intro{display:block;padding:25px 0}.ecomus-discovery .collection-intro h1{font-size:29px}.ecomus-discovery .collection-intro p{margin-top:9px}.ecomus-discovery .search-hero{padding:25px 0 28px}.ecomus-discovery .search-hero h1{font-size:25px}.ecomus-discovery .search-toolbar{height:58px}.ecomus-discovery .search-toolbar-actions{gap:7px}.ecomus-discovery .sort-control select{min-width:95px}.ecomus-discovery .search-filter-panel{display:flex;flex-direction:column}.ecomus-discovery .search-results-section{padding-top:22px}.ecomus-discovery .search-results-section .product-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:30px 9px}.ecomus-discovery .search-results-section .product-quick-view,.ecomus-discovery .search-results-section .quick-add{display:none}}
