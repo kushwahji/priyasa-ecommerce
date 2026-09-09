@@ -1,0 +1,11 @@
+/* Ecomus-inspired Step 1: premium scrolling announcement bar for PRIYASA. */
+.announcement{position:relative;display:block;min-height:34px;overflow:hidden;background:#17151a;color:#fff;border:0;padding:0;white-space:nowrap;font-size:10px;font-weight:750;letter-spacing:.11em;text-transform:uppercase}
+.announcement-track{display:flex;width:max-content;min-height:34px;align-items:center;animation:priyasaAnnouncement 30s linear infinite;will-change:transform}
+.announcement-set{display:flex;align-items:center;flex:none}
+.announcement-item{display:inline-flex;align-items:center;gap:18px;padding:0 28px;color:#fff;text-decoration:none}
+.announcement-item strong{font-weight:800}
+.announcement-item:hover{color:#f5c7d2}
+.announcement-dot{width:3px;height:3px;border-radius:50%;background:#e9154f;flex:none}
+@keyframes priyasaAnnouncement{from{transform:translate3d(0,0,0)}to{transform:translate3d(-50%,0,0)}}
+@media(max-width:760px){.announcement{min-height:30px;font-size:8px;letter-spacing:.09em}.announcement-track{min-height:30px;animation-duration:24s}.announcement-item{gap:12px;padding:0 18px}}
+@media(prefers-reduced-motion:reduce){.announcement-track{animation:none;transform:none;width:100%;justify-content:center}.announcement-set:nth-child(2){display:none}.announcement-item{padding:0 10px}.announcement-item:nth-child(n+2){display:none}}
