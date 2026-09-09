@@ -1,2 +1,2 @@
 import AdvancedStorefrontSearch from '@/components/AdvancedStorefrontSearch';
-export default async function SearchPage({searchParams}:{searchParams:Promise<{q?:string;category?:string}>}){const p=await searchParams;return <div className="storefront-page ecomus-discovery"><div className="page storefront-inner"><AdvancedStorefrontSearch initialQuery={p.q||''} initialCategory={p.category||''}/></div></div>}
+export default async function SearchPage({searchParams}:{searchParams:Promise<{q?:string;category?:string}>}){const p=await searchParams;return <div className="storefront-page ecomus-discovery search-route"><div className="page storefront-inner"><AdvancedStorefrontSearch initialQuery={p.q||''} initialCategory={p.category||''}/></div></div>}
