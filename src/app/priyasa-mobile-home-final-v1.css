@@ -1,0 +1,106 @@
+/* Priyasa storefront final mobile/home parity pass.
+   Loaded last so it intentionally wins over legacy responsive layers. */
+
+@media (max-width:760px){
+  :root{--p-pink:#e91e63;--p-pink-dark:#c91652;--p-ink:#17151a;--p-muted:#716c72;--p-line:#ebe7e9}
+
+  /* Mobile brand = icon only. Desktop keeps the full icon + wordmark asset. */
+  .site-header>.brand-logo-link{justify-self:center!important;display:flex!important;align-items:center!important;width:42px!important;height:42px!important;margin:0!important}
+  .site-header>.brand-logo-link .brand-lockup{display:flex!important;align-items:center!important;width:42px!important;height:42px!important}
+  .site-header>.brand-logo-link .brand-logo-full{display:none!important}
+  .site-header>.brand-logo-link .brand-logo-mobile{display:block!important;width:42px!important;height:42px!important;max-width:42px!important;object-fit:contain!important}
+
+  /* Keep the compact app-shell header: menu / logo / search / bag. */
+  .site-header{grid-template-columns:44px 1fr auto!important;gap:8px!important;padding:0 12px!important;height:68px!important;min-height:68px!important}
+  .site-header>.actions{display:flex!important;gap:0!important;align-items:center!important}
+  .site-header>.actions .header-icon{width:42px!important;height:44px!important;flex:0 0 42px!important}
+  .site-header>.actions .header-icon[aria-label="Search"]{display:grid!important}
+  .site-header>.actions .header-icon[aria-label="Account"],.site-header>.actions .header-icon[aria-label="Wishlist"]{display:none!important}
+  .site-header>.actions .header-icon[aria-label^="Shopping bag"]{display:grid!important}
+
+  /* Discovery row: clean, aligned, no visible scrollbar/scroll affordance. */
+  .mobile-storefront-discovery{width:100%!important;overflow:hidden!important}
+  .mobile-storefront-search{height:46px!important;margin:10px 12px 8px!important}
+  .mobile-storefront-tabs{overflow-x:auto!important;overflow-y:hidden!important;scrollbar-width:none!important;-ms-overflow-style:none!important}
+  .mobile-storefront-tabs::-webkit-scrollbar{display:none!important;width:0!important;height:0!important}
+  .mobile-storefront-tabs a{height:43px!important;padding:0 16px!important;white-space:nowrap!important}
+
+  /* Banner/campaign alignment: no accidental gutters, clipping or vertical jump. */
+  .home-reference-v4 .home-image-highlight-section{padding:0!important;margin:0!important}
+  .home-reference-v4 .home-image-highlight-section .campaign-carousel{width:100%!important;margin:0!important;padding:0 10px!important;box-sizing:border-box!important;overflow:hidden!important}
+  .home-reference-v4 .home-image-highlight-section .campaign-carousel-viewport{width:100%!important;overflow:hidden!important}
+  .home-reference-v4 .home-image-highlight-section .campaign-carousel-track{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important;width:100%!important;transform:none!important}
+  .home-reference-v4 .home-image-highlight-section .campaign-carousel-card{min-width:0!important;width:100%!important;overflow:hidden!important;border-radius:8px!important}
+  .home-reference-v4 .home-image-highlight-section .campaign-carousel-picture{display:block!important;width:100%!important;aspect-ratio:1.62/1!important;overflow:hidden!important}
+  .home-reference-v4 .home-image-highlight-section .campaign-carousel-image{display:block!important;width:100%!important;height:100%!important;object-fit:cover!important}
+  .home-reference-v4 .home-image-highlight-section .campaign-carousel-copy{min-height:0!important;padding:8px 9px!important;background:#fff!important}
+  .home-reference-v4 .home-image-highlight-section .campaign-carousel-copy span{font-size:7px!important;letter-spacing:.1em!important}
+  .home-reference-v4 .home-image-highlight-section .campaign-carousel-copy strong{display:block!important;font-size:13px!important;line-height:1.15!important;margin-top:3px!important}
+  .home-reference-v4 .home-image-highlight-section .campaign-carousel-copy small{font-size:8px!important;margin-top:5px!important}
+  .home-reference-v4 .home-image-highlight-section .campaign-carousel-control{display:none!important}
+  .home-reference-v4 .home-image-highlight-section .campaign-carousel-dots{display:flex!important;justify-content:center!important;gap:5px!important;padding:8px 0 2px!important}
+  .home-reference-v4 .home-image-highlight-section .campaign-carousel-dots button{width:5px!important;height:5px!important;border-radius:50%!important;border:0!important;padding:0!important}
+
+  /* Casual section immediately after image banners. */
+  .home-reference-v4 .home-casual-section{padding:24px 12px 22px!important;background:#fff!important}
+  .home-reference-v4 .home-casual-section .home-section-head{margin:0 2px 13px!important}
+  .home-reference-v4 .home-casual-section .home-casual-grid{display:flex!important;gap:9px!important;overflow-x:auto!important;overflow-y:hidden!important;scroll-snap-type:x mandatory!important;scrollbar-width:none!important;padding:0 1px 5px!important}
+  .home-reference-v4 .home-casual-section .home-casual-grid::-webkit-scrollbar{display:none!important}
+  .home-reference-v4 .home-casual-section .home-casual-card{flex:0 0 43vw!important;width:43vw!important;min-width:43vw!important;aspect-ratio:4/5!important;border-radius:8px!important;background-size:cover!important;background-position:center!important;scroll-snap-align:start!important;overflow:hidden!important;position:relative!important}
+  .home-reference-v4 .home-casual-section .home-casual-copy{padding:11px!important;background:linear-gradient(transparent,rgba(0,0,0,.72))!important;position:absolute!important;left:0!important;right:0!important;bottom:0!important;color:#fff!important}
+  .home-reference-v4 .home-casual-section .home-casual-copy small{font-size:7px!important;letter-spacing:.12em!important}
+  .home-reference-v4 .home-casual-section .home-casual-copy strong{display:block!important;font-size:14px!important;line-height:1.1!important;margin:4px 0!important}
+  .home-reference-v4 .home-casual-section .home-casual-copy span{font-size:8px!important;font-weight:700!important;letter-spacing:.08em!important}
+
+  /* One Flash Sale section: 18 products, 2 cards per row on mobile. */
+  .home-reference-v4 .home-flash-sale{margin:8px 0 24px!important;padding:22px 12px 20px!important;border:0!important;border-top:1px solid #f0dce2!important;border-bottom:1px solid #f0dce2!important;border-radius:0!important;background:#fff9fb!important;overflow:hidden!important}
+  .home-reference-v4 .home-flash-sale:before{font-size:0!important;content:""!important;display:none!important}
+  .home-reference-v4 .home-flash-sale .home-section-head{display:flex!important;align-items:flex-end!important;justify-content:space-between!important;margin:0 2px 14px!important;text-align:left!important}
+  .home-reference-v4 .home-flash-sale .home-section-head h2{font-size:28px!important;line-height:1.05!important;color:#c91652!important;font-weight:700!important;margin:2px 0 0!important}
+  .home-reference-v4 .home-flash-sale .home-section-head p{font-size:9px!important;margin-top:5px!important}
+  .home-reference-v4 .home-flash-sale .home-kicker{color:#c91652!important;font-size:8px!important}
+  .home-reference-v4 .home-flash-sale .home-view-all{font-size:9px!important;color:#c91652!important;white-space:nowrap!important}
+  .home-reference-v4 .home-flash-sale .home-product-grid{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:12px 9px!important;width:100%!important;overflow:visible!important;padding:0!important;margin:0!important;scroll-snap-type:none!important}
+  .home-reference-v4 .home-flash-sale .home-product-grid>.product-card{width:100%!important;min-width:0!important;flex:none!important;margin:0!important;border:1px solid #eee5e7!important;border-radius:8px!important;overflow:hidden!important;background:#fff!important;box-shadow:none!important}
+  .home-reference-v4 .home-flash-sale .home-product-grid>.product-card img{width:100%!important;aspect-ratio:3/4!important;object-fit:cover!important}
+  .home-reference-v4 .home-flash-sale .home-load-more{display:none!important}
+  .home-reference-v4 .home-flash-sale .product-info{padding:8px!important}
+  .home-reference-v4 .home-flash-sale .product-info h3{font-size:12px!important;line-height:1.25!important;margin:0 0 5px!important;display:-webkit-box!important;-webkit-line-clamp:2!important;-webkit-box-orient:vertical!important;overflow:hidden!important}
+  .home-reference-v4 .home-flash-sale .price{font-size:12px!important}
+  .home-reference-v4 .home-flash-sale .mrp{font-size:9px!important}
+  .home-reference-v4 .home-flash-sale .badge{font-size:8px!important;top:7px!important;left:7px!important;padding:4px 6px!important}
+
+  /* All other home sections use the same edge alignment and rhythm. */
+  .home-reference-v4 .home-section{padding:24px 12px!important;margin:0!important}
+  .home-reference-v4 .home-section-head{gap:10px!important;margin-bottom:14px!important}
+  .home-reference-v4 .home-section-head h2{font-size:26px!important;line-height:1.08!important}
+  .home-reference-v4 .home-section-head p{font-size:10px!important}
+  .home-reference-v4 .home-view-all{font-size:9px!important}
+  .home-reference-v4 .home-product-section:not(.home-flash-sale) .home-product-grid{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:12px 9px!important;overflow:visible!important}
+  .home-reference-v4 .home-product-section:not(.home-flash-sale) .home-product-grid>.product-card{min-width:0!important;width:100%!important}
+
+  /* Hide floating scroll-to-top/scroll affordance on mobile; bottom nav is the only fixed navigation. */
+  body .scroll-to-top,body .scroll-top,body .back-to-top,body .back-top,body [data-scroll-top],body [aria-label*="scroll to top" i],body [aria-label*="back to top" i]{display:none!important;visibility:hidden!important;pointer-events:none!important}
+
+  /* Prevent horizontal page drift caused by legacy rails. */
+  html,body{width:100%!important;max-width:100%!important;overflow-x:hidden!important}
+  .home-reference-v4,.home-reference-v4 *{max-width:100vw}
+}
+
+@media (min-width:761px){
+  /* Desktop brand always shows icon + name/full wordmark. */
+  .site-header>.brand-logo-link .brand-logo-full{display:block!important}
+  .site-header>.brand-logo-link .brand-logo-mobile{display:none!important}
+}
+
+@media (max-width:420px){
+  .site-header{grid-template-columns:40px 1fr auto!important;padding:0 9px!important}
+  .site-header>.brand-logo-link,.site-header>.brand-logo-link .brand-lockup{width:40px!important;height:40px!important}
+  .site-header>.brand-logo-link .brand-logo-mobile{width:40px!important;height:40px!important}
+  .site-header>.actions .header-icon{width:38px!important;flex-basis:38px!important}
+  .mobile-storefront-search{margin-left:10px!important;margin-right:10px!important}
+  .mobile-storefront-tabs a{padding-left:14px!important;padding-right:14px!important}
+  .home-reference-v4 .home-casual-section .home-casual-card{flex-basis:45vw!important;width:45vw!important;min-width:45vw!important}
+  .home-reference-v4 .home-flash-sale{padding-left:10px!important;padding-right:10px!important}
+  .home-reference-v4 .home-flash-sale .home-product-grid{gap:10px 7px!important}
+}
