@@ -1,0 +1,22 @@
+/* Priyasa storefront alignment + overflow cleanup */
+html,body{width:100%;max-width:100%;overflow-x:hidden}
+body{min-width:0}
+main{width:100%;min-width:0;overflow-x:clip}
+.page,.storefront-inner,.section{width:100%;max-width:1440px;margin-left:auto;margin-right:auto}
+.page{padding-left:clamp(20px,5vw,72px);padding-right:clamp(20px,5vw,72px)}
+.section{padding-left:clamp(20px,5vw,72px);padding-right:clamp(20px,5vw,72px)}
+.section-head{width:100%;justify-content:space-between}
+.shop-layout,.product-detail,.cart-layout,.checkout-layout,.admin-shell{min-width:0}
+.shop-layout>*,.product-detail>* ,.cart-layout>* ,.checkout-layout>*{min-width:0}
+.product-grid,.category-grid,.feature-grid,.product-grid-editorial{min-width:0}
+.product-card,.category-card,.feature,.cart-product,.checkout-card,.cart-summary{min-width:0;max-width:100%}
+img,video,svg{max-width:100%}
+.table{max-width:100%}
+/* Hide scrollbar chrome while preserving intentional touch/trackpad scrolling. */
+*{scrollbar-width:none;-ms-overflow-style:none}
+*::-webkit-scrollbar{width:0;height:0;display:none}
+/* Remove visual carousel/scroll affordances that were adding clutter. */
+.overflow-scroll,.horizontal-scroll,.scroll-indicator,.scroll-hint,.scroll-icon,.carousel-scrollbar,.swiper-scrollbar{scrollbar-width:none}
+.overflow-scroll::-webkit-scrollbar,.horizontal-scroll::-webkit-scrollbar,.scroll-indicator::-webkit-scrollbar,.scroll-hint::-webkit-scrollbar,.scroll-icon::-webkit-scrollbar,.carousel-scrollbar::-webkit-scrollbar,.swiper-scrollbar::-webkit-scrollbar{display:none;width:0;height:0}
+@media(max-width:900px){.page,.section{padding-left:clamp(16px,4vw,32px);padding-right:clamp(16px,4vw,32px)}.shop-layout{gap:20px}.section-head{gap:12px}.cart-layout,.checkout-layout{width:100%}}
+@media(max-width:560px){.page{padding-left:16px;padding-right:16px}.section{padding-left:16px;padding-right:16px}.product-grid,.category-grid,.feature-grid,.product-grid-editorial{width:100%;gap:10px}.product-card{overflow:hidden}.cart-product{width:100%;overflow:hidden}.cart-product-info{min-width:0}.cart-product-info h3{overflow-wrap:anywhere}.cart-summary{width:100%}.checkout-card{width:100%}.table{overflow-x:auto;white-space:nowrap}}
