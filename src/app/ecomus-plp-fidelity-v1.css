@@ -1,0 +1,58 @@
+/* E5 — Ecomus-style collection / PLP experience. Real filtering remains in ShopFilters. */
+.ecomus-plp{background:#fff;color:#171717}
+.ecomus-plp .plp-hero{min-height:390px}
+.ecomus-plp .plp-hero-overlay{width:min(620px,100%);padding:80px 6vw}
+.ecomus-plp .plp-hero-overlay .eyebrow{font-size:10px;letter-spacing:.16em;text-transform:uppercase;font-weight:700}
+.ecomus-plp .plp-hero-overlay h1{font-size:clamp(40px,5vw,68px);line-height:1;font-weight:600;letter-spacing:-.04em;margin:12px 0}
+.ecomus-plp .plp-hero-overlay p{font-size:14px;line-height:1.7;max-width:500px}
+.ecomus-plp .plp-hero-overlay .button{min-height:46px;border-radius:0;text-transform:uppercase;letter-spacing:.1em;font-size:10px;font-weight:700}
+.ecomus-plp .storefront-inner{max-width:1440px!important;padding:0 40px 80px!important}
+.ecomus-plp .breadcrumbs{padding:22px 0;color:#777;font-size:10px;letter-spacing:.04em}
+.ecomus-plp .breadcrumbs a{color:#777}
+.ecomus-plp .collection-intro{display:flex;align-items:flex-end;justify-content:space-between;gap:30px;padding:28px 0 30px;border-bottom:1px solid #e8e8e8}
+.ecomus-plp .collection-intro .eyebrow{font-size:10px;letter-spacing:.16em;font-weight:700;color:#777}
+.ecomus-plp .collection-intro h1{margin:9px 0 0;font-size:34px;line-height:1.1;font-weight:600;letter-spacing:-.03em}
+.ecomus-plp .collection-intro p{margin:0;color:#777;font-size:12px}
+.ecomus-plp .category-pills{display:flex;gap:22px;overflow:auto;padding:20px 0 24px;border-bottom:1px solid #e8e8e8;scrollbar-width:none}
+.ecomus-plp .category-pills::-webkit-scrollbar{display:none}
+.ecomus-plp .category-pills a{white-space:nowrap;color:#555;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;border-bottom:1px solid transparent;padding-bottom:5px}
+.ecomus-plp .category-pills a:hover{color:#171717;border-color:#171717}
+.ecomus-plp .shop-toolbar{height:62px;margin:0!important;border-bottom:1px solid #e8e8e8!important;border-top:0!important;display:flex;align-items:center;justify-content:space-between;gap:20px}
+.ecomus-plp .shop-toolbar>span{font-size:11px;color:#777}
+.ecomus-plp .shop-toolbar label{display:flex;align-items:center;gap:8px;font-size:10px;text-transform:uppercase;letter-spacing:.08em;font-weight:700}
+.ecomus-plp .shop-toolbar select{height:36px;border:0;background:#fff;color:#171717;font-size:11px;min-width:145px;outline:0}
+.ecomus-plp .mobile-filter-trigger{display:none;border:1px solid #171717;background:#fff;color:#171717;height:38px;padding:0 14px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em}
+.ecomus-plp .desktop-filter-panel{border-bottom:1px solid #e8e8e8;padding:0!important}
+.ecomus-plp .filter-controls{display:grid;grid-template-columns:repeat(4,1fr);gap:0;border:0!important;background:#fff!important;padding:0!important}
+.ecomus-plp .filter-controls>div{min-height:68px;padding:14px 18px;border-right:1px solid #eee;display:flex;align-items:center;flex-wrap:wrap;gap:5px}
+.ecomus-plp .filter-controls>div>span{width:100%;font-size:9px;color:#777;font-weight:700;text-transform:uppercase;letter-spacing:.1em}
+.ecomus-plp .filter-controls button{border:0;background:transparent;color:#555;padding:3px 5px;font-size:10px;cursor:pointer}
+.ecomus-plp .filter-controls button:hover,.ecomus-plp .filter-controls button.active{color:#171717;text-decoration:underline;text-underline-offset:4px}
+.ecomus-plp .filter-controls .filter-clear{border:0;background:#171717;color:#fff;align-self:center;justify-self:center;height:36px;padding:0 15px;font-size:9px;text-transform:uppercase;letter-spacing:.08em;font-weight:700;cursor:pointer}
+.ecomus-plp .product-grid.shop{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:42px 18px!important;padding-top:34px!important}
+.ecomus-plp .product-grid.shop .product-card{min-width:0;border:0;border-radius:0;background:#fff}
+.ecomus-plp .product-grid.shop .product-media{aspect-ratio:3/4;overflow:hidden;background:#f5f5f5}
+.ecomus-plp .product-grid.shop .product-info{padding:12px 0 0}
+.ecomus-plp .product-grid.shop .product-info h3{font-size:13px;font-weight:500;line-height:1.4;margin:5px 0 7px}
+.ecomus-plp .product-grid.shop .product-category{font-size:9px;color:#777;letter-spacing:.12em}
+.ecomus-plp .product-grid.shop .price{font-size:13px;font-weight:700}
+.ecomus-plp .product-grid.shop .mrp{font-size:10px;color:#999}
+.ecomus-plp .product-grid.shop .discount-text{font-size:9px;color:var(--eco-accent)}
+.ecomus-plp .product-grid.shop .product-wishlist{width:34px;height:34px;right:10px;top:10px;border-radius:50%;background:#fff;box-shadow:0 2px 10px rgba(0,0,0,.08)}
+.ecomus-plp .product-grid.shop .product-quick-view{bottom:10px}
+.ecomus-plp .filter-sheet-backdrop{position:fixed;inset:0;z-index:1100;background:rgba(0,0,0,.35);display:flex;justify-content:flex-end}
+.ecomus-plp .filter-sheet{width:min(430px,92vw);height:100%;overflow:auto;background:#fff;padding:22px}
+.ecomus-plp .filter-sheet-head{height:46px;border-bottom:1px solid #eee;display:flex;justify-content:space-between;align-items:start;margin-bottom:12px}
+.ecomus-plp .filter-sheet-head strong{font-size:16px;font-weight:600}
+.ecomus-plp .filter-sheet-head button{border:0;background:none;font-size:24px;cursor:pointer}
+.ecomus-plp .filter-sheet .filter-controls{display:block}
+.ecomus-plp .filter-sheet .filter-controls>div{border-right:0;border-bottom:1px solid #eee;min-height:0;padding:16px 0}
+.ecomus-plp .filter-sheet .filter-clear{margin:16px 0}
+.ecomus-plp .filter-apply{width:100%;border-radius:0;min-height:48px;text-transform:uppercase;letter-spacing:.08em;font-size:10px}
+.ecomus-plp .empty-shop{padding:90px 20px;text-align:center;border-top:1px solid #eee}
+.ecomus-plp .empty-shop h3{font-size:22px;font-weight:600}
+.ecomus-plp .empty-shop p{color:#777;font-size:12px}
+@media(min-width:1200px){.ecomus-plp .product-grid.shop{grid-template-columns:repeat(4,minmax(0,1fr))!important}}
+@media(max-width:1000px){.ecomus-plp .storefront-inner{padding-left:24px!important;padding-right:24px!important}.ecomus-plp .filter-controls{grid-template-columns:repeat(2,1fr)}.ecomus-plp .product-grid.shop{grid-template-columns:repeat(3,minmax(0,1fr))!important}}
+@media(max-width:700px){.ecomus-plp .plp-hero{min-height:330px}.ecomus-plp .plp-hero-overlay{padding:58px 24px}.ecomus-plp .storefront-inner{padding:0 16px 55px!important}.ecomus-plp .collection-intro{display:block;padding:24px 0}.ecomus-plp .collection-intro h1{font-size:28px}.ecomus-plp .collection-intro p{margin-top:8px}.ecomus-plp .category-pills{gap:18px;padding:16px 0 20px}.ecomus-plp .shop-toolbar{height:58px}.ecomus-plp .mobile-filter-trigger{display:block}.ecomus-plp .desktop-filter-panel{display:none}.ecomus-plp .shop-toolbar label{margin-left:auto}.ecomus-plp .shop-toolbar label select{min-width:112px}.ecomus-plp .product-grid.shop{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:30px 9px!important;padding-top:22px!important}.ecomus-plp .product-grid.shop .product-quick-view,.ecomus-plp .product-grid.shop .quick-add{display:none!important}.ecomus-plp .product-grid.shop .product-info h3{font-size:11.5px}.ecomus-plp .product-grid.shop .product-wishlist{width:30px;height:30px;right:7px;top:7px}}
+@media(prefers-reduced-motion:reduce){.ecomus-plp *{scroll-behavior:auto!important}}
