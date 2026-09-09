@@ -1,12 +1,12 @@
 import { NextResponse } from 'next/server';
 import { getSession } from '@/lib/auth';
-import { decryptMetaToken, getMetaWhatsAppConnection } from '@/lib/meta-whatsapp';
+import { decryptMetaToken, getAnyMetaWhatsAppConnection, getMetaWhatsAppConnection } from '@/lib/meta-whatsapp';
 
 export async function GET() {
   const session = await getSession();
   if (!session || !['ADMIN', 'STAFF'].includes(session.role)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   try {
-    const connection = await getMetaWhatsAppConnection(session.userId);
+    const connection = await getMetaWhatsAppConnection(session.userId) || await getAnyMetaWhatsAppConnection();
     if (!connection) return NextResponse.json({ connected: false, configured: Boolean(process.env.META_APP_ID && process.env.META_WHATSAPP_EMBEDDED_SIGNUP_CONFIG_ID) });
     const token = decryptMetaToken(connection.accessTokenEncrypted);
     const version = process.env.META_GRAPH_API_VERSION || 'v23.0';
