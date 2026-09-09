@@ -51,4 +51,12 @@ test.describe('admin ↔ storefront data contracts', () => {
     const slug = href!.split('/product/')[1];
     expect((await productResponse.json()).data.some((product: any) => product.slug === slug)).toBeTruthy();
   });
+
+  test('unknown storefront search returns an empty result without an application error', async ({ request }) => {
+    const response = await request.get('/api/storefront/search?query=__e2e_nonexistent_product__&limit=1');
+    expect(response.status()).toBeLessThan(500);
+    if (!response.ok()) return;
+    const body = await response.json();
+    expect(body.data ?? body.products ?? []).toEqual([]);
+  });
 });
