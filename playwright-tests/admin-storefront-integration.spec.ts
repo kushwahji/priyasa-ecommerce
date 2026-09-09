@@ -1,33 +1,43 @@
 import { test, expect, devices } from '@playwright/test';
 
-type CatalogProduct = { id: string; slug: string; name: string; active: boolean; salePrice?: number | string | null; price?: number | string | null; mrp?: number | string | null; variants: Array<{ id: string; stock: number | string; reserved?: number | string | null }> };
+type CatalogVariant = { id: string; stock: number | string; reserved?: number | string | null };
+type CatalogProduct = { id: string; slug: string; name: string; active: boolean; salePrice?: number | string | null; price?: number | string | null; mrp?: number | string | null; variants: CatalogVariant[] };
 type SearchProduct = { id: string; slug: string; name: string; price: number | string; colors: string[]; sizes: string[] };
+type CatalogPayload = { data: CatalogProduct[] };
+type SearchPayload = { data?: { products?: SearchProduct[] } };
+
+async function catalog(request: Parameters<typeof test>[0] extends never ? never : any): Promise<CatalogProduct[]> {
+  const response = await request.get('/api/products');
+  expect(response.status()).toBe(200);
+  const payload = (await response.json()) as CatalogPayload;
+  expect(Array.isArray(payload.data)).toBeTruthy();
+  return payload.data;
+}
 
 test.describe('admin ↔ storefront data boundary', () => {
   test('public catalog API exposes only active storefront products', async ({ request }) => {
-    const response = await request.get('/api/products'); expect(response.status()).toBe(200);
-    const payload: { data: CatalogProduct[] } = await response.json(); expect(Array.isArray(payload.data)).toBeTruthy();
-    for (const product of payload.data) { expect(product.id).toBeTruthy(); expect(product.slug).toBeTruthy(); expect(product.active).toBe(true); expect(Array.isArray(product.variants)).toBeTruthy(); }
+    const products = await catalog(request);
+    for (const product of products) { expect(product.id).toBeTruthy(); expect(product.slug).toBeTruthy(); expect(product.active).toBe(true); expect(Array.isArray(product.variants)).toBeTruthy(); }
   });
 
   test('storefront search payload is backed by live catalog records', async ({ request }) => {
     const response = await request.get('/api/storefront/search?limit=12'); expect(response.status()).toBeLessThan(500); if (!response.ok()) return;
-    const payload: { data?: { products?: SearchProduct[] } } = await response.json(); const products = payload.data?.products ?? [];
+    const payload = (await response.json()) as SearchPayload; const products = payload.data?.products ?? [];
     expect(Array.isArray(products)).toBeTruthy(); for (const product of products.slice(0, 5)) { expect(product.id).toBeTruthy(); expect(product.slug).toBeTruthy(); expect(product.name).toBeTruthy(); expect(Number(product.price)).toBeGreaterThanOrEqual(0); expect(Array.isArray(product.colors)).toBeTruthy(); expect(Array.isArray(product.sizes)).toBeTruthy(); }
   });
 
   test('catalog and storefront-search surfaces agree on the same live product identity', async ({ request }) => {
     const [catalogResponse, searchResponse] = await Promise.all([request.get('/api/products?limit=12'), request.get('/api/storefront/search?limit=12')]);
     expect(catalogResponse.status()).toBe(200); expect(searchResponse.status()).toBe(200);
-    const catalog: { data: CatalogProduct[] } = await catalogResponse.json(); const search: { data?: { products?: SearchProduct[] } } = await searchResponse.json();
-    const catalogProducts = catalog.data ?? []; const searchProducts = search.data?.products ?? []; expect(Array.isArray(catalogProducts)).toBeTruthy(); expect(Array.isArray(searchProducts)).toBeTruthy();
+    const catalogPayload = (await catalogResponse.json()) as CatalogPayload; const searchPayload = (await searchResponse.json()) as SearchPayload;
+    const catalogProducts = catalogPayload.data ?? []; const searchProducts = searchPayload.data?.products ?? []; expect(Array.isArray(catalogProducts)).toBeTruthy(); expect(Array.isArray(searchProducts)).toBeTruthy();
     const catalogById = new Map<string, CatalogProduct>(catalogProducts.map((product) => [product.id, product]));
     for (const product of searchProducts) { const source = catalogById.get(product.id); if (!source) continue; expect(product.slug).toBe(source.slug); expect(product.name).toBe(source.name); expect(Number(product.price)).toBe(Number(source.salePrice ?? source.price)); }
   });
 
   test('public catalog payload keeps pricing and variant inventory coherent', async ({ request }) => {
-    const response = await request.get('/api/products'); expect(response.status()).toBe(200); const payload: { data: CatalogProduct[] } = await response.json();
-    for (const product of payload.data) { const sale = Number(product.salePrice ?? product.price); const mrp = Number(product.mrp ?? product.salePrice ?? product.price); expect(sale).toBeGreaterThanOrEqual(0); expect(mrp).toBeGreaterThanOrEqual(sale); for (const variant of product.variants) { expect(variant.id).toBeTruthy(); expect(Number(variant.stock)).toBeGreaterThanOrEqual(0); expect(Number(variant.reserved ?? 0)).toBeGreaterThanOrEqual(0); } }
+    const products = await catalog(request);
+    for (const product of products) { const sale = Number(product.salePrice ?? product.price); const mrp = Number(product.mrp ?? product.salePrice ?? product.price); expect(sale).toBeGreaterThanOrEqual(0); expect(mrp).toBeGreaterThanOrEqual(sale); for (const variant of product.variants) { expect(variant.id).toBeTruthy(); expect(Number(variant.stock)).toBeGreaterThanOrEqual(0); expect(Number(variant.reserved ?? 0)).toBeGreaterThanOrEqual(0); } }
   });
 
   test('admin catalog API never becomes a public mutation surface', async ({ request }) => {
@@ -36,7 +46,7 @@ test.describe('admin ↔ storefront data boundary', () => {
   });
 
   test('checkout quote rejects a non-existent variant before order creation', async ({ request }) => {
-    const response = await request.post('/api/checkout/quote', { data: { items: [{ variantId: 'invalid-e2e-variant', quantity: 1 }] } }); expect(response.status()).toBe(409); const payload: { error?: string } = await response.json(); expect(payload.error).toMatch(/no longer available|available/i);
+    const response = await request.post('/api/checkout/quote', { data: { items: [{ variantId: 'invalid-e2e-variant', quantity: 1 }] } }); expect(response.status()).toBe(409); const payload = (await response.json()) as { error?: string }; expect(payload.error).toMatch(/no longer available|available/i);
   });
 
   test('public product pages remain backed by catalog routes', async ({ page }) => {
