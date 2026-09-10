@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "node scripts/use-mysql-schema.mjs && prisma generate --schema prisma/schema.mysql.prisma && next dev",
     "build": "node scripts/use-mysql-schema.mjs && prisma generate --schema prisma/schema.mysql.prisma && next build",
-    "start": "node scripts/use-mysql-schema.mjs && prisma generate --schema prisma/schema.mysql.prisma && prisma db push --schema prisma/schema.mysql.prisma && next start",
+    "start": "next start",
     "lint": "next lint",
     "db:prepare:mysql": "node scripts/use-mysql-schema.mjs",
     "db:generate": "node scripts/use-mysql-schema.mjs && prisma generate --schema prisma/schema.mysql.prisma",
@@ -25,7 +25,7 @@
     "@types/node": "^24.3.0",
     "@types/react": "^19.1.12",
     "@types/react-dom": "^19.1.9",
-    "bcryptjs": "^3.0.2",
+    "bcryptjs": "^3.0.0",
     "firebase": "^12.4.0",
     "jose": "^6.0.12",
     "mariadb": "^3.4.5",
