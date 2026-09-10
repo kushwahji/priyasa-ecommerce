@@ -1,5 +1,40 @@
-import {NextResponse} from 'next/server';import {cookies} from 'next/headers';import {db} from '@/lib/db';
-async function userId(){const jar=await cookies();const id=jar.get('priyasa_local_user_id')?.value;const phone=jar.get('priyasa_mobile')?.value;if(id)return id;if(phone){const u=await db.user.findUnique({where:{phone},select:{id:true}});return u?.id}return null;}
-export async function GET(){const uid=await userId();if(!uid)return NextResponse.json({data:[],authenticated:false});const w=await db.wishlist.upsert({where:{userId:uid},update:{},create:{userId:uid},include:{items:{include:{product:{include:{category:true,images:{orderBy:{sortOrder:'asc'},take:1},variants:{orderBy:{stock:'desc'}}}}}}}});return NextResponse.json({authenticated:true,data:w.items.map(i=>({id:i.product.id,slug:i.product.slug,name:i.product.name,category:i.product.category.name,price:i.product.variants[0]?.price??i.product.salePrice,mrp:i.product.mrp,image:i.product.images[0]?.url||''}))});}
-export async function POST(req:Request){const uid=await userId();if(!uid)return NextResponse.json({error:'Authentication required'},{status:401});const body=await req.json().catch(()=>({}));if(!body.productId)return NextResponse.json({error:'productId required'},{status:400});const w=await db.wishlist.upsert({where:{userId:uid},update:{},create:{userId:uid}});await db.wishlistItem.upsert({where:{wishlistId_productId:{wishlistId:w.id,productId:String(body.productId)}},update:{},create:{wishlistId:w.id,productId:String(body.productId)}});return NextResponse.json({ok:true});}
-export async function DELETE(req:Request){const uid=await userId();if(!uid)return NextResponse.json({error:'Authentication required'},{status:401});const productId=new URL(req.url).searchParams.get('productId');if(!productId)return NextResponse.json({error:'productId required'},{status:400});const w=await db.wishlist.findUnique({where:{userId:uid}});if(w)await db.wishlistItem.deleteMany({where:{wishlistId:w.id,productId}});return NextResponse.json({ok:true});}
+import { NextResponse } from 'next/server';
+import { cookies } from 'next/headers';
+import { priyasaApi, apiError } from '@/lib/priyasa-api';
+
+const endpoint = '/api/v1/storefront/wishlist';
+
+async function token() { return (await cookies()).get('priyasa_access_token')?.value; }
+
+export async function GET() {
+  const auth = await token();
+  if (!auth) return NextResponse.json({ data: [], authenticated: false });
+  const { response, body } = await priyasaApi(endpoint, { method: 'GET', headers: { Authorization: `Bearer ${auth}` } });
+  if (!response.ok) return NextResponse.json({ error: apiError(body, 'Unable to load wishlist.'), details: body }, { status: response.status });
+  return NextResponse.json((body as any)?.data ?? body);
+}
+
+export async function POST(req: Request) {
+  const auth = await token();
+  if (!auth) return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
+  const input = await req.json().catch(() => ({}));
+  if (!input?.variantId && !input?.productId) return NextResponse.json({ error: 'variantId or productId required' }, { status: 400 });
+  const { response, body } = await priyasaApi(endpoint, {
+    method: 'POST', headers: { Authorization: `Bearer ${auth}` }, body: JSON.stringify(input),
+  });
+  if (!response.ok) return NextResponse.json({ error: apiError(body, 'Unable to update wishlist.'), details: body }, { status: response.status });
+  return NextResponse.json((body as any)?.data ?? body, { status: response.status });
+}
+
+export async function DELETE(req: Request) {
+  const auth = await token();
+  if (!auth) return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
+  const url = new URL(req.url);
+  const variantId = url.searchParams.get('variantId');
+  const productId = url.searchParams.get('productId');
+  if (!variantId && !productId) return NextResponse.json({ error: 'variantId or productId required' }, { status: 400 });
+  const query = new URLSearchParams(variantId ? { variantId } : { productId: productId! });
+  const { response, body } = await priyasaApi(`${endpoint}?${query.toString()}`, { method: 'DELETE', headers: { Authorization: `Bearer ${auth}` } });
+  if (!response.ok) return NextResponse.json({ error: apiError(body, 'Unable to remove wishlist item.'), details: body }, { status: response.status });
+  return NextResponse.json((body as any)?.data ?? body);
+}
