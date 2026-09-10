@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "node scripts/use-mysql-schema.mjs && prisma generate --schema prisma/schema.mysql.prisma && next dev",
-    "build": "next build",
+    "build": "prisma generate --schema prisma/schema.mysql.prisma && next build",
+    "postinstall": "prisma generate --schema prisma/schema.mysql.prisma",
     "start": "next start",
     "lint": "next lint",
     "db:prepare:mysql": "node scripts/use-mysql-schema.mjs",
