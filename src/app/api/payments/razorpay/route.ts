@@ -1,2 +1,25 @@
-import {NextResponse} from 'next/server';import {cookies} from 'next/headers';import {db} from '@/lib/db';
-export async function POST(req:Request){const {orderId}=await req.json().catch(()=>({}));if(!orderId)return NextResponse.json({error:'orderId required'},{status:400});const jar=await cookies();const userId=jar.get('priyasa_local_user_id')?.value;if(!userId)return NextResponse.json({error:'Authentication required'},{status:401});const order=await db.order.findFirst({where:{id:orderId,userId},include:{payment:true}});if(!order||!order.payment)return NextResponse.json({error:'Order/payment not found'},{status:404});if(order.status!=='PAYMENT_PENDING'&&order.status!=='CREATED')return NextResponse.json({error:'Order is not payable'},{status:409});if(!process.env.RAZORPAY_KEY_ID||!process.env.RAZORPAY_KEY_SECRET)return NextResponse.json({error:'Payment provider is not configured'},{status:503});if(order.payment.providerOrderId)return NextResponse.json({keyId:process.env.RAZORPAY_KEY_ID,razorpayOrderId:order.payment.providerOrderId,amount:order.total*100,currency:'INR',orderNumber:order.orderNumber});const auth=Buffer.from(`${process.env.RAZORPAY_KEY_ID}:${process.env.RAZORPAY_KEY_SECRET}`).toString('base64');const r=await fetch('https://api.razorpay.com/v1/orders',{method:'POST',headers:{Authorization:`Basic ${auth}`,'Content-Type':'application/json'},body:JSON.stringify({amount:order.total*100,currency:'INR',receipt:order.orderNumber,payment_capture:1,notes:{priyasaOrderId:order.id}})});const data=await r.json().catch(()=>({}));if(!r.ok)return NextResponse.json({error:data.error?.description||'Unable to create payment order'},{status:502});if(Number(data.amount)!==order.total*100||data.currency!=='INR')return NextResponse.json({error:'Gateway amount validation failed'},{status:502});await db.payment.update({where:{id:order.payment.id},data:{providerOrderId:data.id,amount:order.total}});return NextResponse.json({keyId:process.env.RAZORPAY_KEY_ID,razorpayOrderId:data.id,amount:order.total*100,currency:'INR',orderNumber:order.orderNumber});}
+import { NextResponse } from 'next/server';
+import { cookies } from 'next/headers';
+import { priyasaApi, apiError } from '@/lib/priyasa-api';
+
+export async function POST(req: Request) {
+  const jar = await cookies();
+  const token = jar.get('priyasa_access_token')?.value;
+  if (!token) return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
+  const { orderId } = await req.json().catch(() => ({}));
+  if (!orderId) return NextResponse.json({ error: 'orderId required' }, { status: 400 });
+  const { response, body: result } = await priyasaApi(`/api/v1/storefront/orders/${encodeURIComponent(String(orderId))}/payment`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}` },
+    body: JSON.stringify({ provider: 'razorpay' }),
+  });
+  if (!response.ok) return NextResponse.json({ error: apiError(result, 'Unable to start payment.'), details: result }, { status: response.status });
+  const data = (result as any)?.data ?? result;
+  return NextResponse.json({
+    keyId: data?.key_id ?? data?.keyId ?? process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+    razorpayOrderId: data?.razorpay_order_id ?? data?.provider_order_id ?? data?.order_id,
+    amount: data?.amount,
+    currency: data?.currency || 'INR',
+    orderNumber: data?.order_number ?? data?.orderNumber,
+  });
+}

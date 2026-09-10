@@ -1,4 +1,29 @@
 'use client';
-import {useEffect,useState} from 'react';import {CheckIcon} from '@/components/StorefrontIcons';
-type Props={variantId:string;productId:string;name:string;price:number;image?:string};
-export function AddToCart({variantId,productId,name,price,image}:Props){const[busy,setBusy]=useState(false),[done,setDone]=useState(false),[message,setMessage]=useState('');useEffect(()=>{if(!message)return;const t=window.setTimeout(()=>setMessage(''),2600);return()=>window.clearTimeout(t)},[message]);async function add(){if(!variantId)return;setBusy(true);setMessage('');try{const key='priyasa_cart';const cart=JSON.parse(localStorage.getItem(key)||'[]');const i=cart.findIndex((x:any)=>x.variantId===variantId);if(i>=0)cart[i].quantity=Math.min(20,Number(cart[i].quantity||0)+1);else cart.push({variantId,productId,name,price,image,quantity:1});localStorage.setItem(key,JSON.stringify(cart));window.dispatchEvent(new Event('priyasa-cart-updated'));setDone(true);setMessage(i>=0?`${name} quantity updated in your bag.`:`${name} added to your bag.`)}catch{setMessage('We could not update your bag. Please try again.')}finally{setBusy(false)}}return <><button className="button" onClick={add} disabled={busy||!variantId}>{!variantId?'Unavailable':done?'Added to Cart':busy?<><span className="button-spinner"/>Adding…</>:'Add to Cart'}</button>{message&&<div className="storefront-toast is-visible" role="status" aria-live="polite"><CheckIcon/>{message}</div>}</>}
+import { useEffect, useState } from 'react';
+import { CheckIcon } from '@/components/StorefrontIcons';
+type Props = { variantId: string; productId: string; name: string; price: number; image?: string };
+type Item = Props & { quantity: number };
+const KEY = 'priyasa_cart';
+function localCart(): Item[] { try { const value = JSON.parse(localStorage.getItem(KEY) || '[]'); return Array.isArray(value) ? value : []; } catch { return []; } }
+export function AddToCart({ variantId, productId, name, price, image }: Props) {
+  const [busy, setBusy] = useState(false), [done, setDone] = useState(false), [message, setMessage] = useState('');
+  useEffect(() => { if (!message) return; const t = window.setTimeout(() => setMessage(''), 2600); return () => window.clearTimeout(t); }, [message]);
+  async function add() {
+    if (!variantId) return; setBusy(true); setMessage('');
+    try {
+      const cached = localCart();
+      const currentResponse = await fetch('/api/cart', { cache: 'no-store' });
+      const currentData = await currentResponse.json().catch(() => ({}));
+      const server: Item[] = currentData?.data?.items || [];
+      const merged = [...server];
+      for (const item of cached) { const index = merged.findIndex(x => x.variantId === item.variantId); if (index >= 0) merged[index] = { ...merged[index], quantity: Math.min(20, Number(merged[index].quantity || 0) + Number(item.quantity || 0)) }; else merged.push(item); }
+      const index = merged.findIndex(x => x.variantId === variantId);
+      if (index >= 0) merged[index] = { ...merged[index], quantity: Math.min(20, Number(merged[index].quantity || 0) + 1) }; else merged.push({ variantId, productId, name, price, image, quantity: 1 });
+      const save = await fetch('/api/cart', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ items: merged.map(item => ({ variantId: item.variantId, quantity: item.quantity })) }) });
+      if (!save.ok) { const error = await save.json().catch(() => ({})); throw new Error(error.error || 'Unable to update your bag.'); }
+      localStorage.setItem(KEY, JSON.stringify(merged)); window.dispatchEvent(new Event('priyasa-cart-updated')); setDone(true); setMessage(index >= 0 ? `${name} quantity updated in your bag.` : `${name} added to your bag.`);
+    } catch (error) { setMessage(error instanceof Error ? error.message : 'We could not update your bag. Please try again.'); }
+    finally { setBusy(false); }
+  }
+  return <><button className="button" onClick={add} disabled={busy || !variantId}>{!variantId ? 'Unavailable' : done ? 'Added to Cart' : busy ? <><span className="button-spinner" />Adding…</> : 'Add to Cart'}</button>{message && <div className="storefront-toast is-visible" role="status" aria-live="polite"><CheckIcon />{message}</div>}</>;
+}

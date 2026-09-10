@@ -1,2 +1,26 @@
-import {NextResponse} from 'next/server';import {cookies} from 'next/headers';import {db} from '@/lib/db';import {hmacSha256,safeEqual} from '@/lib/crypto';import {recordOrderStatus} from '@/lib/order-state';import {emitOrderEvent} from '@/lib/events';
-export async function POST(req:Request){const body=await req.json().catch(()=>null);const {orderId,razorpay_order_id,razorpay_payment_id,razorpay_signature}=body||{};if(!orderId||!razorpay_order_id||!razorpay_payment_id||!razorpay_signature)return NextResponse.json({error:'Missing payment verification fields'},{status:400});const jar=await cookies();const userId=jar.get('priyasa_local_user_id')?.value;if(!userId)return NextResponse.json({error:'Authentication required'},{status:401});const payment=await db.payment.findFirst({where:{orderId,order:{userId}},include:{order:{include:{items:true}}}});if(!payment)return NextResponse.json({error:'Payment not found'},{status:404});if(payment.providerOrderId!==razorpay_order_id)return NextResponse.json({error:'Payment/order mismatch'},{status:400});if(!process.env.RAZORPAY_KEY_SECRET)return NextResponse.json({error:'Payment provider not configured'},{status:503});const expected=hmacSha256(`${razorpay_order_id}|${razorpay_payment_id}`,process.env.RAZORPAY_KEY_SECRET);if(!safeEqual(expected,razorpay_signature))return NextResponse.json({error:'Invalid payment signature'},{status:401});if(payment.status==='CAPTURED')return NextResponse.json({ok:true,alreadyProcessed:true,orderNumber:payment.order.orderNumber});await db.$transaction(async tx=>{const fresh=await tx.payment.findUnique({where:{id:payment.id}});if(!fresh)throw new Error('PAYMENT_NOT_FOUND');if(fresh.status==='CAPTURED')return;for(const item of payment.order.items){const changed=await tx.$executeRaw`UPDATE ProductVariant SET stock = stock - ${item.quantity}, reserved = reserved - ${item.quantity} WHERE id = ${item.variantId} AND reserved >= ${item.quantity} AND stock >= ${item.quantity}`;if(changed!==1)throw new Error(`Inventory finalization failed for ${item.sku}`);await tx.inventoryMovement.create({data:{variantId:item.variantId,quantity:-item.quantity,reason:'SALE',referenceId:payment.orderId}});}await tx.payment.update({where:{id:payment.id},data:{providerPaymentId:razorpay_payment_id,status:'CAPTURED',signatureVerified:true}});await tx.paymentEvent.create({data:{provider:'razorpay',eventId:`verify_${razorpay_payment_id}`,eventType:'payment.verify',payload:body,paymentId:payment.id}}).catch(()=>undefined);});await recordOrderStatus(orderId,'CONFIRMED');await emitOrderEvent(orderId,'PAYMENT_CAPTURED');await emitOrderEvent(orderId,'ORDER_CONFIRMED');return NextResponse.json({ok:true,orderNumber:payment.order.orderNumber});}
+import { NextResponse } from 'next/server';
+import { cookies } from 'next/headers';
+import { priyasaApi, apiError } from '@/lib/priyasa-api';
+
+export async function POST(req: Request) {
+  const jar = await cookies();
+  const token = jar.get('priyasa_access_token')?.value;
+  if (!token) return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
+  const body = await req.json().catch(() => null);
+  const orderId = body?.orderId;
+  if (!orderId || !body?.razorpay_order_id || !body?.razorpay_payment_id || !body?.razorpay_signature) {
+    return NextResponse.json({ error: 'Missing payment verification fields' }, { status: 400 });
+  }
+  const { response, body: result } = await priyasaApi(`/api/v1/storefront/orders/${encodeURIComponent(String(orderId))}/payment/capture`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}` },
+    body: JSON.stringify({
+      razorpay_order_id: body.razorpay_order_id,
+      razorpay_payment_id: body.razorpay_payment_id,
+      razorpay_signature: body.razorpay_signature,
+    }),
+  });
+  if (!response.ok) return NextResponse.json({ error: apiError(result, 'Payment verification failed.'), details: result }, { status: response.status });
+  const data = (result as any)?.data ?? result;
+  return NextResponse.json({ ok: true, ...((typeof data === 'object' && data) ? data : {}) });
+}

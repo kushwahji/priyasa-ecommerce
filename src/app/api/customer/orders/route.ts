@@ -1,4 +1,15 @@
-import {NextResponse} from 'next/server';
-import {cookies} from 'next/headers';
-import {db} from '@/lib/db';
-export async function GET(){const jar=await cookies();const id=jar.get('priyasa_local_user_id')?.value;const phone=jar.get('priyasa_mobile')?.value;if(!id&&!phone)return NextResponse.json({error:'Authentication required'},{status:401});const user=id?await db.user.findUnique({where:{id},select:{id:true}}):await db.user.findUnique({where:{phone},select:{id:true}});if(!user)return NextResponse.json({error:'Authentication required'},{status:401});const orders=await db.order.findMany({where:{userId:user.id},orderBy:{createdAt:'desc'},take:50,include:{items:{include:{variant:{include:{product:{include:{images:{orderBy:{sortOrder:'asc'},take:1}}}}}}},payment:true,shipment:true,address:true,statusHistory:{orderBy:{createdAt:'desc'},take:1}}});return NextResponse.json({data:orders});}
+import { NextResponse } from 'next/server';
+import { cookies } from 'next/headers';
+import { priyasaApi, apiError } from '@/lib/priyasa-api';
+
+export async function GET() {
+  const jar = await cookies();
+  const token = jar.get('priyasa_access_token')?.value;
+  if (!token) return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
+  const { response, body } = await priyasaApi('/api/v1/storefront/orders', {
+    method: 'GET',
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!response.ok) return NextResponse.json({ error: apiError(body, 'Unable to load orders.'), details: body }, { status: response.status });
+  return NextResponse.json(body);
+}

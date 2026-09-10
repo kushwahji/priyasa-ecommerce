@@ -1,2 +1,16 @@
-import {NextResponse} from 'next/server';import {cookies} from 'next/headers';import {db} from '@/lib/db';
-export async function GET(_req:Request,{params}:{params:Promise<{id:string}>}){const {id}=await params;const jar=await cookies();const uid=jar.get('priyasa_local_user_id')?.value;const phone=jar.get('priyasa_mobile')?.value;const user=uid?await db.user.findUnique({where:{id:uid},select:{id:true}}):phone?await db.user.findUnique({where:{phone},select:{id:true}}):null;if(!user)return NextResponse.json({error:'Authentication required'},{status:401});const order=await db.order.findFirst({where:{id,userId:user.id},include:{items:{include:{variant:{include:{product:{include:{images:{orderBy:{sortOrder:'asc'},take:1}}}}}}},payment:true,shipment:{include:{events:{orderBy:{occurredAt:'asc'}}}},address:true,statusHistory:{orderBy:{createdAt:'asc'}},returns:{orderBy:{createdAt:'desc'}}}});if(!order)return NextResponse.json({error:'Order not found'},{status:404});return NextResponse.json({data:order});}
+import { NextResponse } from 'next/server';
+import { cookies } from 'next/headers';
+import { priyasaApi, apiError } from '@/lib/priyasa-api';
+
+export async function GET(_req: Request, { params }: { params: Promise<{ id: string }> }) {
+  const token = (await cookies()).get('priyasa_access_token')?.value;
+  if (!token) return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
+  const { id } = await params;
+  if (!id) return NextResponse.json({ error: 'Order id required' }, { status: 400 });
+  const { response, body } = await priyasaApi(`/api/v1/storefront/orders/${encodeURIComponent(id)}`, {
+    method: 'GET',
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!response.ok) return NextResponse.json({ error: apiError(body, 'Unable to load order.'), details: body }, { status: response.status });
+  return NextResponse.json(body);
+}
