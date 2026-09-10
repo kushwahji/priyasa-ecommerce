@@ -1,16 +1,76 @@
-import {db} from '@/lib/db';import type {Product} from '@/lib/catalog';import type {Prisma} from '@prisma/client';
-const activeWindow=(now:Date)=>({active:true,OR:[{startsAt:null},{startsAt:{lte:now}}],AND:[{OR:[{endsAt:null},{endsAt:{gte:now}}]}]});
-const productInclude={category:true,variants:{orderBy:{stock:'desc'}},images:{orderBy:{sortOrder:'asc'}}} satisfies Prisma.ProductInclude;
-function effectivePrice(p:any,variant?:any){const variantPrice=typeof variant?.price==='number'&&variant.price>0?variant.price:0;const salePrice=typeof p.salePrice==='number'&&p.salePrice>0?p.salePrice:0;if(salePrice>0&&p.mrp>0&&salePrice<p.mrp)return variantPrice>0?Math.min(variantPrice,salePrice):salePrice;return variantPrice>0?variantPrice:salePrice}
-function mapProduct(p:any):Product{const variant=p.variants?.find((v:any)=>v.stock-v.reserved>0)||p.variants?.[0];const price=effectivePrice(p,variant);return{id:p.id,name:p.name,slug:p.slug,category:p.category.name,categorySlug:p.category.slug,price,mrp:p.mrp,image:p.images?.[0]?.url||'',images:(p.images||[]).map((i:any)=>i.url),colors:[...new Set((p.variants||[]).map((v:any)=>v.color))] as string[],sizes:[...new Set((p.variants||[]).map((v:any)=>v.size))] as string[],description:p.description,variantId:variant?.id||'',badge:undefined}}
-export async function getStorefrontProducts(options:{categorySlug?:string;limit?:number}={}):Promise<Product[]>{const where:any={active:true};if(options.categorySlug)where.category={slug:options.categorySlug};const rows=await db.product.findMany({where,include:productInclude,orderBy:{createdAt:'desc'},take:options.limit});return rows.map(mapProduct)}
-export async function getLatestLaunches(limit=8){return getStorefrontProducts({limit})}
-export async function getSearchProducts(query:string,limit=24){const q=query.trim();if(!q)return getLatestLaunches(Math.min(limit,12));const rows=await db.product.findMany({where:{active:true,OR:[{name:{contains:q}},{slug:{contains:q}},{brand:{contains:q}},{description:{contains:q}},{category:{name:{contains:q}}},{variants:{some:{OR:[{sku:{contains:q}},{size:{contains:q}},{color:{contains:q}}]}}}]},include:productInclude,orderBy:{createdAt:'desc'},take:limit});return rows.map(mapProduct)}
-export async function getBestSellers(limit=8){const groups=await db.orderItem.groupBy({by:['variantId'],where:{order:{status:{in:['CONFIRMED','PROCESSING','SHIPPED','DELIVERED']}}},_sum:{quantity:true},orderBy:{_sum:{quantity:'desc'}},take:limit*3});if(!groups.length)return getStorefrontProducts({limit});const variantRows=await db.productVariant.findMany({where:{id:{in:groups.map(g=>g.variantId)}},select:{id:true,productId:true}});const rankedIds:string[]=[];for(const group of groups){const variant=variantRows.find(v=>v.id===group.variantId);if(variant&&!rankedIds.includes(variant.productId))rankedIds.push(variant.productId)}const all=await getStorefrontProducts();return rankedIds.map(id=>all.find(p=>p.id===id)).filter((p):p is Product=>Boolean(p)).slice(0,limit)}
-export async function getSaleProducts(limit=8){const rows=await db.product.findMany({where:{active:true},include:productInclude,orderBy:{updatedAt:'desc'},take:limit*3});return rows.filter((p:any)=>effectivePrice(p,p.variants?.[0])<p.mrp).slice(0,limit).map(mapProduct)}
-export async function getProductsForHomeSection(type:string,limit=8):Promise<Product[]>{const t=type.toLowerCase().trim();if(t==='products-latest'||t==='latest'||t==='latest-collection')return getLatestLaunches(limit);if(t==='products-best'||t==='best-sellers'||t==='trending')return getBestSellers(limit);if(t==='products-sale'||t==='sale')return getSaleProducts(limit);if(t.startsWith('products-category:'))return getStorefrontProducts({categorySlug:t.slice('products-category:'.length).trim(),limit});return []}
-export async function getStorefrontProduct(slug:string){const p=await db.product.findFirst({where:{slug,active:true},include:{category:true,variants:{orderBy:{stock:'desc'}},images:{orderBy:{sortOrder:'asc'}},reviews:{where:{approved:true},select:{rating:true}}}});if(!p)return null;const variant=p.variants.find(v=>v.stock-v.reserved>0)||p.variants[0];const price=effectivePrice(p,variant);const reviews=p.reviews;const rating=reviews.length?reviews.reduce((sum,r)=>sum+r.rating,0)/reviews.length:0;return{id:p.id,name:p.name,slug:p.slug,category:p.category.name,categorySlug:p.category.slug,price,mrp:p.mrp,image:p.images[0]?.url||'',images:p.images.map(i=>i.url),colors:[...new Set(p.variants.map(v=>v.color))],sizes:[...new Set(p.variants.map(v=>v.size))],description:p.description,variantId:variant?.id||'',variants:p.variants.map(v=>({id:v.id,color:v.color,size:v.size,price:effectivePrice(p,v),stock:Math.max(0,v.stock-v.reserved),sku:v.sku})),rating,reviewCount:reviews.length,fabric:p.fabric,care:p.care}}
-export async function getStorefrontCategories(){return db.category.findMany({where:{products:{some:{active:true}}},orderBy:{name:'asc'},include:{_count:{select:{products:true}},products:{where:{active:true},take:1,orderBy:{createdAt:'desc'},include:{images:{orderBy:{sortOrder:'asc'},take:1}}}}})}
-export async function getActiveCms(key:string){return db.cmsSection.findFirst({where:{key,...activeWindow(new Date())},orderBy:{sortOrder:'asc'}})}
-export async function getHomeCms(){return db.cmsSection.findMany({where:activeWindow(new Date()),orderBy:{sortOrder:'asc'}})}
-export const money=(n:number)=>`₹${n.toLocaleString('en-IN')}`;
+import type { Product } from '@/lib/catalog';
+
+type ApiResponse = { success?: boolean; data?: any; message?: string };
+const BASE_URL = (process.env.PRIYASA_API_BASE_URL || 'https://api.priyasa.com').replace(/\/$/, '');
+
+async function coreFetch(path: string, init: RequestInit = {}): Promise<ApiResponse> {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 8000);
+  try {
+    const response = await fetch(`${BASE_URL}${path}`, { ...init, headers: { Accept: 'application/json', ...(init.headers || {}) }, cache: 'no-store', signal: init.signal || controller.signal });
+    const body = await response.json().catch(() => null);
+    if (!response.ok) throw new Error(body?.message || `PriyasaCore request failed (${response.status})`);
+    return body || {};
+  } finally { clearTimeout(timeout); }
+}
+
+function listFrom(response: ApiResponse): any[] {
+  const value = response.data;
+  if (Array.isArray(value)) return value;
+  if (Array.isArray(value?.data)) return value.data;
+  return [];
+}
+
+function mediaUrls(product: any): string[] {
+  const media = product?.media;
+  if (Array.isArray(media)) return media.map((item) => typeof item === 'string' ? item : item?.url || item?.image_url).filter(Boolean);
+  if (media && typeof media === 'object') return Object.values(media).flatMap((item: any) => typeof item === 'string' ? [item] : [item?.url, item?.image_url]).filter(Boolean) as string[];
+  return [];
+}
+
+function available(variant: any): number {
+  const inventory = variant?.inventory;
+  if (inventory) return Math.max(0, Number(inventory.quantity || 0) - Number(inventory.reserved_quantity || 0));
+  return Math.max(0, Number(variant?.stock || 0) - Number(variant?.reserved || 0));
+}
+
+function mapProduct(product: any): Product {
+  const variants = Array.isArray(product?.variants) ? product.variants.filter((v: any) => v?.is_active !== false) : [];
+  const inStock = variants.find((v: any) => available(v) > 0) || variants[0];
+  const urls = [...mediaUrls(product), ...variants.map((v: any) => v?.image_url).filter(Boolean)].filter((value, index, all) => all.indexOf(value) === index);
+  const price = Number(inStock?.price ?? product?.price ?? 0);
+  const mrp = Number(inStock?.mrp ?? product?.mrp ?? price);
+  const category = product?.category;
+  return { id: String(product.id), name: String(product.name || ''), slug: String(product.slug || product.id), category: String(category?.name || 'Priyasa'), categorySlug: category?.slug ? String(category.slug) : undefined, price, mrp, image: urls[0] || '/images/product-placeholder.svg', images: urls.length ? urls : ['/images/product-placeholder.svg'], colors: [...new Set(variants.map((v: any) => v?.color).filter(Boolean))] as string[], sizes: [...new Set(variants.map((v: any) => v?.size).filter(Boolean))] as string[], description: String(product?.short_description || product?.description || ''), variantId: inStock?.id ? String(inStock.id) : '', badge: mrp > price && price > 0 ? `${Math.round(((mrp - price) / mrp) * 100)}% OFF` : undefined };
+}
+
+export async function getStorefrontProducts(options: { categorySlug?: string; limit?: number; search?: string } = {}): Promise<Product[]> {
+  const params = new URLSearchParams();
+  if (options.categorySlug) params.set('category', options.categorySlug);
+  if (options.search) params.set('search', options.search);
+  params.set('per_page', String(Math.min(Math.max(options.limit || 24, 1), 100)));
+  return listFrom(await coreFetch(`/api/v1/storefront/products?${params.toString()}`)).map(mapProduct);
+}
+export async function getLatestLaunches(limit = 8) { return getStorefrontProducts({ limit }); }
+export async function getSearchProducts(query: string, limit = 24) { return getStorefrontProducts({ search: query, limit }); }
+/** PriyasaCore currently exposes catalog/search but not a dedicated best-seller endpoint. */
+export async function getBestSellers(limit = 8) { return getStorefrontProducts({ limit }); }
+export async function getSaleProducts(limit = 8) { return (await getStorefrontProducts({ limit: Math.min(100, limit * 3) })).filter((p) => p.price > 0 && p.mrp > p.price).slice(0, limit); }
+export async function getProductsForHomeSection(type: string, limit = 8): Promise<Product[]> { const t = type.toLowerCase().trim(); if (t === 'products-sale' || t === 'sale') return getSaleProducts(limit); if (t === 'products-latest' || t === 'latest' || t === 'latest-collection') return getLatestLaunches(limit); if (t === 'products-best' || t === 'best-sellers' || t === 'trending') return getBestSellers(limit); if (t.startsWith('products-category:')) return getStorefrontProducts({ categorySlug: t.slice('products-category:'.length).trim(), limit }); return []; }
+
+export async function getStorefrontProduct(slug: string) {
+  const response = await coreFetch(`/api/v1/storefront/products/${encodeURIComponent(slug)}`);
+  const product = response.data; if (!product) return null;
+  const mapped = mapProduct(product);
+  const variants = Array.isArray(product.variants) ? product.variants.filter((v: any) => v?.is_active !== false) : [];
+  let rating = 0, reviewCount = 0;
+  try { const reviews = listFrom(await coreFetch(`/api/v1/storefront/products/${encodeURIComponent(slug)}/reviews`)); reviewCount = reviews.length; rating = reviewCount ? reviews.reduce((sum, review) => sum + Number(review.rating || 0), 0) / reviewCount : 0; } catch { /* supplementary */ }
+  return { ...mapped, variants: variants.map((variant: any) => ({ id: String(variant.id), color: variant.color, size: variant.size, price: Number(variant.price ?? product.price ?? 0), mrp: Number(variant.mrp ?? product.mrp ?? 0), stock: available(variant), sku: variant.sku })), rating, reviewCount, fabric: product?.attributes?.fabric, care: product?.attributes?.care };
+}
+
+export async function getStorefrontCategories() {
+  return listFrom(await coreFetch('/api/v1/storefront/categories')).map((category: any) => ({ id: String(category.id), name: String(category.name || ''), slug: String(category.slug || category.id), imageUrl: category.image_url || category.imageUrl || category.media?.url || '', products: [] }));
+}
+export async function getActiveCms(key: string) { return (await coreFetch(`/api/v1/storefront/cms/${encodeURIComponent(key)}`).catch(() => ({ data: null }))).data || null; }
+export async function getHomeCms() { return []; }
+export const money = (n: number) => `₹${n.toLocaleString('en-IN')}`;
