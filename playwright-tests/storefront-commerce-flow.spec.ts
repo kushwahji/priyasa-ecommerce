@@ -47,7 +47,7 @@ test.describe('production storefront commerce flow', () => {
     await expect(page.locator('body')).not.toContainText('Application error');
     await expect(page.locator('body')).toContainText(/Sign in to continue|Shipping address/i);
     if (await page.locator('.payment-method-grid').count()) {
-      await expect(page.locator('.payment-method-grid')).toContainText(/Online payment|Cash on Delivery|Priyasa Wallet/i);
+      await expect(page.locator('.payment-method-grid')).toContainText(/Online payment|Cash on Delivery/i);
     }
   });
 
