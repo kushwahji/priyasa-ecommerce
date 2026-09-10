@@ -19,6 +19,8 @@ const schema = z.object({
   paymentMethod: z.enum(['razorpay', 'cod', 'wallet']).default('razorpay'),
 });
 
+const ONLINE_PAYMENT_DISCOUNT = 70;
+
 export async function POST(req: Request) {
   const parsed = schema.safeParse(await req.json().catch(() => null));
   if (!parsed.success) return NextResponse.json({ error: 'Invalid checkout data', details: parsed.error.flatten() }, { status: 400 });
@@ -76,6 +78,7 @@ export async function POST(req: Request) {
         }
       }
 
+      if (data.paymentMethod === 'razorpay') discount = Math.min(subtotal, discount + ONLINE_PAYMENT_DISCOUNT);
       const shipping = subtotal - discount >= 999 ? 0 : 99;
       const total = Math.max(0, subtotal - discount) + shipping;
       const codMax = Number(process.env.COD_MAX_AMOUNT || '5000');
