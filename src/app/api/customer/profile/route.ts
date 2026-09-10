@@ -1,4 +1,9 @@
-import {NextResponse} from 'next/server';import {cookies} from 'next/headers';import {z} from 'zod';import {db} from '@/lib/db';
-async function getUser(){const jar=await cookies();const id=jar.get('priyasa_local_user_id')?.value;const phone=jar.get('priyasa_mobile')?.value;if(id)return db.user.findUnique({where:{id}});if(phone)return db.user.findUnique({where:{phone}});return null;}
-const schema=z.object({name:z.string().min(2).max(120),email:z.string().email().max(190).optional().or(z.literal(''))});
-export async function PATCH(req:Request){const user=await getUser();if(!user)return NextResponse.json({error:'Authentication required'},{status:401});const parsed=schema.safeParse(await req.json().catch(()=>null));if(!parsed.success)return NextResponse.json({error:'Invalid profile',details:parsed.error.flatten()},{status:400});const updated=await db.user.update({where:{id:user.id},data:{name:parsed.data.name,email:parsed.data.email||null}});return NextResponse.json({data:{id:updated.id,name:updated.name,email:updated.email,phone:updated.phone}});}
+import {NextResponse} from 'next/server';
+import {cookies} from 'next/headers';
+import {priyasaApi,apiError} from '@/lib/priyasa-api';
+
+const endpoint='/api/v1/storefront/profile';
+async function token(){return (await cookies()).get('priyasa_access_token')?.value;}
+async function proxy(method:string,body?:unknown){const t=await token();if(!t)return NextResponse.json({error:'Authentication required'},{status:401});const {response,body:result}=await priyasaApi(endpoint,{method,headers:{Authorization:`Bearer ${t}`},...(body===undefined?{}:{body:JSON.stringify(body)})});if(!response.ok)return NextResponse.json({error:apiError(result,'Unable to update profile.'),details:result},{status:response.status});return NextResponse.json((result as any)?.data??result,{status:response.status});}
+export async function GET(){return proxy('GET');}
+export async function PATCH(req:Request){const body=await req.json().catch(()=>({}));const name=typeof body?.name==='string'?body.name.trim():'';const parts=name.split(/\s+/).filter(Boolean);return proxy('PATCH',{first_name:parts[0]||undefined,last_name:parts.slice(1).join(' ')||undefined,email:typeof body?.email==='string'?(body.email.trim()||null):undefined});}
