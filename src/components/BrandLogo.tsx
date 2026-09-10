@@ -1,25 +1,4 @@
 'use client';
-
-import Link from 'next/link';
-import { useEffect, useState } from 'react';
-
-type BrandLogoProps = { href?: string; compact?: boolean; className?: string; placement?: 'header' | 'footer' };
-type Settings = { headerDesktopLogo: string; headerMobileLogo: string; footerDesktopLogo: string; footerMobileLogo: string };
-const defaults: Settings = { headerDesktopLogo: '/images/priyasa-logo.svg', headerMobileLogo: '/images/priyasa-icon.svg', footerDesktopLogo: '/images/priyasa-logo.svg', footerMobileLogo: '/images/priyasa-icon.svg' };
-
-/** Admin-managed desktop branding; the mobile header uses the original Priyasa icon for consistent app-style branding. */
-export function BrandLogo({ href = '/', compact = false, className = '', placement = 'header' }: BrandLogoProps) {
-  const [settings, setSettings] = useState<Settings>(defaults);
-  useEffect(() => {
-    fetch('/api/storefront/settings', { cache: 'no-store' }).then((response) => response.json()).then((payload) => {
-      if (payload?.data) setSettings((current) => ({ ...current, ...payload.data }));
-    }).catch(() => undefined);
-  }, []);
-  const desktop = placement === 'footer' ? settings.footerDesktopLogo : settings.headerDesktopLogo;
-  const mobile = placement === 'footer' ? settings.footerMobileLogo : defaults.headerMobileLogo;
-  const content = <span className={`brand-lockup ${compact ? 'brand-lockup--compact' : ''} brand-lockup--${placement} ${className}`}>
-    <img className="brand-logo-full" src={desktop || defaults.headerDesktopLogo} alt="PRIYASA" width={184} height={48} />
-    <img className="brand-logo-mobile" src={mobile || defaults.headerMobileLogo} alt="PRIYASA" width={42} height={42} />
-  </span>;
-  return href ? <Link href={href} className="brand-logo-link" aria-label="PRIYASA home">{content}</Link> : content;
-}
+import Link from 'next/link';import {useEffect,useState}from'react';
+type BrandLogoProps={href?:string;compact?:boolean;className?:string;placement?:'header'|'footer'};type Settings={headerDesktopLogo:string;headerMobileLogo:string;footerDesktopLogo:string;footerMobileLogo:string};const defaults:Settings={headerDesktopLogo:'/images/priyasa-logo.svg',headerMobileLogo:'/images/priyasa-icon.svg',footerDesktopLogo:'/images/priyasa-logo.svg',footerMobileLogo:'/images/priyasa-icon.svg'};
+export function BrandLogo({href='/',compact=false,className='',placement='header'}:BrandLogoProps){const[settings,setSettings]=useState<Settings>(defaults);useEffect(()=>{fetch('/api/storefront/settings',{cache:'no-store'}).then(r=>r.json()).then(p=>{if(p?.data)setSettings(c=>({...c,...p.data}))}).catch(()=>undefined)},[]);const desktop=placement==='footer'?settings.footerDesktopLogo:settings.headerDesktopLogo;const mobile=placement==='footer'?settings.footerMobileLogo:defaults.headerMobileLogo;const content=<span className={`brand-lockup ${compact?'brand-lockup--compact ':''}brand-lockup--${placement} ${className}`}><img className="brand-logo-full" src={desktop||defaults.headerDesktopLogo} alt="PRIYASA" width={184} height={48}/><img className="brand-logo-mobile" src={mobile||defaults.headerMobileLogo} alt="PRIYASA" width={42} height={42}/></span>;return <>{href?<Link href={href} className="brand-logo-link" aria-label="PRIYASA home">{content}</Link>:content}<style jsx global>{`@media(max-width:900px){.site-header{grid-template-columns:44px 1fr auto!important;gap:0!important;min-height:72px!important;padding:8px 12px!important}.site-header>.brand-logo-link{grid-column:2!important;justify-self:center!important;margin:0!important;display:flex!important;align-items:center!important;justify-content:center!important}.site-header>.brand-logo-link .brand-logo-full{display:none!important}.site-header>.brand-logo-link .brand-logo-mobile{display:block!important;width:42px!important;height:42px!important;object-fit:contain!important}.site-header>.actions{grid-column:3!important;gap:1px!important}}@media(max-width:420px){.site-header{grid-template-columns:40px 1fr auto!important;padding-left:9px!important;padding-right:9px!important}.site-header>.brand-logo-link .brand-logo-mobile{width:40px!important;height:40px!important}.site-header>.actions .header-icon{width:38px!important;height:38px!important;flex-basis:38px!important}}`}</style></>}
