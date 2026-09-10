@@ -95,6 +95,20 @@ test.describe('admin ↔ storefront data boundary', () => {
     expect(response.status()).not.toBe(201);
   });
 
+  test('admin order operations never become a public mutation surface', async ({ request }) => {
+    const fakeOrderId = 'invalid-e2e-order';
+    const operations = [
+      request.patch(`/api/admin/orders/${fakeOrderId}/status`, { data: { status: 'CONFIRMED' } }),
+      request.post(`/api/admin/orders/${fakeOrderId}/shipment`, { data: {} }),
+      request.post(`/api/admin/orders/${fakeOrderId}/refund`, { data: { amount: 1 } }),
+    ];
+    const responses = await Promise.all(operations);
+    for (const response of responses) {
+      expect([401, 403, 409]).toContain(response.status());
+      expect(response.status()).not.toBe(200);
+    }
+  });
+
   test('checkout quote rejects a non-existent variant before order creation', async ({ request }) => {
     const response = await request.post('/api/checkout/quote', {
       data: { items: [{ variantId: 'invalid-e2e-variant', quantity: 1 }] },
