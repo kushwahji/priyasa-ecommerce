@@ -48,12 +48,15 @@ export async function PUT(req: Request) {
       }
       return NextResponse.json({ ok: true });
     }
-    const { userId, sessionKey } = await identity(); const ids = [...new Set(parsed.data.items.map(i => i.variantId)); const variants = await db.productVariant.findMany({ where: { id: { in: ids } }, include: { product: true } });
+    const { userId, sessionKey } = await identity();
+    const ids = [...new Set(parsed.data.items.map(i => i.variantId))];
+    const variants = await db.productVariant.findMany({ where: { id: { in: ids } }, include: { product: true } });
     if (variants.length !== ids.length || variants.some(v => !v.product.active)) return NextResponse.json({ error: 'One or more products are unavailable.' }, { status: 409 });
     for (const i of parsed.data.items) { const v = variants.find(x => x.id === i.variantId)!; if (v.stock - v.reserved < i.quantity) return NextResponse.json({ error: `${v.product.name} has only ${Math.max(0, v.stock - v.reserved)} available.` }, { status: 409 }); }
     let cart = await db.cart.findFirst({ where: userId ? { userId } : { sessionKey } });
     if (cart) cart = await db.cart.update({ where: { id: cart.id }, data: { couponCode: parsed.data.couponCode || null } }); else cart = await db.cart.create({ data: { ...(userId ? { userId } : { sessionKey }), couponCode: parsed.data.couponCode || null } });
-    await db.cartItem.deleteMany({ where: { cartId: cart.id } }); if (parsed.data.items.length) await db.cartItem.createMany({ data: parsed.data.items.map(i => ({ cartId: cart.id, variantId: i.variantId, quantity: i.quantity })) });
+    await db.cartItem.deleteMany({ where: { cartId: cart.id } });
+    if (parsed.data.items.length) await db.cartItem.createMany({ data: parsed.data.items.map(i => ({ cartId: cart.id, variantId: i.variantId, quantity: i.quantity })) });
     return NextResponse.json({ ok: true });
   } catch (error) { return NextResponse.json({ error: apiError(error, 'Unable to save cart') }, { status: 502 }); }
 }
