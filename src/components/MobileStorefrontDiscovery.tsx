@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import {SearchIcon} from '@/components/StorefrontIcons';
 
 const tabs=[
   ['ALL','/shop'],
@@ -11,11 +10,7 @@ const tabs=[
 ] as const;
 
 export default function MobileStorefrontDiscovery(){
-  return <section className="mobile-storefront-discovery" aria-label="Store discovery">
-    <Link className="mobile-storefront-search" href="/search" aria-label="Search products, styles and categories">
-      <SearchIcon/>
-      <span>Search products, styles &amp; categories</span>
-    </Link>
+  return <section className="mobile-storefront-discovery mobile-storefront-discovery--tabs-only" aria-label="Shop categories">
     <nav className="mobile-storefront-tabs" aria-label="Shop categories">
       {tabs.map(([label,href],index)=><Link key={href} href={href} className={index===0?'is-active':''}>{label}</Link>)}
     </nav>
