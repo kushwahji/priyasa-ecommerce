@@ -4,10 +4,10 @@ import {getStorefrontCategories} from '@/lib/storefront-data';
 import {ProductCard} from '@/components/ProductCard';
 import HomeCarousel from '@/components/HomeCarousel';
 
-type Section={id:string;key?:string;type:string;title?:string|null;subtitle?:string|null;imageUrl?:string|null;mobileImageUrl?:string|null;ctaLabel?:string|null;ctaHref?:string|null};
+type Section={id:string;key?:string;type?:string;title?:string|null;subtitle?:string|null;imageUrl?:string|null;mobileImageUrl?:string|null;ctaLabel?:string|null;ctaHref?:string|null};
 
 export default async function HomeCmsSection({section,carouselSlides}:{section:Section;carouselSlides?:Section[]}){
- const type=section.type.toLowerCase();
+ const type=String(section.type||'').toLowerCase();
  if(type==='hero-slide'||type==='image-carousel')return carouselSlides?.length&&carouselSlides[0].id===section.id?<HomeCarousel slides={carouselSlides} hero={type==='hero-slide'}/>:null;
  if(type.startsWith('products-')||['latest','latest-collection','best-sellers','trending','sale'].includes(type)){
   const products=await getProductsForHomeSection(type,8);if(!products.length)return null;
