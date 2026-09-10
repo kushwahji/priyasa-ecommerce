@@ -1,25 +1,24 @@
 import { test, expect } from '@playwright/test';
 
-const protectedMutationRoutes = [
-  ['/api/admin/orders/invalid-e2e-order/status', { status: 'PROCESSING' }],
-  ['/api/admin/orders/invalid-e2e-order/shipment', { provider: 'shiprocket' }],
-  ['/api/admin/orders/invalid-e2e-order/shipment-action', { action: 'REQUEST_PICKUP' }],
+const protectedMutations: Array<{ path: string; method: 'POST' | 'PATCH'; data: Record<string, unknown> }> = [
+  { path: '/api/admin/orders/invalid-e2e-order/status', method: 'PATCH', data: { status: 'PROCESSING' } },
+  { path: '/api/admin/orders/invalid-e2e-order/shipment', method: 'POST', data: { provider: 'shiprocket' } },
+  { path: '/api/admin/orders/invalid-e2e-order/shipment-action', method: 'POST', data: { action: 'pickup' } },
 ];
 
 test.describe('fulfillment automation boundaries', () => {
   test('admin fulfillment mutations never accept an unauthenticated request', async ({ request }) => {
-    for (const [path, data] of protectedMutationRoutes) {
-      const response = await request.post(path, { data });
-      expect(response.status(), `${path} must not create a fulfillment mutation anonymously`).not.toBe(201);
-      expect(response.status()).toBeLessThan(500);
+    for (const mutation of protectedMutations) {
+      const response = mutation.method === 'PATCH'
+        ? await request.patch(mutation.path, { data: mutation.data })
+        : await request.post(mutation.path, { data: mutation.data });
+      expect(response.status(), `${mutation.method} ${mutation.path} must not mutate fulfillment anonymously`).toBe(403);
     }
   });
 
   test('invalid shipment creation cannot create a shipment', async ({ request }) => {
-    const response = await request.post('/api/admin/orders/invalid-e2e-order/shipment', {
-      data: { provider: 'shiprocket' },
-    });
-    expect(response.status()).not.toBe(201);
+    const response = await request.post('/api/admin/orders/invalid-e2e-order/shipment', { data: { provider: 'shiprocket' } });
+    expect(response.status()).toBe(403);
   });
 
   test('public tracking surface remains reachable without exposing admin controls', async ({ page }) => {
@@ -30,10 +29,8 @@ test.describe('fulfillment automation boundaries', () => {
     await expect(page.locator('body')).not.toContainText(/Create Shipment|Request Pickup|AWB Assigned/i);
   });
 
-  test('shipment provider webhook route rejects malformed anonymous callbacks', async ({ request }) => {
-    const response = await request.post('/api/webhooks/shiprocket', {
-      data: { event: 'invalid-e2e-event' },
-    });
+  test('shipment provider webhook rejects malformed payloads', async ({ request }) => {
+    const response = await request.post('/api/webhooks/shiprocket', { data: { event: 'invalid-e2e-event' } });
     expect(response.status()).not.toBe(201);
     expect(response.status()).not.toBe(200);
   });
