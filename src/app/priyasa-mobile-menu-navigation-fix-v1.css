@@ -3,81 +3,21 @@
  * backdrop have deterministic hit-testing and stacking order.
  */
 @media (max-width: 900px) {
-  html body .mobile-menu-backdrop {
-    position: fixed !important;
-    inset: 0 !important;
-    z-index: 1190 !important;
-    display: block !important;
-    background: rgba(15, 10, 13, .42) !important;
-    touch-action: none !important;
-  }
-
-  html body .mobile-drawer {
-    position: fixed !important;
-    top: 0 !important;
-    left: 0 !important;
-    bottom: 0 !important;
-    z-index: 1200 !important;
-    width: min(88vw, 390px) !important;
-    max-width: 390px !important;
-    height: 100dvh !important;
-    max-height: 100dvh !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    overflow-x: hidden !important;
-    overflow-y: auto !important;
-    overscroll-behavior: contain !important;
-    -webkit-overflow-scrolling: touch !important;
-    background: #fff !important;
-    pointer-events: none !important;
-    visibility: hidden !important;
-    opacity: 0 !important;
-    transform: translate3d(-105%, 0, 0) !important;
-    transition: transform .24s ease, opacity .18s ease, visibility 0s linear .24s !important;
-    box-shadow: 18px 0 48px rgba(20, 10, 15, .16) !important;
-  }
-
-  html body .mobile-drawer.is-open {
-    pointer-events: auto !important;
-    visibility: visible !important;
-    opacity: 1 !important;
-    transform: translate3d(0, 0, 0) !important;
-    transition: transform .24s ease, opacity .18s ease !important;
-  }
-
-  html body .mobile-drawer a,
-  html body .mobile-drawer button {
-    position: relative !important;
-    z-index: 2 !important;
-    pointer-events: auto !important;
-    touch-action: manipulation !important;
-  }
-
-  html body .mobile-drawer-nav,
-  html body .mobile-drawer-group,
-  html body .mobile-drawer-foot {
-    position: relative !important;
-    z-index: 1 !important;
-  }
-
-  html body.menu-open {
-    overflow: hidden !important;
-    overscroll-behavior: none !important;
-  }
-
-  html body.menu-open .site-header {
-    z-index: 1180 !important;
-  }
+  html body .mobile-menu-backdrop { position:fixed!important; inset:0!important; z-index:1190!important; display:block!important; background:rgba(15,10,13,.42)!important; touch-action:none!important; }
+  html body .mobile-drawer { position:fixed!important; top:0!important; left:0!important; bottom:0!important; z-index:1200!important; width:min(88vw,390px)!important; max-width:390px!important; height:100dvh!important; max-height:100dvh!important; margin:0!important; padding:0!important; overflow-x:hidden!important; overflow-y:auto!important; overscroll-behavior:contain!important; -webkit-overflow-scrolling:touch!important; background:#fff!important; pointer-events:none!important; visibility:hidden!important; opacity:0!important; transform:translate3d(-105%,0,0)!important; transition:transform .24s ease,opacity .18s ease,visibility 0s linear .24s!important; box-shadow:18px 0 48px rgba(20,10,15,.16)!important; }
+  html body .mobile-drawer.is-open { pointer-events:auto!important; visibility:visible!important; opacity:1!important; transform:translate3d(0,0,0)!important; transition:transform .24s ease,opacity .18s ease!important; }
+  html body .mobile-drawer a, html body .mobile-drawer button { position:relative!important; z-index:2!important; pointer-events:auto!important; touch-action:manipulation!important; }
+  html body .mobile-drawer-nav, html body .mobile-drawer-group, html body .mobile-drawer-foot { position:relative!important; z-index:1!important; }
+  html body .mobile-drawer-nav button, html body .mobile-drawer-foot button, html body .mobile-drawer-search button { width:100%!important; border:0!important; background:transparent!important; color:inherit!important; text-align:left!important; cursor:pointer!important; margin:0!important; }
+  html body .mobile-drawer-nav button { display:flex!important; align-items:center!important; justify-content:space-between!important; gap:12px!important; padding:11px 18px!important; min-height:44px!important; }
+  html body .mobile-drawer-nav button span { flex:1!important; }
+  html body .mobile-drawer-foot button { display:flex!important; align-items:center!important; gap:12px!important; padding:12px 18px!important; min-height:44px!important; }
+  html body .mobile-drawer-search button { display:flex!important; align-items:center!important; gap:10px!important; padding:0!important; }
+  html body.menu-open { overflow:hidden!important; overscroll-behavior:none!important; }
+  html body.menu-open .site-header { z-index:1180!important; }
 }
 
-/* If CMS/fallback ordering ever emits the same service rail twice as
- * adjacent home sections, keep the first rail and suppress the duplicate. */
-.home-reference-v4 .home-service-promises ~ .home-service-promises {
-  display: none !important;
-}
+/* Prevent a duplicated service rail when the CMS/fallback ordering emits it twice. */
+.home-reference-v4 .home-service-promises ~ .home-service-promises { display:none!important; }
 
-@media (max-width: 760px) {
-  .home-reference-v4 .home-service-promises {
-    margin-top: 0 !important;
-  }
-}
+@media (max-width:760px) { .home-reference-v4 .home-service-promises { margin-top:0!important; } }
