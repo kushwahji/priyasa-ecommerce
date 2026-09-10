@@ -56,15 +56,13 @@ test.describe('production storefront commerce flow', () => {
       const response = await page.goto(route, { waitUntil: 'domcontentloaded' });
       expect(response?.status(), `${route} returned an HTTP error`).toBeLessThan(500);
       await expect(page.locator('body')).not.toContainText('Application error');
-      if (route === '/account/payment-methods') {
-        await expect(page.locator('body')).toContainText(/Payment Methods|Sign in/i);
-      }
+      if (route === '/account/payment-methods') await expect(page.locator('body')).toContainText(/Payment Methods|Sign in/i);
     }
   });
 
   test('global storefront controls remain keyboard and pointer usable', async ({ page }) => {
     await page.goto('/');
-    const controls = page.locator('a,button').filter({ visible: true });
+    const controls = page.locator('a:visible,button:visible');
     const count = Math.min(await controls.count(), 30);
     expect(count).toBeGreaterThan(0);
     for (let i = 0; i < count; i += 1) {
