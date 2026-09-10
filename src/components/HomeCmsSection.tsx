@@ -4,7 +4,7 @@ import {getStorefrontCategories} from '@/lib/storefront-data';
 import {ProductCard} from '@/components/ProductCard';
 import HomeCarousel from '@/components/HomeCarousel';
 
-type Section={id:string;key:string;type:string;title?:string|null;subtitle?:string|null;imageUrl?:string|null;mobileImageUrl?:string|null;ctaLabel?:string|null;ctaHref?:string|null};
+type Section={id:string;key?:string;type:string;title?:string|null;subtitle?:string|null;imageUrl?:string|null;mobileImageUrl?:string|null;ctaLabel?:string|null;ctaHref?:string|null};
 
 export default async function HomeCmsSection({section,carouselSlides}:{section:Section;carouselSlides?:Section[]}){
  const type=section.type.toLowerCase();
