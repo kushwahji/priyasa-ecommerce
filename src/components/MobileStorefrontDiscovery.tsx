@@ -1,4 +1,7 @@
+'use client';
+
 import Link from 'next/link';
+import {usePathname} from 'next/navigation';
 
 const tabs=[
   ['ALL','/shop'],
@@ -10,6 +13,8 @@ const tabs=[
 ] as const;
 
 export default function MobileStorefrontDiscovery(){
+  const pathname=usePathname();
+  if(pathname!=='/') return null;
   return <section className="mobile-storefront-discovery mobile-storefront-discovery--tabs-only" aria-label="Shop categories">
     <nav className="mobile-storefront-tabs" aria-label="Shop categories">
       {tabs.map(([label,href],index)=><Link key={href} href={href} className={index===0?'is-active':''}>{label}</Link>)}
