@@ -46,17 +46,39 @@ export default function Checkout(){
 
   const clientSubtotal=useMemo(()=>items.reduce((sum,item)=>sum+Number(item.price||0)*Number(item.quantity||0),0),[items]);
 
+  async function syncCartToCore(){
+    if(authenticated!==true)return;
+    const response=await fetch('/api/cart',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({items:items.map(item=>({variantId:String(item.variantId),quantity:Number(item.quantity)})),couponCode:form.coupon.trim().toUpperCase()||undefined})});
+    const data=await response.json().catch(()=>({}));
+    if(!response.ok)throw new Error(data.error||'Unable to sync your bag. Please refresh and try again.');
+  }
+
+  async function getFreshQuote(){
+    await syncCartToCore();
+    const response=await fetch('/api/checkout/quote',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({items:items.map(item=>({variantId:String(item.variantId),quantity:Number(item.quantity)})),coupon:form.coupon.trim().toUpperCase()||undefined,pincode:form.pincode||undefined})});
+    const data=await response.json().catch(()=>({}));
+    if(!response.ok)throw new Error(data.error||'Unable to validate your bag.');
+    return data;
+  }
+
   useEffect(()=>{
     let cancelled=false;
     const timer=window.setTimeout(async()=>{
       if(!items.length){setQuote(null);return;}
-      const response=await fetch('/api/checkout/quote',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({items:items.map(item=>({variantId:item.variantId,quantity:item.quantity})),coupon:form.coupon||undefined})});
-      const data=await response.json().catch(()=>({}));
-      if(cancelled)return;
-      if(response.ok)setQuote(data);else{setQuote(null);setStatus(data.error||'Unable to calculate your order.');}
+      if(authenticated!==true)return;
+      try{
+        const data=await getFreshQuote();
+        if(cancelled)return;
+        setQuote(data);
+        setStatus('');
+      }catch(error){
+        if(cancelled)return;
+        setQuote(null);
+        setStatus(error instanceof Error?error.message:'Unable to calculate your order.');
+      }
     },220);
     return()=>{cancelled=true;window.clearTimeout(timer)};
-  },[items,form.coupon]);
+  },[items,form.coupon,authenticated,form.pincode]);
 
   function selectAddress(address:Address){setSelectedAddressId(address.id);setForm(current=>({...current,fullName:address.fullName,phone:address.phone,line1:address.line1,city:address.city,state:address.state,pincode:address.pincode}));}
   function updateField(field:string,value:string){setForm(current=>({...current,[field]:value}));if(field!=='phone')setSelectedAddressId('');}
@@ -77,11 +99,9 @@ export default function Checkout(){
     if(!quote){setStatus('Please wait while we validate your order.');setStep(1);return;}
     setBusy(true);setStatus('Rechecking price, stock and offer…');
     try{
-      const quoteResponse=await fetch('/api/checkout/quote',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({items:items.map(item=>({variantId:item.variantId,quantity:item.quantity})),coupon:form.coupon||undefined})});
-      const freshQuote=await quoteResponse.json().catch(()=>({}));
-      if(!quoteResponse.ok)throw new Error(freshQuote.error||'Your bag changed. Please refresh.');
+      const freshQuote=await getFreshQuote();
       setQuote(freshQuote);
-      const orderResponse=await fetch('/api/orders',{method:'POST',headers:{'Content-Type':'application/json','Idempotency-Key':crypto.randomUUID()},body:JSON.stringify({addressId:selectedAddressId||undefined,coupon:form.coupon||undefined,paymentMethod})});
+      const orderResponse=await fetch('/api/orders',{method:'POST',headers:{'Content-Type':'application/json','Idempotency-Key':crypto.randomUUID()},body:JSON.stringify({addressId:selectedAddressId||undefined,coupon:form.coupon.trim().toUpperCase()||undefined,paymentMethod})});
       const order=await orderResponse.json().catch(()=>({}));
       if(!orderResponse.ok)throw new Error(order.error||'Unable to create order.');
       if(paymentMethod==='cod'){
@@ -90,7 +110,7 @@ export default function Checkout(){
         return;
       }
       setStatus('Opening secure payment…');
-      const paymentResponse=await fetch('/api/payments/razorpay',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({orderId:order.orderId})});
+      const paymentResponse=await fetch('/api/payments/razorpay',{method:'POST',headers:{'Content-Type':'application/json','Idempotency-Key':crypto.randomUUID()},body:JSON.stringify({orderId:order.orderId})});
       const payment=await paymentResponse.json().catch(()=>({}));
       if(!paymentResponse.ok)throw new Error(payment.error||'Unable to start payment.');
       if(!payment.keyId||!payment.razorpayOrderId||Number(payment.amount)<=0)throw new Error('Payment gateway returned an invalid order. Please retry.');
