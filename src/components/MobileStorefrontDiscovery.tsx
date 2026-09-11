@@ -1,14 +1,14 @@
 'use client';
 
-import {usePathname} from 'next/navigation';
+import Link from 'next/link';
+import { SearchIcon } from '@/components/StorefrontIcons';
 
-/**
- * The mobile home page no longer renders the legacy ALL / WOMEN / MEN / KIDS
- * discovery rail. Category discovery belongs inside Shop/search, not between
- * the app header and the home merchandising experience.
- */
+/** Mobile home discovery is a search affordance only; category tabs are removed. */
 export default function MobileStorefrontDiscovery(){
-  const pathname=usePathname();
-  if(pathname!=='/') return null;
-  return null;
+  return <section className="mobile-storefront-discovery mobile-storefront-discovery--search" aria-label="Store search">
+    <Link className="mobile-home-search" href="/search" aria-label="Search for products, brands and more">
+      <SearchIcon />
+      <span>Search for products, brands and more...</span>
+    </Link>
+  </section>;
 }
