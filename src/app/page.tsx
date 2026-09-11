@@ -1,71 +1,94 @@
-import { getBestSellers, getProductsForHomeSection } from '@/lib/storefront-data';
-import { getCachedHomeCms, getCachedStorefrontCategories, getCachedStorefrontProducts } from '@/lib/storefront-cache';
 import HomeHeroCarousel from '@/components/HomeHeroCarousel';
-import HomeImageCarousel from '@/components/HomeImageCarousel';
-import HomeOfferStrip from '@/components/HomeOfferStrip';
-import HomeCmsSection from '@/components/HomeCmsSection';
 import HomeProductGrid from '@/components/HomeProductGrid';
-import AffiliateHomeSection from '@/components/AffiliateHomeSection';
 import PersonalizedRecommendations from '@/components/PersonalizedRecommendations';
-import { TruckIcon, ShieldIcon, ReturnIcon, GiftIcon } from '@/components/StorefrontIcons';
+import { getCachedHomeCms, getCachedStorefrontProducts } from '@/lib/storefront-cache';
+import { getProductsForHomeSection } from '@/lib/storefront-data';
 import { SiteStructuredData } from '@/app/seo-schema';
+import { ReturnIcon, ShieldIcon, TruckIcon, GiftIcon } from '@/components/StorefrontIcons';
 
 export const revalidate = 120;
-const cleanText=(value:unknown)=>String(value??'').replace(/<[^>]*>/g,' ').replace(/&amp;/g,'&').replace(/&quot;/g,'"').replace(/&#39;|&apos;/g,"'").replace(/\s+/g,' ').trim();
-const typeOf=(s:any)=>String(s.type||'').toLowerCase();
-const productType=(type:string)=>!['products-all','products-grid-30'].includes(type)&&(type.startsWith('products-')||['latest','latest-collection','best-sellers','trending','sale'].includes(type));
-const imageType=(type:string)=>['image-carousel','image-slide','carousel'].includes(type);
-const bannerType=(type:string)=>['promo','banner','image-banner','collection-banner'].includes(type);
-const casualType=(type:string)=>['casual-grid','casual','lifestyle-grid'].includes(type);
-const featureType=(type:string)=>['feature','lifestyle'].includes(type);
-const deliveryType=(type:string)=>['delivery-banner','benefits','trust-strip'].includes(type);
-const festivalType=(type:string)=>['festival','festival-grid','festive-collection'].includes(type);
-const sectionPriority=(section:any)=>{const t=typeOf(section);const title=cleanText(section.title).toLowerCase();if(['hero','hero-slide'].includes(t))return 10;if(imageType(t))return 20;if(casualType(t))return 25;if(t==='products-sale'||t==='sale'||title.includes('flash sale'))return 30;if(t==='products-latest'||t==='latest'||t==='latest-collection'||title.includes('new launch')||title.includes('new in'))return 31;if(deliveryType(t))return 40;if(festivalType(t)||title.includes('festival')||title.includes('festive'))return 50;if(t==='products-all'||t==='products-grid-30'||title.includes('all products')||title.includes('30 products'))return 60;if(productType(t)&&(['best-sellers','products-best','best seller'].some(k=>t.includes(k)||title.includes(k))))return 70;if(t==='category-grid')return 80;if(featureType(t)||bannerType(t))return 90;return 100;};
-const categoriesMarkup=(categories:any[],title='Shop by Category',subtitle='Find your style, your way.')=><section className="home-section"><div className="home-section-head"><div><span className="home-kicker">THE PRIYASA EDIT</span><h2>{title}</h2><p>{subtitle}</p></div><a className="home-view-all" href="/shop">View All →</a></div><div className="category-grid category-grid-editorial">{categories.slice(0,8).map((category:any)=><a className="category-card" key={category.id} href={`/category/${category.slug}`}><div className="category-image" style={{backgroundImage:`url(${category.imageUrl||category.products?.[0]?.images?.[0]?.url||'/images/product-placeholder.svg'})`}}/><div className="category-label"><strong>{category.name}</strong><span>Shop Now →</span></div></a>)}</div></section>;
-const promoCards=(categories:any[])=>{const cards=categories.slice(0,4);if(!cards.length)return null;return <section className="home-section home-casual-section"><div className="home-section-head"><div><span className="home-kicker">CASUAL EDIT</span><h2>Casual Styles</h2><p>Easy everyday looks, curated for you.</p></div><a className="home-view-all" href="/shop">Explore All →</a></div><div className="home-casual-grid">{cards.map((c:any)=><a className="home-casual-card" key={c.id} href={`/category/${c.slug}`} style={{backgroundImage:`url(${c.imageUrl||c.products?.[0]?.images?.[0]?.url||'/images/product-placeholder.svg'})`}}><div className="home-casual-copy"><small>PRIYASA EDIT</small><strong>{c.name}</strong><span>SHOP NOW →</span></div></a>)}</div></section>};
-const trustStrip=()=> <section className="home-service-promises" aria-label="Priyasa service promises"><div className="home-service-promises-inner"><div className="home-service-promise"><ReturnIcon/><div><strong>7 Days Easy Return</strong><small>Simple & hassle-free returns</small></div></div><div className="home-service-promise"><ShieldIcon/><div><strong>Premium Quality</strong><small>Made with care, made to last</small></div></div><div className="home-service-promise"><GiftIcon/><div><strong>COD Available</strong><small>Pay when your order arrives</small></div></div><div className="home-service-promise"><TruckIcon/><div><strong>Pan India Delivery</strong><small>We deliver across India</small></div></div></div></section>;
+
+type HomeSection = {
+  id:string|number;
+  key?:string;
+  type?:string;
+  title?:string|null;
+  subtitle?:string|null;
+  image_url?:string|null;
+  imageUrl?:string|null;
+  cta_label?:string|null;
+  ctaLabel?:string|null;
+  cta_href?:string|null;
+  ctaHref?:string|null;
+  content?:any;
+  sort_order?:number;
+  sortOrder?:number;
+};
+
+const text=(value:unknown)=>String(value??'').replace(/<[^>]*>/g,' ').replace(/&amp;/g,'&').replace(/&quot;/g,'"').replace(/&#39;|&apos;/g,"'").replace(/\s+/g,' ').trim();
+const typeOf=(section:HomeSection)=>String(section.type||'').toLowerCase();
+const image=(section:HomeSection)=>section.imageUrl||section.image_url||'';
+const href=(section:HomeSection)=>section.ctaHref||section.cta_href||'';
+const label=(section:HomeSection)=>section.ctaLabel||section.cta_label||'Shop Now';
+
+function trustStrip(){return <section className="home-service-promises home-managed-trust" aria-label="Priyasa service promises"><div className="home-service-promises-inner"><div className="home-service-promise"><ReturnIcon/><div><strong>7 Days Easy Return</strong></div></div><div className="home-service-promise"><ShieldIcon/><div><strong>Premium Quality</strong></div></div><div className="home-service-promise"><GiftIcon/><div><strong>COD Available</strong></div></div><div className="home-service-promise"><TruckIcon/><div><strong>Pan India Delivery</strong></div></div></div></section>}
+
+function ManagedOffer({section}:{section:HomeSection}){const item=Array.isArray(section.content?.items)?section.content.items[0]:null;const offer={...section,...item};return <section className="home-managed-offer"><div className="home-managed-offer-copy"><span className="home-kicker">{text(section.type)||'PRIYASA OFFERS'}</span><h2>{text(offer.title||section.title||'Special Offer')}</h2>{offer.subtitle&&<p>{text(offer.subtitle)}</p>}{(offer.cta_href||offer.ctaHref||href(section))&&<a className="button" href={offer.cta_href||offer.ctaHref||href(section)}>{offer.cta_label||offer.ctaLabel||label(section)} →</a>}</div>{(offer.image_url||offer.imageUrl||image(section))&&<div className="home-managed-offer-image" style={{backgroundImage:`url(${offer.image_url||offer.imageUrl||image(section)})`}}/>}</section>}
+
+function ManagedBanner({section}:{section:HomeSection}){return <section className="home-managed-banner"><div className="home-managed-banner-copy"><span className="home-kicker">{text(section.type)||'PRIYASA EDIT'}</span><h2>{text(section.title||'The Priyasa Edit')}</h2>{section.subtitle&&<p>{text(section.subtitle)}</p>}{href(section)&&<a className="button dark-button" href={href(section)}>{label(section)} →</a>}</div><div className="home-managed-banner-image" style={{backgroundImage:`url(${image(section)})`}}/></section>}
+
 export default async function Home(){
- const [categories,sections,latest]=await Promise.all([getCachedStorefrontCategories(),getCachedHomeCms(),getCachedStorefrontProducts({limit:30})]);
- const fallbackBest=await getBestSellers(30);
- const fallbackSale=await getProductsForHomeSection('products-sale',30);
- const flashProducts=Array.from(new Map([...fallbackSale,...latest].map((p:any)=>[p.id,p])).values()).slice(0,18);
- const festivalSlug=categories.find((c:any)=>['festival','festive','diwali','navratri','eid','wedding'].some((k:string)=>String(c.slug).toLowerCase().includes(k)))?.slug;
- const festivalProducts=festivalSlug?await getCachedStorefrontProducts({categorySlug:festivalSlug,limit:30}):[];
- const hasCms=sections.length>0;const used=new Set<string>();
- const renderProductSection=async(section:any,productsOverride?:any[],className='',limit=12)=>{const products=(productsOverride||await getProductsForHomeSection(typeOf(section),limit)).slice(0,limit);if(!products.length)return null;return <section className={`home-section home-product-section ${className}`.trim()} key={section.id}><div className="home-section-head"><div><span className="home-kicker">{section.subtitle||'PRIYASA EDIT'}</span><h2>{section.title||'Curated for you'}</h2>{section.subtitle&&<p>{cleanText(section.subtitle)}</p>}</div>{section.ctaHref&&<a className="home-view-all" href={section.ctaHref}>{section.ctaLabel||'View All'} →</a>}</div><HomeProductGrid products={products} initialVisible={limit} step={limit}/></section>};
- const renderFlashSale=async(key:string)=>renderProductSection({id:`flash-sale-${key}`,type:'products-sale',title:'Flash Sale',subtitle:'LATEST LAUNCH • 18 STYLES',ctaHref:'/offers',ctaLabel:'Shop All Offers'},flashProducts,'home-flash-sale',18);
- const body:any[]=[];
- if(!hasCms){
-  if(latest.length)body.push(<section className="home-section home-hero-multi" key="fallback-hero"><section className="home-fallback-hero"><div className="hero-fallback-media" style={{backgroundImage:`url(${latest[0].image})`}}/><div className="hero-fallback-copy"><span className="eyebrow">PRIYASA NEW SEASON</span><h1>Every You,<br/>Beautiful.</h1><p>Discover thoughtfully designed fashion for every mood, moment and you.</p><a className="button" href="/new-arrivals">Shop New Arrivals →</a></div></section></section>);
-  if(categories.length)body.push(promoCards(categories));
-  if(flashProducts.length)body.push(await renderFlashSale('fallback'));
-  body.push(trustStrip());
-  body.push(<AffiliateHomeSection key="fallback-affiliate"/>);
-  if(festivalProducts.length)body.push(<section className="home-festival-wrap" key="festival-fallback"><section className="home-section"><div className="home-section-head"><div><span className="home-kicker">FESTIVAL EDIT</span><h2>Festival Collection</h2><p>Celebrate every occasion in style.</p></div><a className="home-view-all" href={`/category/${festivalSlug}`}>Shop Collection →</a></div><div className="home-festival-grid">{festivalProducts.slice(0,4).map((p:any)=><a className="home-festival-card" key={p.id} href={`/product/${p.slug}`} style={{backgroundImage:`url(${p.image})`}}><div className="home-festival-copy"><strong>{p.name}</strong><span>SHOP NOW →</span></div></a>)}</div></section></section>);
-  if(fallbackBest.length)body.push(await renderProductSection({id:'best',type:'products-best',title:'Best Sellers',subtitle:'MOST LOVED',ctaHref:'/shop',ctaLabel:'View All'},fallbackBest));
-  if(categories.length)body.push(categoriesMarkup(categories));
- }else{
-  const orderedSections=[...sections].sort((a:any,b:any)=>{const priority=sectionPriority(a)-sectionPriority(b);if(priority!==0)return priority;return (Number(a.sortOrder)||0)-(Number(b.sortOrder)||0);});
-  let offerPlaced=false;let servicePromisesPlaced=false;let flashSalePlaced=false;let casualPlaced=false;
-  const hasCmsCasual=sections.some((s:any)=>casualType(typeOf(s)));
-  const hasCmsSale=sections.some((s:any)=>{const t=typeOf(s);const title=cleanText(s.title).toLowerCase();return t==='products-sale'||t==='sale'||title.includes('flash sale')});
-  for(const section of orderedSections){const type=typeOf(section);if(used.has(section.id))continue;
-   if(['hero','hero-slide'].includes(type)){const slides=sections.filter((s:any)=>['hero','hero-slide'].includes(typeOf(s))).sort((a:any,b:any)=>(Number(a.sortOrder)||0)-(Number(b.sortOrder)||0));slides.forEach((s:any)=>used.add(s.id));body.push(<section className="home-section home-hero-multi" key={`hero-${section.id}`}><HomeHeroCarousel slides={slides}/></section>);continue}
-   if(imageType(type)){const slides=sections.filter((s:any)=>imageType(typeOf(s))).sort((a:any,b:any)=>(Number(a.sortOrder)||0)-(Number(b.sortOrder)||0));slides.forEach((s:any)=>used.add(s.id));if(!offerPlaced){body.push(<HomeOfferStrip key={`offer-before-images-${section.id}`}/>);offerPlaced=true}body.push(<section className="home-section home-image-highlight-section" key={`images-${section.id}`}><HomeImageCarousel slides={slides}/></section>);if(!casualPlaced&&!hasCmsCasual&&categories.length){body.push(promoCards(categories));casualPlaced=true;if(!flashSalePlaced&&flashProducts.length){body.push(await renderFlashSale(`after-images-${section.id}`));flashSalePlaced=true}}if(!servicePromisesPlaced){body.push(trustStrip());servicePromisesPlaced=true}continue}
-   if(casualType(type)){const group=sections.filter((s:any)=>casualType(typeOf(s))).sort((a:any,b:any)=>(Number(a.sortOrder)||0)-(Number(b.sortOrder)||0));group.forEach((s:any)=>used.add(s.id));body.push(<section className="home-section home-casual-section" key={`casual-${section.id}`}><div className="home-section-head"><div><span className="home-kicker">{section.subtitle||'CASUAL EDIT'}</span><h2>{section.title||'Casual Styles'}</h2>{section.subtitle&&<p>{cleanText(section.subtitle)}</p>}</div>{section.ctaHref&&<a className="home-view-all" href={section.ctaHref}>{section.ctaLabel||'Explore All'} →</a>}</div><div className="home-casual-grid">{group.map((s:any)=><a className="home-casual-card" key={s.id} href={s.ctaHref||'/shop'} style={{backgroundImage:`url(${s.imageUrl||'/images/product-placeholder.svg'})`}}><div className="home-casual-copy"><small>PRIYASA EDIT</small><strong>{s.title||'Everyday Style'}</strong><span>{s.ctaLabel||'SHOP NOW'} →</span></div></a>)}</div></section>);casualPlaced=true;if(!hasCmsSale&&!flashSalePlaced&&flashProducts.length){body.push(await renderFlashSale(`after-casual-${section.id}`));flashSalePlaced=true}continue}
-   if(type==='category-grid'){used.add(section.id);body.push(categoriesMarkup(categories,section.title||'Shop by Category',section.subtitle||'Find your style, your way.'));continue}
-   if(type==='products-all'||type==='products-grid-30'){used.add(section.id);body.push(await renderProductSection(section,await getCachedStorefrontProducts({limit:30})));continue}
-   if(productType(type)){used.add(section.id);const title=cleanText(section.title).toLowerCase();const isSale=type==='products-sale'||type==='sale'||title.includes('flash sale');const isLatest=type==='products-latest'||type==='latest'||type==='latest-collection'||title.includes('new launch')||title.includes('new in');if(isLatest)continue;if(isSale&&flashSalePlaced)continue;const managedClass=isSale?'home-flash-sale':type==='products-latest'||type==='latest'||type==='latest-collection'||title.includes('new launch')?'home-latest-launch':'';if(isSale)flashSalePlaced=true;body.push(await renderProductSection(section,isSale?flashProducts:undefined,managedClass,isSale?18:12));continue}
-   if(festivalType(type)){used.add(section.id);body.push(<section className="home-festival-wrap" key={section.id}><section className="home-section"><div className="home-section-head"><div><span className="home-kicker">{section.subtitle||'FESTIVAL EDIT'}</span><h2>{section.title||'Festival Collection'}</h2></div>{section.ctaHref&&<a className="home-view-all" href={section.ctaHref}>{section.ctaLabel||'Shop Collection'} →</a>}</div><div className="home-festival-grid">{(festivalProducts.length?festivalProducts:latest).slice(0,4).map((p:any)=><a className="home-festival-card" key={p.id} href={`/product/${p.slug}`} style={{backgroundImage:`url(${p.image})`}}><div className="home-festival-copy"><strong>{p.name}</strong><span>SHOP NOW →</span></div></a>)}</div></section></section>);continue}
-   if(deliveryType(type)){used.add(section.id);if(!servicePromisesPlaced){body.push(trustStrip());servicePromisesPlaced=true}continue}
-   if(bannerType(type)){used.add(section.id);body.push(<section className="split-banner" key={section.id}><div className="split-copy"><span className="eyebrow dark">{section.subtitle||'PRIYASA EDIT'}</span><h2>{section.title||'The Priyasa Edit'}</h2>{section.ctaHref&&<a className="button dark-button" href={section.ctaHref}>{section.ctaLabel||'Shop Now'} →</a>}</div><div className="split-image" style={{backgroundImage:`url(${section.imageUrl||''})`}}/></section>);if(!servicePromisesPlaced){body.push(trustStrip());servicePromisesPlaced=true}continue}
-   if(featureType(type)){const group=sections.filter((s:any)=>featureType(typeOf(s))).sort((a:any,b:any)=>(Number(a.sortOrder)||0)-(Number(b.sortOrder)||0));group.forEach((s:any)=>used.add(s.id));body.push(<section className="home-section" key={`feature-${section.id}`}><div className="home-section-head"><div><span className="home-kicker">{section.subtitle||'PRIYASA EDIT'}</span><h2>{section.title||'Style for Every You'}</h2></div></div><div className="feature-grid feature-grid-editorial">{group.map((s:any)=><a key={s.id} href={s.ctaHref||'/shop'} className="feature" style={{backgroundImage:`linear-gradient(180deg,rgba(0,0,0,.03),rgba(0,0,0,.62)),url(${s.imageUrl||''})`}}><span className="eyebrow">{s.subtitle||'THE EDIT'}</span><h3>{s.title||'Explore the edit'}</h3><span>{s.ctaLabel||'Shop Now'} →</span></a>)}</div></section>);continue}
-   used.add(section.id);body.push(<HomeCmsSection key={section.id} section={section}/>);
+  const sections=(await getCachedHomeCms()).slice().sort((a:any,b:any)=>(Number(a.sort_order??a.sortOrder??0)-Number(b.sort_order??b.sortOrder??0)));
+  const latest=await getCachedStorefrontProducts({limit:30});
+  const body:any[]=[];
+  let trustAdded=false;
+  let heroAdded=false;
+
+  for(const section of sections as HomeSection[]){
+    const type=typeOf(section);
+    if(type==='banner'&&String(section.key||'')==='home')continue;
+    if(type==='category_grid')continue;
+
+    if(type==='hero_slider'||type==='hero'||type==='hero-slide'){
+      if(heroAdded)continue;
+      const items=Array.isArray(section.content?.items)?section.content.items:[];
+      const slides=items.length?items.map((item:any,index:number)=>({id:`${section.id}-${index}`,title:item.title||section.title,subtitle:item.subtitle||section.subtitle,imageUrl:item.image_url||item.imageUrl||image(section),mobileImageUrl:item.mobile_image_url||item.mobileImageUrl||item.image_url||item.imageUrl||image(section),ctaLabel:item.cta_label||item.ctaLabel||label(section),ctaHref:item.cta_href||item.ctaHref||href(section)})):[{id:String(section.id),title:section.title,subtitle:section.subtitle,imageUrl:image(section),ctaLabel:label(section),ctaHref:href(section)}];
+      body.push(<section className="home-section home-hero-multi home-managed-hero" key={section.id}><HomeHeroCarousel slides={slides}/></section>);
+      heroAdded=true;
+      if(!trustAdded){body.push(trustStrip());trustAdded=true;}
+      continue;
+    }
+
+    if(type==='offer'){
+      body.push(<ManagedOffer section={section} key={section.id}/>);
+      continue;
+    }
+
+    if(type==='new_arrivals'||type==='new-arrivals'||type==='latest'||type==='latest-collection'){
+      const products=await getProductsForHomeSection('new_arrivals',8);
+      if(products.length)body.push(<section className="home-section home-product-section home-managed-products" key={section.id}><div className="home-section-head"><div><span className="home-kicker">{text(section.subtitle)||'FRESH STYLES'}</span><h2>{text(section.title)||'New Arrivals'}</h2></div>{href(section)&&<a className="home-view-all" href={href(section)}>{label(section)} →</a>}</div><HomeProductGrid products={products} initialVisible={8} step={8}/></section>);
+      continue;
+    }
+
+    if(type==='trending'||type==='products-best'||type==='best-sellers'){
+      const products=await getProductsForHomeSection('trending',8);
+      if(products.length)body.push(<section className="home-section home-product-section home-managed-products" key={section.id}><div className="home-section-head"><div><span className="home-kicker">{text(section.subtitle)||'MOST LOVED'}</span><h2>{text(section.title)||'Trending Now'}</h2></div>{href(section)&&<a className="home-view-all" href={href(section)}>{label(section)} →</a>}</div><HomeProductGrid products={products} initialVisible={8} step={8}/></section>);
+      continue;
+    }
+
+    if(type==='banner'){
+      body.push(<ManagedBanner section={section} key={section.id}/>);
+      continue;
+    }
+
+    if(type==='text'){
+      const html=section.content?.html;
+      body.push(<section className="home-managed-text home-section" key={section.id}><span className="home-kicker">{text(section.title)||'PRIYASA'}</span><p>{text(html)||text(section.subtitle)}</p></section>);
+    }
   }
-  if(!casualPlaced&&!hasCmsCasual&&categories.length){body.splice(Math.min(3,body.length),0,promoCards(categories));casualPlaced=true}
-  if(!servicePromisesPlaced){body.splice(Math.min(5,body.length),0,trustStrip());servicePromisesPlaced=true}
-  if(!offerPlaced)body.splice(Math.min(1,body.length),0,<HomeOfferStrip key="offer-fallback-position"/>);
-  if(!flashSalePlaced&&flashProducts.length){body.push(await renderFlashSale('cms-fallback'));flashSalePlaced=true}
- }
- return <div className="home-reference-v4"><SiteStructuredData />{body.filter(Boolean)}<div className="home-centre-design"><h2>Style for Every You</h2><p>Curated fashion, thoughtful details and beautiful everyday moments — the Priyasa way.</p></div><PersonalizedRecommendations/></div>;
+
+  if(!heroAdded&&latest.length){body.push(<section className="home-section home-hero-multi" key="fallback"><HomeHeroCarousel slides={[{id:'fallback',title:'Priyasa Fashion',subtitle:'New season. New style.',imageUrl:latest[0].image,ctaLabel:'Shop Now',ctaHref:'/shop'}]}/></section>);}
+  if(!trustAdded){body.splice(1,0,trustStrip());}
+
+  return <div className="home-reference-v4"><SiteStructuredData/>{body.filter(Boolean)}<PersonalizedRecommendations/></div>;
 }
