@@ -1,0 +1,125 @@
+/* PRIYASA mobile production shell v2.
+ * Final override layer for 320–900px devices. Keeps the storefront content/API
+ * untouched while normalising headers, drawers, account navigation and PLP chrome.
+ */
+@media (max-width: 900px) {
+  :root { --priyasa-pink:#e91e63; --priyasa-ink:#20222d; --priyasa-muted:#70727c; --priyasa-line:#e9e9ed; --priyasa-surface:#fff; }
+  html, body { max-width:100%; overflow-x:hidden; }
+  body { padding-bottom:calc(78px + env(safe-area-inset-bottom)); }
+  .announcement { display:none!important; }
+
+  /* Global mobile header: compact, balanced and touch-safe. */
+  body .site-header {
+    min-height:64px!important; height:64px!important; padding:8px 14px!important;
+    display:grid!important; grid-template-columns:42px minmax(0,1fr) auto!important;
+    align-items:center!important; gap:8px!important; background:#fff!important;
+    border-bottom:1px solid var(--priyasa-line)!important; box-shadow:none!important;
+    position:sticky!important; top:0!important; z-index:1100!important;
+  }
+  body .site-header nav { display:none!important; }
+  body .site-header > .mobile-menu { grid-column:1!important; width:42px!important; height:42px!important; margin:0!important; display:grid!important; place-items:center!important; border:0!important; background:transparent!important; color:var(--priyasa-ink)!important; padding:7px!important; }
+  body .site-header > .brand-logo-link { grid-column:2!important; justify-self:start!important; min-width:0!important; margin:0!important; display:flex!important; align-items:center!important; }
+  body .site-header > .brand-logo-link .brand-lockup { display:flex!important; align-items:center!important; }
+  body .site-header > .brand-logo-link .brand-logo-full { display:block!important; width:124px!important; height:auto!important; max-height:34px!important; object-fit:contain!important; }
+  body .site-header > .brand-logo-link .brand-logo-mobile { display:none!important; }
+  body .site-header > .actions { grid-column:3!important; display:flex!important; align-items:center!important; gap:2px!important; margin:0!important; }
+  body .site-header > .actions .header-icon { width:40px!important; height:40px!important; min-width:40px!important; flex:0 0 40px!important; border:0!important; background:transparent!important; color:var(--priyasa-ink)!important; padding:8px!important; }
+  body .site-header > .actions .header-icon svg { width:23px!important; height:23px!important; }
+
+  /* Account/search/cart actions are navigation surfaces, not oversized modal pages. */
+  body.e2-panel-open { overflow:hidden!important; }
+  body .e2-panel-backdrop { background:rgba(17,18,25,.38)!important; backdrop-filter:blur(2px)!important; }
+  body .e2-panel { width:min(100%,430px)!important; border-radius:20px 20px 0 0!important; overflow:hidden!important; }
+  body .e2-panel-head { min-height:62px!important; padding:14px 18px!important; border-bottom:1px solid var(--priyasa-line)!important; }
+  body .e2-panel-close { width:40px!important; height:40px!important; border-radius:50%!important; background:#f5f5f7!important; }
+
+  /* Drawer: Myntra-like clean left navigation, no category wall or giant logo. */
+  body .mobile-menu-backdrop { background:rgba(15,16,22,.46)!important; backdrop-filter:blur(1px)!important; }
+  body .mobile-drawer { width:min(86vw,372px)!important; max-width:372px!important; border-radius:0 22px 22px 0!important; box-shadow:12px 0 42px rgba(0,0,0,.18)!important; }
+  body .mobile-drawer-head { height:68px!important; min-height:68px!important; padding:10px 14px!important; display:flex!important; align-items:center!important; justify-content:space-between!important; border-bottom:1px solid var(--priyasa-line)!important; background:#fff!important; position:sticky!important; top:0!important; z-index:5!important; }
+  body .mobile-drawer-brand { display:flex!important; flex-direction:column!important; align-items:flex-start!important; justify-content:center!important; gap:2px!important; border:0!important; background:transparent!important; padding:0!important; color:var(--priyasa-muted)!important; }
+  body .mobile-drawer-brand img { display:block!important; width:128px!important; height:auto!important; max-height:32px!important; object-fit:contain!important; object-position:left center!important; }
+  body .mobile-drawer-brand span { font-size:9px!important; letter-spacing:.16em!important; text-transform:uppercase!important; color:#9b7181!important; }
+  body .mobile-drawer-head > button:last-child { width:40px!important; height:40px!important; border:0!important; border-radius:50%!important; background:#f6f6f7!important; display:grid!important; place-items:center!important; }
+  body .mobile-drawer-account { margin:14px 14px 10px!important; padding:14px!important; border:1px solid #f0dce4!important; border-radius:16px!important; background:linear-gradient(135deg,#fff7fa,#fff)!important; }
+  body .mobile-drawer-account > div { display:flex!important; align-items:center!important; gap:11px!important; }
+  body .mobile-drawer-account > div > svg { width:30px!important; height:30px!important; color:var(--priyasa-pink)!important; flex:0 0 auto!important; }
+  body .mobile-drawer-account strong { display:block!important; font-size:15px!important; line-height:1.2!important; color:var(--priyasa-ink)!important; }
+  body .mobile-drawer-account span { display:block!important; margin-top:4px!important; font-size:11px!important; line-height:1.35!important; color:var(--priyasa-muted)!important; }
+  body .mobile-drawer-account > button { width:100%!important; margin-top:12px!important; min-height:42px!important; border:0!important; border-radius:10px!important; background:var(--priyasa-pink)!important; color:#fff!important; font-weight:700!important; font-size:13px!important; display:flex!important; align-items:center!important; justify-content:center!important; gap:7px!important; }
+  body .mobile-drawer-search { margin:0 14px 8px!important; padding:0!important; }
+  body .mobile-drawer-search button { min-height:46px!important; padding:0 12px!important; border:1px solid var(--priyasa-line)!important; border-radius:11px!important; background:#fafafd!important; color:var(--priyasa-ink)!important; }
+  body .mobile-drawer-search button svg { width:20px!important; height:20px!important; flex:0 0 auto!important; }
+  body .mobile-drawer-search button span { font-size:12px!important; }
+  body .mobile-drawer-nav { padding:4px 14px 100px!important; }
+  body .mobile-drawer-group { margin:0!important; padding:8px 0!important; border-top:1px solid var(--priyasa-line)!important; }
+  body .mobile-drawer-group:first-child { border-top:0!important; }
+  body .mobile-drawer-group h3 { margin:4px 4px 3px!important; font-size:10px!important; letter-spacing:.16em!important; text-transform:uppercase!important; color:#999aa2!important; }
+  body .mobile-drawer-group a { min-height:43px!important; padding:8px 4px!important; border-radius:9px!important; display:flex!important; align-items:center!important; justify-content:space-between!important; color:var(--priyasa-ink)!important; text-decoration:none!important; font-size:14px!important; font-weight:600!important; }
+  body .mobile-drawer-group a:active { background:#faf0f4!important; }
+  body .mobile-drawer-group a svg { width:16px!important; height:16px!important; color:#aaa!important; }
+  body .mobile-drawer-foot { position:fixed!important; left:0!important; bottom:0!important; width:min(86vw,372px)!important; padding:9px 8px calc(9px + env(safe-area-inset-bottom))!important; background:rgba(255,255,255,.97)!important; border-top:1px solid var(--priyasa-line)!important; display:grid!important; grid-template-columns:repeat(5,1fr)!important; gap:2px!important; z-index:10!important; }
+  body .mobile-drawer-foot a { min-width:0!important; padding:5px 2px!important; display:flex!important; flex-direction:column!important; align-items:center!important; gap:4px!important; color:#5d5f69!important; text-decoration:none!important; font-size:9px!important; font-weight:700!important; }
+  body .mobile-drawer-foot a svg { width:20px!important; height:20px!important; color:var(--priyasa-pink)!important; }
+
+  /* Inner-page headers: consistent back/title/actions instead of giant arrows. */
+  body:has(.plp-mobile-head) .site-header { display:none!important; }
+  body:has(.account-mobile-head) .site-header { display:none!important; }
+  body:has(.plp-mobile-head) .plp-mobile-head,
+  body:has(.account-mobile-head) .account-mobile-head { position:sticky!important; top:0!important; z-index:1080!important; min-height:64px!important; height:64px!important; padding:8px 14px!important; margin:0!important; background:#fff!important; border-bottom:1px solid var(--priyasa-line)!important; display:grid!important; align-items:center!important; }
+  body:has(.plp-mobile-head) .plp-mobile-head { grid-template-columns:42px minmax(0,1fr) auto!important; gap:8px!important; }
+  body:has(.plp-mobile-head) .plp-mobile-head .back { width:40px!important; height:40px!important; display:grid!important; place-items:center!important; font-size:0!important; color:var(--priyasa-ink)!important; text-decoration:none!important; }
+  body:has(.plp-mobile-head) .plp-mobile-head .back::before { content:'‹'; font-size:42px!important; font-weight:300!important; line-height:1!important; transform:translateY(-2px)!important; }
+  body:has(.plp-mobile-head) .plp-mobile-head h1 { margin:0!important; font-size:20px!important; line-height:1!important; font-weight:700!important; color:var(--priyasa-ink)!important; }
+  body:has(.plp-mobile-head) .plp-mobile-head .actions { display:flex!important; gap:2px!important; }
+  body:has(.plp-mobile-head) .plp-mobile-head .actions a { width:40px!important; height:40px!important; display:grid!important; place-items:center!important; color:var(--priyasa-ink)!important; }
+  body:has(.plp-mobile-head) .plp-mobile-head .actions svg { width:22px!important; height:22px!important; }
+
+  body:has(.account-mobile-head) .account-mobile-head { grid-template-columns:42px minmax(0,1fr) auto auto!important; gap:6px!important; }
+  body:has(.account-mobile-head) .account-mobile-head .account-back { width:40px!important; height:40px!important; display:grid!important; place-items:center!important; color:var(--priyasa-ink)!important; }
+  body:has(.account-mobile-head) .account-mobile-head .account-back svg { width:25px!important; height:25px!important; }
+  body:has(.account-mobile-head) .account-mobile-head strong { font-size:20px!important; line-height:1!important; font-weight:700!important; color:var(--priyasa-ink)!important; }
+  body:has(.account-mobile-head) .account-mobile-head .account-head-icon { width:40px!important; height:40px!important; display:grid!important; place-items:center!important; color:var(--priyasa-ink)!important; }
+  body:has(.account-mobile-head) .account-mobile-head .account-head-icon svg { width:22px!important; height:22px!important; }
+
+  /* Shop: no horizontal category rail on mobile. */
+  body:has(.shop-page-v1) .category-pills { display:none!important; }
+  body:has(.shop-page-v1) .shop-page-v1 { min-height:100vh!important; }
+  body:has(.shop-page-v1) .shop-page-v1 .storefront-inner { padding-top:20px!important; }
+  body:has(.shop-page-v1) .shop-page-v1 .breadcrumbs { display:none!important; }
+  body:has(.shop-page-v1) .collection-intro { padding:0 18px 22px!important; margin:0!important; border-bottom:1px solid var(--priyasa-line)!important; }
+  body:has(.shop-page-v1) .collection-intro h1 { font-size:40px!important; line-height:.98!important; letter-spacing:-.045em!important; margin:5px 0 10px!important; }
+  body:has(.shop-page-v1) .collection-intro p { font-size:14px!important; margin:0!important; color:var(--priyasa-muted)!important; }
+  body:has(.shop-page-v1) .eyebrow.dark { font-size:10px!important; letter-spacing:.25em!important; }
+
+  /* Bottom nav: stable 4-tab thumb-zone navigation. */
+  body .mobile-bottom-nav { position:fixed!important; left:0!important; right:0!important; bottom:0!important; z-index:1150!important; height:calc(66px + env(safe-area-inset-bottom))!important; padding:7px 8px env(safe-area-inset-bottom)!important; background:rgba(255,255,255,.97)!important; border-top:1px solid var(--priyasa-line)!important; box-shadow:0 -5px 18px rgba(20,20,30,.05)!important; display:grid!important; grid-template-columns:repeat(4,1fr)!important; }
+  body .mobile-bottom-nav a { min-width:0!important; min-height:52px!important; display:flex!important; flex-direction:column!important; justify-content:center!important; align-items:center!important; gap:4px!important; color:#656873!important; text-decoration:none!important; border-radius:10px!important; }
+  body .mobile-bottom-nav a svg { width:24px!important; height:24px!important; stroke-width:1.8!important; }
+  body .mobile-bottom-nav a small { font-size:11px!important; line-height:1!important; font-weight:650!important; }
+  body .mobile-bottom-nav a.is-active { color:var(--priyasa-pink)!important; }
+
+  /* Remove desktop-style oversized cards from guest account on phones. */
+  body:has(.account-mobile-head) .account-shell { padding:0 14px 28px!important; }
+  body:has(.account-mobile-head) .account-welcome-card { margin:18px 0 14px!important; border-radius:20px!important; padding:24px 20px!important; min-height:0!important; }
+  body:has(.account-mobile-head) .account-welcome-copy h1 { font-size:34px!important; line-height:1.02!important; letter-spacing:-.04em!important; }
+  body:has(.account-mobile-head) .account-welcome-copy p { font-size:14px!important; line-height:1.55!important; }
+  body:has(.account-mobile-head) .account-primary-cta { min-height:48px!important; padding:0 16px!important; border-radius:11px!important; }
+  body:has(.account-mobile-head) .account-quick-grid { grid-template-columns:repeat(2,minmax(0,1fr))!important; gap:10px!important; }
+  body:has(.account-mobile-head) .account-quick-grid a { min-height:112px!important; padding:16px!important; border-radius:16px!important; }
+  body:has(.account-mobile-head) .account-v2-layout { display:block!important; }
+  body:has(.account-mobile-head) .account-v2-sidebar { display:none!important; }
+  body:has(.account-mobile-head) .account-v2-main { width:100%!important; padding:0!important; }
+  body:has(.account-mobile-head) .account-stat-grid { grid-template-columns:repeat(2,minmax(0,1fr))!important; gap:10px!important; }
+  body:has(.account-mobile-head) .account-profile-card { padding:16px!important; border-radius:16px!important; }
+  body:has(.account-mobile-head) .account-v2-link-grid { grid-template-columns:repeat(2,minmax(0,1fr))!important; gap:10px!important; }
+}
+
+@media (max-width:420px) {
+  body .site-header { grid-template-columns:40px minmax(0,1fr) auto!important; padding-left:9px!important; padding-right:9px!important; }
+  body .site-header > .brand-logo-link .brand-logo-full { width:112px!important; }
+  body .site-header > .actions .header-icon { width:37px!important; min-width:37px!important; flex-basis:37px!important; }
+  body:has(.plp-mobile-head) .plp-mobile-head,
+  body:has(.account-mobile-head) .account-mobile-head { padding-left:9px!important; padding-right:9px!important; }
+  body:has(.shop-page-v1) .collection-intro h1 { font-size:36px!important; }
+}
