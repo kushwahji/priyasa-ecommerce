@@ -1,0 +1,33 @@
+/* Markup-specific final pass for the production storefront shell. */
+.site-header>.brand-logo-link{display:flex!important;align-items:center!important}
+.site-header>.actions{display:flex!important;align-items:center!important}
+.mobile-drawer-account>div{display:flex!important;align-items:center!important;gap:10px!important}
+.mobile-drawer-account>button{width:100%!important;height:44px!important;margin-top:12px!important;border:0!important;border-radius:7px!important;background:#ff3f6c!important;color:#fff!important;font-weight:750!important;box-shadow:0 5px 14px rgba(255,63,108,.18)!important}
+.mobile-drawer-account>button svg{margin-left:6px!important}
+.mobile-drawer-search button{width:100%!important;height:48px!important;border:1px solid #ededf0!important;border-radius:8px!important;background:#f6f6f8!important;color:#5f6470!important;display:flex!important;align-items:center!important;gap:10px!important;padding:0 13px!important;text-align:left!important}
+.mobile-drawer-group button,.mobile-drawer-foot button{width:100%!important;min-height:44px!important;border:0!important;background:transparent!important;color:#282c3f!important;display:flex!important;align-items:center!important;justify-content:space-between!important;padding:0 2px!important;border-radius:6px!important;text-align:left!important}
+.mobile-drawer-group button:hover,.mobile-drawer-foot button:hover{background:#fff5f7!important;color:#ff3f6c!important;padding-left:8px!important}
+.mobile-drawer-group button svg,.mobile-drawer-foot button svg{width:20px!important;height:20px!important;flex:0 0 auto!important}
+.mobile-drawer-group button span,.mobile-drawer-foot button span{flex:1!important}
+.mobile-drawer-foot{display:grid!important;grid-template-columns:1fr!important;gap:2px!important}
+.e2-panel-backdrop{background:rgba(21,24,34,.5)!important;backdrop-filter:blur(4px)!important}
+.e2-panel{background:#fff!important;box-shadow:-16px 0 50px rgba(0,0,0,.16)!important}
+.e2-panel-button--dark{background:#ff3f6c!important;border-color:#ff3f6c!important}
+.e2-search-form:focus-within{border-color:#f18aa5!important;box-shadow:0 0 0 4px rgba(255,63,108,.08)!important}
+.e2-search-links a:hover,.e2-account-link:hover{background:#fff5f7!important;color:#ff3f6c!important}
+@media(max-width:680px){
+ .site-header>.brand-logo-link{position:absolute!important;left:50%!important;top:13px!important;transform:translateX(-50%)!important;min-width:0!important;height:40px!important;justify-content:center!important}
+ .site-header>.brand-logo-link .brand-logo-full{display:block!important;width:105px!important;height:auto!important;max-height:34px!important}
+ .site-header>.brand-logo-link .brand-logo-mobile{display:none!important}
+ .site-header>.actions{position:absolute!important;right:8px!important;top:9px!important;height:48px!important;gap:1px!important}
+ .site-header>.actions .header-icon{width:40px!important;height:40px!important;flex-basis:40px!important}
+ .site-header>.actions .header-icon[aria-label="Search"]{display:none!important}
+ .site-header>.actions .header-icon[aria-label="Wishlist"]{display:none!important}
+ .site-header>.actions .header-icon[aria-label="Account"]{display:flex!important}
+ .site-header>.actions .header-icon[aria-label^="Shopping bag"]{display:flex!important}
+ .site-header>.mobile-menu{z-index:2!important}
+ .mobile-drawer{width:min(365px,90vw)!important}
+ .mobile-drawer-group h3{font-size:10px!important;letter-spacing:.14em!important;color:#8b8f98!important}
+ .mobile-drawer-group button{font-size:14px!important;min-height:46px!important}
+ .mobile-drawer-foot button{font-size:14px!important;min-height:46px!important}
+}
