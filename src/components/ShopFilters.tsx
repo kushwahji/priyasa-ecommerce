@@ -1,17 +1,76 @@
 'use client';
-import {useMemo,useState} from 'react';
+
+import {useEffect,useMemo,useRef,useState} from 'react';
 import {ProductCard} from '@/components/ProductCard';
 import type {Product} from '@/lib/catalog';
+
+type Category = {name:string;slug:string};
 const sizes=['XS','S','M','L','XL','XXL','Free Size'];
 const prices=[['Under ₹999',0,999],['₹999 – ₹1,999',999,1999],['₹2,000 – ₹2,999',2000,2999],['₹3,000+',3000,Infinity]] as const;
 const discounts=[['10%+',10],['30%+',30],['50%+',50]] as const;
 const colors=['Black','White','Pink','Red','Blue','Green','Yellow','Beige'];
 const fabrics=['Cotton','Rayon','Georgette','Viscose','Chiffon','Silk'];
+
+function discountOf(p:Product){return p.mrp>0?((p.mrp-p.price)/p.mrp)*100:0}
 function hasWord(p:Product,word:string){const hay=`${p.name} ${p.description} ${p.fabric||''} ${p.category}`.toLowerCase();return hay.includes(word.toLowerCase())}
-export function ShopFilters({products,categories}:{products:Product[];categories:string[]}){
- const [category,setCategory]=useState('All'),[size,setSize]=useState(''),[price,setPrice]=useState(''),[discount,setDiscount]=useState(''),[color,setColor]=useState(''),[fabric,setFabric]=useState(''),[availability,setAvailability]=useState(false),[sort,setSort]=useState('featured'),[mobileFilters,setMobileFilters]=useState(false);
- const filtered=useMemo(()=>{let list=products.filter(p=>category==='All'||p.category===category);if(size)list=list.filter(p=>p.sizes.includes(size));if(price){const r=prices.find(x=>x[0]===price);if(r)list=list.filter(p=>p.price>=r[1]&&p.price<=r[2]);}if(discount){const d=discounts.find(x=>x[0]===discount)?.[1]||0;list=list.filter(p=>p.mrp>0&&((p.mrp-p.price)/p.mrp)*100>=d)}if(color)list=list.filter(p=>p.colors.some(c=>c.toLowerCase()===color.toLowerCase())||hasWord(p,color));if(fabric)list=list.filter(p=>hasWord(p,fabric));if(availability)list=list.filter(p=>Boolean(p.variantId));return [...list].sort((a,b)=>sort==='price-low'?a.price-b.price:sort==='price-high'?b.price-a.price:sort==='discount'?((b.mrp-b.price)/Math.max(b.mrp,1))-((a.mrp-a.price)/Math.max(a.mrp,1)):sort==='rating'?(b.rating||0)-(a.rating||0):0)},[products,category,size,price,discount,color,fabric,availability,sort]);
- const clear=()=>{setCategory('All');setSize('');setPrice('');setDiscount('');setColor('');setFabric('');setAvailability(false)};
- const controls=<div className="filter-controls"><div><span>Category</span><button className={category==='All'?'active':''} onClick={()=>setCategory('All')}>All</button>{categories.map(x=><button key={x} className={category===x?'active':''} onClick={()=>setCategory(x)}>{x}</button>)}</div><div><span>Size</span>{sizes.map(x=><button key={x} className={size===x?'active':''} onClick={()=>setSize(size===x?'':x)}>{x}</button>)}</div><div><span>Color</span>{colors.map(x=><button key={x} className={color===x?'active':''} onClick={()=>setColor(color===x?'':x)}>{x}</button>)}</div><div><span>Fabric</span>{fabrics.map(x=><button key={x} className={fabric===x?'active':''} onClick={()=>setFabric(fabric===x?'':x)}>{x}</button>)}</div><div><span>Price</span>{prices.map(x=><button key={x[0]} className={price===x[0]?'active':''} onClick={()=>setPrice(price===x[0]?'':x[0])}>{x[0]}</button>)}</div><div><span>Discount</span>{discounts.map(x=><button key={x[0]} className={discount===x[0]?'active':''} onClick={()=>setDiscount(discount===x[0]?'':x[0])}>{x[0]}</button>)}</div><div><span>Availability</span><button className={availability?'active':''} onClick={()=>setAvailability(v=>!v)}>In stock</button></div><button className="filter-clear" onClick={clear}>Clear all</button></div>;
- return <><div className="shop-toolbar"><button className="mobile-filter-trigger" onClick={()=>setMobileFilters(true)}>☷ Filters{[category!=='All',!!size,!!price,!!discount,!!color,!!fabric,availability].filter(Boolean).length?` (${[category!=='All',!!size,!!price,!!discount,!!color,!!fabric,availability].filter(Boolean).length})`:''}</button><span>{filtered.length} products</span><label>Sort by <select value={sort} onChange={e=>setSort(e.target.value)}><option value="featured">Recommended</option><option value="rating">Top Rated</option><option value="price-low">Price: Low to High</option><option value="price-high">Price: High to Low</option><option value="discount">Best Discount</option></select></label></div><aside className="desktop-filter-panel">{controls}</aside>{mobileFilters&&<div className="filter-sheet-backdrop" onClick={()=>setMobileFilters(false)}><div className="filter-sheet" onClick={e=>e.stopPropagation()}><div className="filter-sheet-head"><strong>Filters</strong><button onClick={()=>setMobileFilters(false)}>×</button></div>{controls}<button className="button dark-button filter-apply" onClick={()=>setMobileFilters(false)}>View {filtered.length} products</button></div></div>}<div className="product-grid shop">{filtered.map(p=><ProductCard key={p.id} product={p}/>)}</div>{!filtered.length&&<div className="empty-shop"><h3>No styles found</h3><p>Try another category, colour, size, fabric or price range.</p><button className="button" onClick={clear}>Clear filters</button></div>}</>;
+
+export function ShopFilters({products:initialProducts,categories}:{products:Product[];categories:Category[]}){
+ const [products,setProducts]=useState(initialProducts),[category,setCategory]=useState(''),[size,setSize]=useState(''),[price,setPrice]=useState(''),[discount,setDiscount]=useState(''),[color,setColor]=useState(''),[fabric,setFabric]=useState(''),[availability,setAvailability]=useState(false),[sort,setSort]=useState('featured'),[mobileFilters,setMobileFilters]=useState(false),[loading,setLoading]=useState(false),[page,setPage]=useState(1),[hasMore,setHasMore]=useState(initialProducts.length>=24);
+ const requestId=useRef(0);
+ const firstRender=useRef(true);
+
+ const serverFiltersActive=Boolean(category||size||price||color||availability||sort!=='featured');
+ const fetchProducts=async(nextPage:number,append=false)=>{
+  const id=++requestId.current; setLoading(true);
+  try{
+   const params=new URLSearchParams({page:String(nextPage),limit:'24'});
+   if(category)params.set('category',category);
+   if(size)params.set('size',size);
+   if(color)params.set('color',color);
+   if(availability)params.set('in_stock','1');
+   if(price){const r=prices.find(x=>x[0]===price);if(r){params.set('min',String(r[1]));if(Number.isFinite(r[2]))params.set('max',String(r[2]));}}
+   if(sort==='price-low')params.set('sort','price_asc');
+   else if(sort==='price-high')params.set('sort','price_desc');
+   else if(sort==='rating'||sort==='discount')params.set('sort','newest');
+   const response=await fetch(`/api/storefront/search-advanced?${params.toString()}`,{cache:'no-store'});
+   const body=await response.json();
+   if(id!==requestId.current)return;
+   if(!response.ok)throw new Error(body?.error||'Unable to load products');
+   const next=Array.isArray(body?.data?.products)?body.data.products:[];
+   setProducts(append?[...products,...next]:next);setPage(nextPage);setHasMore(next.length>=24);
+  }catch{if(!append)setProducts([])}finally{if(id===requestId.current)setLoading(false)}
+ };
+
+ useEffect(()=>{if(firstRender.current){firstRender.current=false;return}setPage(1);void fetchProducts(1,false)},[category,size,price,color,availability,sort]);
+
+ const filtered=useMemo(()=>{
+  let list=[...products];
+  if(discount){const d=discounts.find(x=>x[0]===discount)?.[1]||0;list=list.filter(p=>discountOf(p)>=d)}
+  if(fabric)list=list.filter(p=>hasWord(p,fabric));
+  if(sort==='discount')list.sort((a,b)=>discountOf(b)-discountOf(a));
+  if(sort==='rating')list.sort((a,b)=>(b.rating||0)-(a.rating||0));
+  return list;
+ },[products,discount,fabric,sort]);
+
+ const clear=()=>{setCategory('');setSize('');setPrice('');setDiscount('');setColor('');setFabric('');setAvailability(false);setSort('featured');setPage(1);setProducts(initialProducts)};
+ const activeCount=[!!category,!!size,!!price,!!discount,!!color,!!fabric,availability].filter(Boolean).length;
+ const controls=<div className="filter-controls">
+  <div><span>Category</span><button className={!category?'active':''} onClick={()=>setCategory('')}>All</button>{categories.map(x=><button key={x.slug} className={category===x.slug?'active':''} onClick={()=>setCategory(category===x.slug?'':x.slug)}>{x.name}</button>)}</div>
+  <div><span>Size</span>{sizes.map(x=><button key={x} className={size===x?'active':''} onClick={()=>setSize(size===x?'':x)}>{x}</button>)}</div>
+  <div><span>Color</span>{colors.map(x=><button key={x} className={color===x?'active':''} onClick={()=>setColor(color===x?'':x)}>{x}</button>)}</div>
+  <div><span>Fabric</span>{fabrics.map(x=><button key={x} className={fabric===x?'active':''} onClick={()=>setFabric(fabric===x?'':x)}>{x}</button>)}</div>
+  <div><span>Price</span>{prices.map(x=><button key={x[0]} className={price===x[0]?'active':''} onClick={()=>setPrice(price===x[0]?'':x[0])}>{x[0]}</button>)}</div>
+  <div><span>Discount</span>{discounts.map(x=><button key={x[0]} className={discount===x[0]?'active':''} onClick={()=>setDiscount(discount===x[0]?'':x[0])}>{x[0]}</button>)}</div>
+  <div><span>Availability</span><button className={availability?'active':''} onClick={()=>setAvailability(v=>!v)}>In stock</button></div>
+  <button className="filter-clear" onClick={clear}>Clear all</button>
+ </div>;
+
+ return <>
+  <div className="shop-toolbar"><button className="mobile-filter-trigger" onClick={()=>setMobileFilters(true)}>☷ Filters{activeCount?` (${activeCount})`:''}</button><span aria-live="polite">{loading?'Loading…':`${filtered.length}${hasMore?'+' :''} products`}</span><label>Sort by <select value={sort} onChange={e=>setSort(e.target.value)}><option value="featured">Recommended</option><option value="rating">Top Rated</option><option value="price-low">Price: Low to High</option><option value="price-high">Price: High to Low</option><option value="discount">Best Discount</option></select></label></div>
+  <aside className="desktop-filter-panel">{controls}</aside>
+  {mobileFilters&&<div className="filter-sheet-backdrop" onClick={()=>setMobileFilters(false)}><div className="filter-sheet" onClick={e=>e.stopPropagation()}><div className="filter-sheet-head"><strong>Filters</strong><button onClick={()=>setMobileFilters(false)}>×</button></div>{controls}<button className="button dark-button filter-apply" onClick={()=>setMobileFilters(false)}>View {filtered.length}{hasMore?'+' :''} products</button></div></div>}
+  <div className="product-grid shop" aria-busy={loading}>{filtered.map(p=><ProductCard key={p.id} product={p}/>)}</div>
+  {hasMore&&<div className="shop-load-more"><button className="button" disabled={loading} onClick={()=>void fetchProducts(page+1,true)}>{loading?'Loading…':'Load more styles'}</button></div>}
+  {!loading&&!filtered.length&&<div className="empty-shop"><h3>No styles found</h3><p>Try another category, colour, size, fabric or price range.</p><button className="button" onClick={clear}>Clear filters</button></div>}
+ </>;
 }
