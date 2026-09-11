@@ -1,28 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { jwtVerify } from 'jose';
 
-const secret = () => new TextEncoder().encode(process.env.SESSION_SECRET?.trim() || 'development-only-change-me');
-
-/** Protect every admin control route before rendering. /admin/login remains public. */
-export async function proxy(request: NextRequest) {
+/**
+ * PRIYASA Store is storefront-only. Administration lives in priyasa-admin.
+ * Legacy embedded admin URLs are explicitly disabled so they cannot reach
+ * obsolete local-database handlers.
+ */
+export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  if (!pathname.startsWith('/admin') || pathname === '/admin/login') return NextResponse.next();
-
-  const token = request.cookies.get('priyasa_session')?.value;
-  if (!token) return NextResponse.redirect(new URL('/admin/login', request.url));
-
-  try {
-    const { payload } = await jwtVerify(token, secret());
-    const role = String(payload.role || 'CUSTOMER');
-    if (!payload.sub || !['ADMIN', 'STAFF'].includes(role)) {
-      return NextResponse.redirect(new URL('/admin/login', request.url));
-    }
-    return NextResponse.next();
-  } catch {
-    return NextResponse.redirect(new URL('/admin/login', request.url));
+  if (pathname.startsWith('/admin') || pathname.startsWith('/api/admin')) {
+    return NextResponse.json(
+      { success: false, message: 'Administration has moved to the PRIYASA Admin application.' },
+      { status: 410 },
+    );
   }
+  return NextResponse.next();
 }
 
 export const config = {
-  matcher: ['/admin/:path*'],
+  matcher: ['/admin/:path*', '/api/admin/:path*'],
 };
