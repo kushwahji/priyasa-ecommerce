@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { getCachedHomeCms, getCachedStorefrontCategories } from '@/lib/storefront-cache';
+import { getHomeSections } from '@/lib/home-cms';
 import { getProductsForHomeSection } from '@/lib/storefront-data';
 import HomeHeroCarousel from '@/components/HomeHeroCarousel';
 import HomeImageCarousel from '@/components/HomeImageCarousel';
@@ -7,45 +7,13 @@ import HomeCmsSection from '@/components/HomeCmsSection';
 import { SiteStructuredData } from '@/app/seo-schema';
 
 type Section = { id:string|number; type?:string; title?:string|null; subtitle?:string|null; image_url?:string|null; imageUrl?:string|null; mobile_image_url?:string|null; mobileImageUrl?:string|null; cta_label?:string|null; ctaLabel?:string|null; cta_href?:string|null; ctaHref?:string|null; content?:Record<string,any>|null; sort_order?:number; sortOrder?:number };
-
 const typeOf=(s:Section)=>String(s.type||'banner').toLowerCase();
 const contentOf=(s:Section)=>s.content&&typeof s.content==='object'?s.content:{};
-
-function normalize(s:Section):any {
-  const c=contentOf(s);
-  return {...s,imageUrl:s.imageUrl||s.image_url||c.image_url||c.imageUrl||null,mobileImageUrl:s.mobileImageUrl||s.mobile_image_url||c.mobile_image_url||c.mobileImageUrl||null,ctaLabel:s.ctaLabel||s.cta_label||c.cta_label||c.ctaLabel||null,ctaHref:s.ctaHref||s.cta_href||c.cta_href||c.ctaHref||null,subtitle:s.subtitle||c.subtitle||null};
-}
-
-function GenericItems({section}:{section:Section}){
-  const s=normalize(section), items=Array.isArray(contentOf(s).items)?contentOf(s).items:[];
-  if(!items.length) return null;
-  return <section className="section home-dynamic-items"><div className="section-head"><div><span className="eyebrow dark">{s.subtitle||'PRIYASA EDIT'}</span><h2>{s.title||'Explore the edit'}</h2></div>{s.ctaHref&&<Link className="text-link" href={s.ctaHref}>{s.ctaLabel||'View All'} →</Link>}</div><div className="category-grid category-grid-editorial">{items.map((item:any,index:number)=><Link className="category-card" key={String(item.id||item.slug||index)} href={item.href||item.url||'/shop'}><div className="category-image" style={{backgroundImage:`url(${item.image_url||item.imageUrl||item.image||'/images/product-placeholder.svg'})`}}/><div className="category-label"><strong>{item.title||item.name||'Explore'}</strong><span>{item.cta_label||item.ctaLabel||'Shop Now'} →</span></div></Link>)}</div></section>;
-}
-
-async function DynamicSection({section}:{section:Section}){
-  const s=normalize(section), type=typeOf(s), c=contentOf(s);
-  if(['hero','hero-slide','hero_slider'].includes(type)||['image-carousel','image_carousel','carousel'].includes(type)) return null;
-  if(['products','product-carousel','product_carousel','product-grid','product_grid','products-sale','sale','products-latest','latest','latest-collection','products-best','best-sellers','trending','new_arrivals','flash_sale'].includes(type)||type.startsWith('products-')){
-    const query=String(c.query||type).toLowerCase();
-    const products=await getProductsForHomeSection(query,Math.min(30,Math.max(4,Number(c.limit||12))));
-    if(!products.length)return null;
-    return <section className="section home-dynamic-products"><div className="section-head"><div><span className="eyebrow dark">{s.subtitle||'PRIYASA EDIT'}</span><h2>{s.title||'Curated for you'}</h2></div>{s.ctaHref&&<Link className="text-link" href={s.ctaHref}>{s.ctaLabel||'View All'} →</Link>}</div><div className="product-grid product-grid-editorial">{products.map(p=><div key={p.id}><Link href={`/product/${p.slug}`}><img src={p.image} alt={p.name} loading="lazy"/><div><strong>{p.name}</strong><span>₹{p.price.toLocaleString('en-IN')}</span></div></Link></div>)}</div></section>;
-  }
-  if(type==='text'||type==='content') return <section className="section home-text-block"><span className="eyebrow dark">{s.subtitle||'PRIYASA'}</span><h2>{s.title}</h2>{typeof c.html==='string'?<div dangerouslySetInnerHTML={{__html:c.html}}/>:<p>{String(c.text||'')}</p>}{s.ctaHref&&<Link className="text-link" href={s.ctaHref}>{s.ctaLabel||'Explore'} →</Link>}</section>;
-  if(['collection-showcase','collection_showcase','brand-grid','brand_grid'].includes(type)) return <GenericItems section={s}/>;
-  if(type==='video'){const src=String(c.video_url||c.videoUrl||s.imageUrl||'');if(!src)return null;return <section className="section home-video"><video controls playsInline muted preload="metadata" poster={s.imageUrl||undefined} src={src}/></section>}
-  return <HomeCmsSection section={s as any}/>;
-}
-
-export default async function DynamicHome(){
-  const [sections,categories]=await Promise.all([getCachedHomeCms(),getCachedStorefrontCategories()]);
-  const ordered=[...sections].sort((a:any,b:any)=>(Number(a.sortOrder??a.sort_order??0)-Number(b.sortOrder??b.sort_order??0))||Number(a.id)-Number(b.id));
-  const hero=ordered.filter(s=>['hero','hero-slide','hero_slider'].includes(typeOf(s)));
-  const images=ordered.filter(s=>['image-carousel','image_carousel','carousel'].includes(typeOf(s)));
-  const body:any[]=[]; const rendered=new Set<string>();
-  if(hero.length){body.push(<section className="section home-hero-multi" key="managed-hero"><HomeHeroCarousel slides={hero.map(normalize)}/></section>);hero.forEach(s=>rendered.add(String(s.id)));}
-  if(images.length){body.push(<section className="section home-image-highlight-section" key="managed-images"><HomeImageCarousel slides={images.map(normalize)}/></section>);images.forEach(s=>rendered.add(String(s.id)));}
-  for(const section of ordered){if(rendered.has(String(section.id)))continue;const node=await DynamicSection({section});if(node)body.push(<div key={String(section.id)}>{node}</div>);}
-  if(!body.length){body.push(<section className="section home-empty-state" key="empty"><h1>Welcome to Priyasa</h1><p>Our latest collections are coming soon.</p><Link className="button" href="/shop">Shop Now →</Link></section>);}
-  return <div className="home-reference-v5"><SiteStructuredData/>{body}</div>;
-}
+function normalize(s:Section):any { const c=contentOf(s); return {...s,imageUrl:s.imageUrl||s.image_url||c.image_url||c.imageUrl||null,mobileImageUrl:s.mobileImageUrl||s.mobile_image_url||c.mobile_image_url||c.mobileImageUrl||null,ctaLabel:s.ctaLabel||s.cta_label||c.cta_label||c.ctaLabel||null,ctaHref:s.ctaHref||s.cta_href||c.cta_href||c.ctaHref||null,subtitle:s.subtitle||c.subtitle||null}; }
+function GenericItems({section}:{section:Section}){ const s=normalize(section), items=Array.isArray(contentOf(s).items)?contentOf(s).items:[]; if(!items.length)return null; return <section className="section home-dynamic-items"><div className="section-head"><div><span className="eyebrow dark">{s.subtitle||'PRIYASA EDIT'}</span><h2>{s.title||'Explore the edit'}</h2></div>{s.ctaHref&&<Link className="text-link" href={s.ctaHref}>{s.ctaLabel||'View All'} →</Link>}</div><div className="category-grid category-grid-editorial">{items.map((item:any,index:number)=><Link className="category-card" key={String(item.id||item.slug||index)} href={item.href||item.url||'/shop'}><div className="category-image" style={{backgroundImage:`url(${item.image_url||item.imageUrl||item.image||'/images/product-placeholder.svg'})`}}/><div className="category-label"><strong>{item.title||item.name||'Explore'}</strong><span>{item.cta_label||item.ctaLabel||'Shop Now'} →</span></div></Link>)}</div></section>; }
+async function DynamicSection({section}:{section:Section}){ const s=normalize(section), type=typeOf(s), c=contentOf(s); if(['hero','hero-slide','hero_slider','image-carousel','image_carousel','carousel'].includes(type))return null; if(['products','product-carousel','product_carousel','product-grid','product_grid','products-sale','sale','products-latest','latest','latest-collection','products-best','best-sellers','trending','new_arrivals','flash_sale'].includes(type)||type.startsWith('products-')){ const query=String(c.query||type).toLowerCase(); const products=await getProductsForHomeSection(query,Math.min(30,Math.max(4,Number(c.limit||12)))); if(!products.length)return null; return <section className="section home-dynamic-products"><div className="section-head"><div><span className="eyebrow dark">{s.subtitle||'PRIYASA EDIT'}</span><h2>{s.title||'Curated for you'}</h2></div>{s.ctaHref&&<Link className="text-link" href={s.ctaHref}>{s.ctaLabel||'View All'} →</Link>}</div><div className="product-grid product-grid-editorial">{products.map(p=><div key={p.id}><Link href={`/product/${p.slug}`}><img src={p.image} alt={p.name} loading="lazy"/><div><strong>{p.name}</strong><span>₹{p.price.toLocaleString('en-IN')}</span></div></Link></div>)}</div></section>; }
+ if(type==='text'||type==='content')return <section className="section home-text-block"><span className="eyebrow dark">{s.subtitle||'PRIYASA'}</span><h2>{s.title}</h2>{typeof c.html==='string'?<div dangerouslySetInnerHTML={{__html:c.html}}/>:<p>{String(c.text||'')}</p>}{s.ctaHref&&<Link className="text-link" href={s.ctaHref}>{s.ctaLabel||'Explore'} →</Link>}</section>;
+ if(['collection-showcase','collection_showcase','brand-grid','brand_grid'].includes(type))return <GenericItems section={s}/>;
+ if(type==='video'){const src=String(c.video_url||c.videoUrl||'');if(!src)return null;return <section className="section home-video"><video controls playsInline muted preload="metadata" poster={s.imageUrl||undefined} src={src}/></section>}
+ return <HomeCmsSection section={s as any}/>; }
+export default async function DynamicHome(){ const sections=await getHomeSections(); const ordered=[...sections].sort((a:any,b:any)=>(Number(a.sortOrder??a.sort_order??0)-Number(b.sortOrder??b.sort_order??0))||Number(a.id)-Number(b.id)); const hero=ordered.filter(s=>['hero','hero-slide','hero_slider'].includes(typeOf(s))); const images=ordered.filter(s=>['image-carousel','image_carousel','carousel'].includes(typeOf(s))); const body:any[]=[]; const rendered=new Set<string>(); if(hero.length){body.push(<section className="section home-hero-multi" key="managed-hero"><HomeHeroCarousel slides={hero.map(normalize)}/></section>);hero.forEach(s=>rendered.add(String(s.id)));} if(images.length){body.push(<section className="section home-image-highlight-section" key="managed-images"><HomeImageCarousel slides={images.map(normalize)}/></section>);images.forEach(s=>rendered.add(String(s.id)));} for(const section of ordered){if(rendered.has(String(section.id)))continue;const node=await DynamicSection({section});if(node)body.push(<div key={String(section.id)}>{node}</div>);} if(!body.length)body.push(<section className="section home-empty-state" key="empty"><h1>Welcome to Priyasa</h1><p>Our latest collections are coming soon.</p><Link className="button" href="/shop">Shop Now →</Link></section>); return <div className="home-reference-v5"><SiteStructuredData/>{body}</div>; }
