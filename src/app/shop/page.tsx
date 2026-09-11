@@ -21,7 +21,7 @@ export default async function Shop() {
       <div className="breadcrumbs"><Link href="/">Home</Link> / Shop</div>
       <div className="collection-intro"><div><span className="eyebrow dark">THE PRIYASA EDIT</span><h1>All styles</h1></div><p>Explore the live collection.</p></div>
       <div className="category-pills"><Link href="/shop">All</Link>{categories.map(c => <Link href={`/category/${c.slug}`} key={c.id}>{c.name}</Link>)}</div>
-      <ShopFilters products={products} categories={categories.map(c => c.name)} />
+      <ShopFilters products={products} categories={categories.map(c => ({ name: c.name, slug: c.slug }))} />
     </div>
   </div>;
 }
