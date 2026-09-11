@@ -1,6 +1,8 @@
-/* Priyasa mobile home v2 — final alignment and brand treatment. */
+/* Priyasa mobile home v2 — clean app-shell layout. */
 @media(max-width:760px){
   :root{--p-home-pink:#ff1f68;--p-home-ink:#24232a;--p-home-muted:#707078;--p-home-line:#ececef;--p-home-soft:#fff7f9}
+
+  /* Header: search is an icon action only; never render a second home search bar. */
   .site-header{height:72px!important;min-height:72px!important;grid-template-columns:44px minmax(0,1fr) auto!important;align-items:center!important;gap:6px!important;padding:0 18px!important;box-sizing:border-box!important}
   .site-header>.mobile-menu{grid-column:1!important;width:42px!important;height:42px!important;margin:0!important;display:grid!important;place-items:center!important;background:transparent!important}
   .site-header>.mobile-menu svg{width:30px!important;height:30px!important;stroke-width:1.8!important}
@@ -14,6 +16,12 @@
   .site-header>.actions .header-account-trigger,.site-header>.actions .header-icon:nth-child(3){display:none!important}
   .site-header>.actions .header-icon[aria-label="Search"]{display:grid!important}
   .site-header>.actions .header-icon[aria-label^="Shopping bag"]{display:grid!important}
+
+  /* Home has no inline/discovery search field. Header search opens the search drawer. */
+  .home-reference-v4 .mobile-storefront-discovery,
+  body:has(.home-reference-v4) .mobile-storefront-discovery,
+  body:has(.home-reference-v4) .mobile-storefront-discovery--search,
+  body:has(.home-reference-v4) .mobile-storefront-tabs{display:none!important}
 
   main{padding-bottom:92px!important;overflow-x:hidden!important}
   .home-reference-v4{width:100%!important;max-width:100%!important;margin:0!important;padding:0!important;overflow:hidden!important;background:#fff!important}
@@ -29,13 +37,16 @@
   .home-reference-v4 .home-image-highlight-section{padding:0 20px 12px!important;margin:0!important}
   .home-reference-v4 .home-image-highlight-section>*{width:100%!important;box-sizing:border-box!important;margin:0!important}
 
-  .home-reference-v4 .home-service-promises{width:calc(100% - 40px)!important;box-sizing:border-box!important;padding:0!important;margin:18px 20px 26px!important;overflow:hidden!important;background:#fff7fa!important;border-radius:12px!important}
-  .home-reference-v4 .home-service-promises-inner{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;width:100%!important;box-sizing:border-box!important}
-  .home-reference-v4 .home-service-promise{min-width:0!important;min-height:132px!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;text-align:center!important;padding:14px 5px!important;box-sizing:border-box!important;border-right:1px solid #f1dce4!important}
+  /* Slim service strip: compact, one-line labels, no oversized card. */
+  .home-reference-v4 .home-service-promises{width:calc(100% - 40px)!important;box-sizing:border-box!important;height:72px!important;min-height:72px!important;padding:0!important;margin:14px 20px 22px!important;overflow:hidden!important;background:#fff7fa!important;border-radius:10px!important}
+  .home-reference-v4 .home-service-promises-inner{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;width:100%!important;height:100%!important;box-sizing:border-box!important}
+  .home-reference-v4 .home-service-promise{min-width:0!important;height:72px!important;min-height:72px!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;text-align:center!important;padding:5px 3px!important;box-sizing:border-box!important;border-right:1px solid #f1dce4!important}
   .home-reference-v4 .home-service-promise:last-child{border-right:0!important}
-  .home-reference-v4 .home-service-promise svg{width:29px!important;height:29px!important;flex:none!important;margin-bottom:8px!important;color:#df2867!important;stroke-width:1.7!important}
-  .home-reference-v4 .home-service-promise strong{display:block!important;font-size:10px!important;line-height:1.22!important;font-weight:750!important;white-space:normal!important}
+  .home-reference-v4 .home-service-promise svg{width:22px!important;height:22px!important;flex:none!important;margin:0 0 4px!important;color:#df2867!important;stroke-width:1.7!important}
+  .home-reference-v4 .home-service-promise strong{display:block!important;font-size:9px!important;line-height:1.12!important;font-weight:750!important;white-space:normal!important}
   .home-reference-v4 .home-service-promise small{display:none!important}
+  /* The hero carousel also contains an older 3-item promise strip; use the unified 4-item strip instead. */
+  .home-reference-v4 .home-hero-service-promises{display:none!important}
 
   .home-reference-v4 .category-grid,.home-reference-v4 .category-grid-editorial,.home-reference-v4 .home-category-section{display:none!important}
   .mobile-storefront-tabs,.mobile-storefront-discovery--tabs-only{display:none!important}
@@ -89,10 +100,10 @@
   .site-header>.actions .header-icon svg{width:24px!important;height:24px!important}
   .home-reference-v4 .home-section{padding-left:18px!important;padding-right:18px!important}
   .home-reference-v4 .home-hero-multi,.home-reference-v4 .home-hero-multi.home-section{padding-left:18px!important;padding-right:18px!important}
-  .home-reference-v4 .home-service-promises{width:calc(100% - 36px)!important;margin-left:18px!important;margin-right:18px!important}
+  .home-reference-v4 .home-service-promises{width:calc(100% - 36px)!important;height:68px!important;min-height:68px!important;margin-left:18px!important;margin-right:18px!important}
+  .home-reference-v4 .home-service-promise{height:68px!important;min-height:68px!important;padding-left:2px!important;padding-right:2px!important}
+  .home-reference-v4 .home-service-promise svg{width:20px!important;height:20px!important;margin-bottom:3px!important}
+  .home-reference-v4 .home-service-promise strong{font-size:8px!important}
   .home-reference-v4 .home-casual-section,.home-reference-v4 .home-product-section:not(.home-flash-sale){padding-left:18px!important;padding-right:18px!important}
   .home-reference-v4 .home-casual-section .home-casual-card,.home-reference-v4 .home-product-section:not(.home-flash-sale) .home-product-grid>.product-card{flex-basis:calc((100vw - 56px)/3)!important;width:calc((100vw - 56px)/3)!important;min-width:calc((100vw - 56px)/3)!important}
-  .home-reference-v4 .home-service-promise{min-height:122px!important;padding-left:4px!important;padding-right:4px!important}
-  .home-reference-v4 .home-service-promise svg{width:27px!important;height:27px!important}
-  .home-reference-v4 .home-service-promise strong{font-size:9px!important}
 }
