@@ -17,14 +17,15 @@ test.describe('customer order management', () => {
       route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ authenticated: true, user: { id: 'customer-e2e-1', name: 'Test Customer', phone: '9999999999' } }) })
     );
     await page.route('**/api/customer/orders/order-e2e-1', async route =>
-      route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(order) })
+      route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ success: true, data: order }) })
     );
   });
 
-  test('shows cancel and invoice actions for a confirmed order', async ({ page }) => {
+  test('shows cancel, invoice and tracking actions for a confirmed order', async ({ page }) => {
     await page.goto('/account/orders/order-e2e-1');
     await expect(page.getByRole('button', { name: /cancel order/i })).toBeVisible();
-    await expect(page.getByRole('button', { name: /invoice|view invoice/i })).toBeVisible();
+    await expect(page.getByRole('link', { name: /view invoice/i })).toBeVisible();
+    await expect(page.getByRole('link', { name: /track order/i })).toBeVisible();
   });
 
   test('cancels a confirmed order with an idempotency key and refreshes', async ({ page }) => {
@@ -33,7 +34,7 @@ test.describe('customer order management', () => {
       cancelCalls++;
       expect(route.request().method()).toBe('POST');
       expect(route.request().headers()['idempotency-key']).toBeTruthy();
-      await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ id: order.id, status: 'CANCELLED' }) });
+      await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ success: true, data: { id: order.id, status: 'CANCELLED' } }) });
     });
 
     await page.goto('/account/orders/order-e2e-1');
@@ -42,20 +43,20 @@ test.describe('customer order management', () => {
     await expect.poll(() => cancelCalls).toBe(1);
   });
 
-  test('loads invoice through the customer proxy', async ({ page }) => {
-    let invoiceCalls = 0;
+  test('opens the dedicated invoice page through the customer route', async ({ page }) => {
     await page.route('**/api/customer/orders/order-e2e-1/invoice', async route => {
-      invoiceCalls++;
       expect(route.request().method()).toBe('GET');
       await route.fulfill({
         status: 200,
         contentType: 'application/json',
-        body: JSON.stringify({ invoiceNumber: 'INV-1001', orderNumber: order.orderNumber, total: order.total, currency: 'INR' }),
+        body: JSON.stringify({ success: true, data: { invoiceNumber: 'INV-1001', orderNumber: order.orderNumber, total: order.total, currency: 'INR', orderId: order.id } }),
       });
     });
 
     await page.goto('/account/orders/order-e2e-1');
-    await page.getByRole('button', { name: /invoice|view invoice/i }).click();
-    await expect.poll(() => invoiceCalls).toBe(1);
+    await page.getByRole('link', { name: /view invoice/i }).click();
+    await expect(page).toHaveURL(/\/account\/orders\/order-e2e-1\/invoice$/);
+    await expect(page.getByRole('heading', { name: /tax invoice/i })).toBeVisible();
+    await expect(page.getByText('INV-1001')).toBeVisible();
   });
 });
