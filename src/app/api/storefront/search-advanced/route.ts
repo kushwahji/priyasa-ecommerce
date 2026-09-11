@@ -1,5 +1,55 @@
-import {NextResponse} from 'next/server';
-import {getSearchProducts,getStorefrontCategories,getStorefrontProducts} from '@/lib/storefront-data';
-const norm=(v:string)=>v.toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
-const distance=(a:string,b:string)=>{const x=norm(a),y=norm(b),d=Array.from({length:y.length+1},(_,i)=>i);for(let i=1;i<=x.length;i++){let prev=d[0];d[0]=i;for(let j=1;j<=y.length;j++){const cur=d[j];d[j]=x[i-1]===y[j-1]?prev:Math.min(prev+1,d[j]+1,d[j-1]+1);prev=cur}}return d[y.length]};
-export async function GET(req:Request){try{const u=new URL(req.url),q=(u.searchParams.get('q')||'').trim(),limit=Math.min(100,Math.max(4,Number(u.searchParams.get('limit')||24))),category=(u.searchParams.get('category')||'').toLowerCase(),size=(u.searchParams.get('size')||'').toLowerCase(),color=(u.searchParams.get('color')||'').toLowerCase(),min=Number(u.searchParams.get('min')||0),max=Number(u.searchParams.get('max')||0),sort=u.searchParams.get('sort')||'relevance';const [candidates,categories]=await Promise.all([q?getSearchProducts(q,limit):getStorefrontProducts({categorySlug:category||undefined,limit}),getStorefrontCategories()]);let products=candidates.filter(p=>(!category||p.categorySlug?.toLowerCase()===category)&&(!size||p.sizes.some(s=>s.toLowerCase()===size))&&(!color||p.colors.some(c=>c.toLowerCase()===color))&&(!min||p.price>=min)&&(!max||p.price<=max));if(q){const nq=norm(q),tokens=nq.split(/\s+/).filter(Boolean);products.sort((a,b)=>{const score=(p:any)=>{const text=norm(`${p.name} ${p.category} ${p.description} ${(p.colors||[]).join(' ')} ${(p.sizes||[]).join(' ')}`);return text.includes(nq)?0:tokens.reduce((s,t)=>s+(text.includes(t)?0:Math.min(4,distance(t,text.split(' ').sort((x:string,y:string)=>distance(t,x)-distance(t,y))[0]||''))),0)};return score(a)-score(b)})}if(sort==='price_asc')products.sort((a,b)=>a.price-b.price);else if(sort==='price_desc')products.sort((a,b)=>b.price-a.price);else if(sort==='discount')products.sort((a,b)=>(b.mrp-b.price)/Math.max(1,b.mrp)-(a.mrp-a.price)/Math.max(1,a.mrp));else if(sort==='name')products.sort((a,b)=>a.name.localeCompare(b.name));else if(sort==='newest')products=products.slice().reverse();return NextResponse.json({data:{query:q,products:products.slice(0,limit),categories:categories.map(c=>({name:c.name,slug:c.slug,productCount:c._count?.products||0}))}})}catch(e){return NextResponse.json({error:e instanceof Error?e.message:'Unable to search'},{status:500})}}
+import { NextResponse } from 'next/server';
+import { getStorefrontCategories, getStorefrontProducts } from '@/lib/storefront-data';
+
+const parseNumber = (value: string | null) => {
+  if (!value) return undefined;
+  const n = Number(value);
+  return Number.isFinite(n) && n >= 0 ? n : undefined;
+};
+
+export async function GET(req: Request) {
+  try {
+    const u = new URL(req.url);
+    const q = (u.searchParams.get('q') || '').trim();
+    const limit = Math.min(100, Math.max(4, Number(u.searchParams.get('limit') || 24)));
+    const page = Math.max(1, Number(u.searchParams.get('page') || 1));
+    const category = (u.searchParams.get('category') || '').trim();
+    const brand = (u.searchParams.get('brand') || '').trim();
+    const size = (u.searchParams.get('size') || '').trim();
+    const color = (u.searchParams.get('color') || '').trim();
+    const minPrice = parseNumber(u.searchParams.get('min'));
+    const maxPrice = parseNumber(u.searchParams.get('max'));
+    const inStock = u.searchParams.get('in_stock') === '1' || u.searchParams.get('availability') === 'in_stock';
+    const rawSort = u.searchParams.get('sort') || 'relevance';
+    const sort = rawSort === 'price_asc' ? 'price' : rawSort === 'price_desc' ? 'price_desc' : rawSort === 'name' ? 'name' : rawSort === 'newest' ? 'newest' : undefined;
+
+    const [products, categories] = await Promise.all([
+      getStorefrontProducts({
+        categorySlug: category || undefined,
+        brand: brand || undefined,
+        search: q || undefined,
+        size: size || undefined,
+        color: color || undefined,
+        minPrice,
+        maxPrice,
+        inStock,
+        sort,
+        page,
+        limit,
+      }),
+      getStorefrontCategories(),
+    ]);
+
+    return NextResponse.json({
+      data: {
+        query: q,
+        page,
+        limit,
+        products,
+        categories: categories.map(c => ({ name: c.name, slug: c.slug, productCount: c._count?.products || 0 })),
+      },
+    });
+  } catch (e) {
+    return NextResponse.json({ error: e instanceof Error ? e.message : 'Unable to search' }, { status: 500 });
+  }
+}
