@@ -12,11 +12,6 @@ const regressionRoutes = [
   '/checkout/success?order=invalid',
 ];
 
-async function assertHealthyPage(page: Parameters<typeof test>[0] extends never ? never : any) {
-  const response = await page.waitForLoadState('domcontentloaded').catch(() => null);
-  void response;
-}
-
 test('protected customer journeys fail safely without application errors', async ({ page }) => {
   for (const route of regressionRoutes) {
     const response = await page.goto(route, { waitUntil: 'domcontentloaded' });
