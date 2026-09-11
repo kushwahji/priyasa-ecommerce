@@ -26,6 +26,7 @@ for (const viewport of [
       await expect(header).toBeVisible();
       await expect(header.locator('.brand-logo-link img').first()).toBeVisible();
       await expect(header.locator('button[aria-label="Search"]')).toBeVisible();
+      await expect(header.locator('button[aria-label="My Account"]')).toBeVisible();
       await expect(header.locator('button[aria-label="Shopping bag"], button[aria-label^="Shopping bag"]').first()).toBeVisible();
     });
 
@@ -36,6 +37,17 @@ for (const viewport of [
       await expect(page.getByPlaceholder('Search products, styles & categories')).toBeVisible();
       await page.getByRole('button', { name: 'Close search' }).click();
       await expect(page.getByRole('dialog', { name: 'Search' })).toHaveCount(0);
+    });
+
+    test('account quick panel opens and navigates cleanly', async ({ page }) => {
+      await page.goto('/', { waitUntil: 'domcontentloaded' });
+      await page.getByRole('button', { name: 'My Account' }).click();
+      const dialog = page.getByRole('dialog', { name: 'My Account' });
+      await expect(dialog).toBeVisible();
+      await expect(dialog.getByText('Hello, beautiful!')).toBeVisible();
+      await expect(dialog.getByRole('link', { name: 'My orders' })).toHaveAttribute('href', '/account/orders');
+      await dialog.getByRole('link', { name: 'My orders' }).click();
+      await expect(page).toHaveURL(/\/account\/orders$/);
     });
   });
 }
