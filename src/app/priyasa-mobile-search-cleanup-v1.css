@@ -1,7 +1,7 @@
+@import './priyasa-mobile-app-shell-v3.css';
+
 /* Home mobile search cleanup: the header Search icon already opens the real search form. */
 @media (max-width:760px){
-  /* Suppress any legacy/CMS home search-bar presentation without touching
-     the header search drawer or the dedicated /search route. */
   body:not(:has(.search-route)) main .home-reference-v4 .home-search-bar,
   body:not(:has(.search-route)) main .home-reference-v4 .mobile-search-bar,
   body:not(:has(.search-route)) main .home-reference-v4 .search-bar,
@@ -13,6 +13,3 @@
     display:none!important;
   }
 }
-
-/* Premium app-shell layer is loaded last so older reference styles cannot undo it. */
-@import './priyasa-mobile-app-shell-v3.css';
