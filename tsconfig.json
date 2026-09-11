@@ -17,5 +17,20 @@
     "paths": { "@/*": ["./src/*"] }
   },
   "include": ["next-env.d.ts", ".next/types/**/*.ts", "**/*.ts", "**/*.tsx"],
-  "exclude": ["node_modules"]
+  "exclude": [
+    "node_modules",
+    "src/app/admin/**",
+    "src/app/api/admin/**",
+    "src/app/api/v1/orders/**",
+    "src/lib/woocommerce-import.ts",
+    "src/lib/auth.ts",
+    "src/lib/custom-api.ts",
+    "src/lib/custom-api-worker.ts",
+    "src/lib/fulfillment.ts",
+    "src/lib/meta-whatsapp.ts",
+    "src/lib/meta-whatsapp-conversations.ts",
+    "src/lib/order-state.ts",
+    "src/lib/review-meta.ts",
+    "src/lib/wallet.ts"
+  ]
 }
