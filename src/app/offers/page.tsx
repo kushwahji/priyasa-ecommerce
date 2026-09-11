@@ -1,28 +1,19 @@
 import Link from 'next/link';
-import { db } from '@/lib/db';
 import { getActiveCms, getStorefrontCategories } from '@/lib/storefront-data';
 import { SearchIcon, BagIcon, GiftIcon } from '@/components/StorefrontIcons';
 
 export const dynamic = 'force-dynamic';
 
-export default async function Offers(){
-  const now=new Date();
-  const [coupons,categories,hero]=await Promise.all([
-    db.coupon.findMany({where:{active:true,startsAt:{lte:now},endsAt:{gte:now}},orderBy:{value:'desc'}}),
-    getStorefrontCategories(),
-    getActiveCms('offers.hero')
-  ]);
+export default async function Offers() {
+  const [categories, hero] = await Promise.all([getStorefrontCategories(), getActiveCms('offers.hero')]);
   return <div className="offers-page offers-page-v1">
     <div className="offers-mobile-head"><Link className="back" href="/" aria-label="Back">‹</Link><h1>Offers</h1><div className="actions"><Link href="/search" aria-label="Search"><SearchIcon/></Link><Link href="/cart" aria-label="Bag"><BagIcon/></Link></div></div>
     <div className="offers-breadcrumb"><Link href="/">Home</Link><span> / </span>Offers</div>
-    <section className="offers-hero" style={hero?.imageUrl?{backgroundImage:`linear-gradient(90deg,rgba(255,240,243,.96),rgba(255,223,229,.7)),url(${hero.imageUrl})`,backgroundSize:'cover'}:{}}>
-      <div><span className="eyebrow">{hero?.type||'PRIYASA OFFERS'}</span><h1>{hero?.title||'Special Offers'}</h1><p>{hero?.subtitle||'Live offers from the Priyasa catalogue.'}</p>{hero?.ctaHref&&<Link className="button" href={hero.ctaHref}>{hero.ctaLabel||'Shop Now'} →</Link>}</div>
+    <section className="offers-hero" style={hero?.imageUrl ? { backgroundImage: `linear-gradient(90deg,rgba(255,240,243,.96),rgba(255,223,229,.7)),url(${hero.imageUrl})`, backgroundSize: 'cover' } : {}}>
+      <div><span className="eyebrow">{hero?.type || 'PRIYASA OFFERS'}</span><h1>{hero?.title || 'Special Offers'}</h1><p>{hero?.subtitle || 'Live offers from the Priyasa catalogue.'}</p>{hero?.ctaHref && <Link className="button" href={hero.ctaHref}>{hero.ctaLabel || 'Shop Now'} →</Link>}</div>
     </section>
-    <div className="offer-tabs"><Link className="active" href="/offers">All Offers</Link>{categories.map(c=><Link key={c.id} href={`/category/${c.slug}`}>{c.name}</Link>)}</div>
-    <section className="offer-list">
-      {coupons.map(c=><article className="offer-row" key={c.id}><div className="offer-row-image"><GiftIcon/></div><div><span className="eyebrow">LIVE OFFER</span><h2>{c.type==='PERCENTAGE'?`Extra ${c.value}% OFF`:`₹${c.value} OFF`}</h2><p>{c.minCart>0?`On orders above ₹${c.minCart.toLocaleString('en-IN')}`:'On eligible products'}</p><span className="offer-code">Use Code: {c.code}</span></div><Link className="button" href="/shop">Shop Now →</Link></article>)}
-      {!coupons.length&&<div className="empty-shop"><h3>No active offers</h3><p>Check back soon for the next Priyasa offer.</p></div>}
-    </section>
+    <div className="offer-tabs"><Link className="active" href="/offers">All Offers</Link>{categories.map((category) => <Link key={category.id} href={`/category/${category.slug}`}>{category.name}</Link>)}</div>
+    <section className="offer-list"><div className="empty-shop"><div className="offer-row-image"><GiftIcon/></div><h3>No active offers</h3><p>Check back soon for the next Priyasa offer.</p><Link className="button" href="/shop">Shop Now →</Link></div></section>
     <section className="offer-benefits"><div><b>✓</b><span><strong>Easy Returns</strong><small>On eligible products</small></span></div><div><b>✓</b><span><strong>Secure Payment</strong><small>Protected checkout</small></span></div><div><b>✓</b><span><strong>Fast Delivery</strong><small>Across India</small></span></div></section>
-  </div>
+  </div>;
 }

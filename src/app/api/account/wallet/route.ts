@@ -1,3 +1,0 @@
-import {NextResponse} from 'next/server';import {cookies} from 'next/headers';import {listWalletTransactions} from '@/lib/wallet';
-export const dynamic='force-dynamic';
-export async function GET(){const jar=await cookies();const userId=jar.get('priyasa_local_user_id')?.value;if(!userId)return NextResponse.json({error:'Authentication required.'},{status:401});try{return NextResponse.json(await listWalletTransactions(userId),{headers:{'Cache-Control':'private, no-store'}})}catch(error){console.error('[PRIYASA WALLET]',error);return NextResponse.json({error:'Wallet is temporarily unavailable.'},{status:503})}}
