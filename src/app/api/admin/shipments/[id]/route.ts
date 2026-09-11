@@ -1,8 +1,0 @@
-import {NextResponse} from 'next/server';
-import {z} from 'zod';
-import {requireAdminPermission} from '@/lib/auth';
-import {createShipmentRecord} from '@/lib/fulfillment';
-import {db} from '@/lib/db';
-const schema=z.object({provider:z.string().min(2).max(80),carrier:z.string().max(120).optional(),trackingNumber:z.string().max(120).optional(),trackingUrl:z.string().url().optional(),providerShipmentId:z.string().max(200).optional(),labelUrl:z.string().url().optional(),invoiceUrl:z.string().url().optional(),weightGrams:z.number().int().positive().optional()});
-export async function GET(_req:Request,{params}:{params:Promise<{id:string}>}){try{await requireAdminPermission('orders.read');const {id}=await params;const shipment=await db.shipment.findUnique({where:{id},include:{events:{orderBy:{occurredAt:'asc'}}}});if(!shipment)return NextResponse.json({error:'Shipment not found'},{status:404});return NextResponse.json({data:shipment});}catch(e){return NextResponse.json({error:e instanceof Error?e.message:'Unable to load shipment'},{status:403});}}
-export async function PUT(req:Request,{params}:{params:Promise<{id:string}>}){try{await requireAdminPermission('orders.write');const p=schema.safeParse(await req.json());if(!p.success)return NextResponse.json({error:'Invalid shipment data',details:p.error.flatten()},{status:400});const {id}=await params;const existing=await db.shipment.findUnique({where:{id}});if(!existing)return NextResponse.json({error:'Shipment not found'},{status:404});const shipment=await createShipmentRecord(existing.orderId,p.data.provider,p.data);return NextResponse.json({data:shipment});}catch(e){return NextResponse.json({error:e instanceof Error?e.message:'Unable to update shipment'},{status:400});}}

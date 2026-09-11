@@ -1,8 +1,0 @@
-import {NextResponse} from 'next/server';import {revalidatePath} from 'next/cache';import {requireAdminPermission} from '@/lib/auth';import {db} from '@/lib/db';import {recordOrderStatus} from '@/lib/order-state';import {emitOrderEvent} from '@/lib/events';
-const allowed=['CREATED','PAYMENT_PENDING','CONFIRMED','PROCESSING','SHIPPED','DELIVERED','CANCELLED','RETURN_REQUESTED','RETURNED','REFUNDED'];
-export async function PATCH(req:Request,{params}:{params:Promise<{id:string}>}){try{const admin=await requireAdminPermission('orders.write');const {id}=await params;const b=await req.json();if(!allowed.includes(b.status))return NextResponse.json({error:'Invalid order status'},{status:400});const o=await db.order.findUnique({where:{id}});if(!o)return NextResponse.json({error:'Order not found'},{status:404});if(o.status==='REFUNDED'&&b.status!=='REFUNDED')return NextResponse.json({error:'Refunded order cannot move backwards'},{status:409});const updated=await recordOrderStatus(id,b.status,admin.userId,b.note);if(b.status==='DELIVERED')await emitOrderEvent(id,'DELIVERED');
-// Best-seller merchandising is derived from completed order states. Invalidate
-// the public catalog pages after an admin status mutation so the storefront
-// does not retain a stale ranking until its normal ISR window expires.
-if(o.status!==b.status){revalidatePath('/');revalidatePath('/shop');}
-return NextResponse.json(updated);}catch(e){const forbidden=e instanceof Error&&e.message.includes('FORBIDDEN');return NextResponse.json({error:forbidden?'Forbidden':'Unable to update order'},{status:forbidden?403:500});}}
