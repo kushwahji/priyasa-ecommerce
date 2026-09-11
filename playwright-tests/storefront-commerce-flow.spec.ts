@@ -85,7 +85,7 @@ test.describe('production storefront commerce flow', () => {
       await expect(page.locator('.mobile-drawer')).toBeVisible({ timeout: 3000 });
       await expect(page.locator('.mobile-drawer nav a').first()).toBeVisible();
       await page.locator('.mobile-drawer-head button[aria-label="Close menu"]').click();
-      await expect(page.locator('.mobile-drawer-head button[aria-label="Close menu"]')).toHaveCount(1);
+      await expect(page.locator('.mobile-drawer')).not.toHaveClass(/is-open/);
     }
 
     await page.getByRole('button', { name: 'Search' }).click();
