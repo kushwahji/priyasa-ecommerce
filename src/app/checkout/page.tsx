@@ -13,9 +13,31 @@ type PaymentMethod = 'razorpay' | 'cod';
 type Address = { id:string; fullName:string; phone:string; line1:string; city:string; state:string; pincode:string; isDefault?:boolean };
 type CartItem = { variantId:string; name:string; price:number; quantity:number; image?:string };
 
+function normalizeCart(raw: unknown): CartItem[] {
+  if (!Array.isArray(raw)) return [];
+  const merged = new Map<string, CartItem>();
+  for (const value of raw) {
+    if (!value || typeof value !== 'object') continue;
+    const item = value as Record<string, unknown>;
+    const variantId = String(item.variantId ?? '').trim();
+    const quantity = Math.floor(Number(item.quantity));
+    if (!variantId || !Number.isFinite(quantity) || quantity < 1) continue;
+    const safeQuantity = Math.min(20, quantity);
+    const existing = merged.get(variantId);
+    merged.set(variantId, {
+      variantId,
+      name: String(item.name ?? 'Product').slice(0, 240),
+      price: Number.isFinite(Number(item.price)) && Number(item.price) >= 0 ? Number(item.price) : 0,
+      quantity: Math.min(20, (existing?.quantity ?? 0) + safeQuantity),
+      image: typeof item.image === 'string' ? item.image : undefined,
+    });
+  }
+  return [...merged.values()];
+}
+
 async function loadRazorpay(){
   if(window.Razorpay) return true;
-  await new Promise<void>((resolve,reject)=>{ const script=document.createElement('script'); script.src='https://checkout.razorpay.com/v1/checkout.js'; script.async=true; script.onload=()=>resolve(); script.onerror=()=>reject(new Error('Unable to load payment gateway. Please try again.')); document.body.appendChild(script); });
+  await new Promise<void>((resolve,reject)=>{ const existing=document.querySelector('script[data-razorpay-checkout]'); if(existing){existing.addEventListener('load',()=>resolve(),{once:true});existing.addEventListener('error',()=>reject(new Error('Unable to load payment gateway. Please try again.')),{once:true});return;} const script=document.createElement('script'); script.src='https://checkout.razorpay.com/v1/checkout.js'; script.async=true; script.dataset.razorpayCheckout='true'; script.onload=()=>resolve(); script.onerror=()=>reject(new Error('Unable to load payment gateway. Please try again.')); document.body.appendChild(script); });
   return Boolean(window.Razorpay);
 }
 
@@ -33,7 +55,11 @@ export default function Checkout(){
   const [status,setStatus]=useState('');
 
   useEffect(()=>{
-    try{setItems(JSON.parse(window.localStorage.getItem('priyasa_cart')||'[]'));}catch{setItems([])}
+    try {
+      const normalized=normalizeCart(JSON.parse(window.localStorage.getItem('priyasa_cart')||'[]'));
+      setItems(normalized);
+      window.localStorage.setItem('priyasa_cart',JSON.stringify(normalized));
+    } catch { setItems([]); }
     void fetch('/api/customer/session',{cache:'no-store'}).then(r=>r.json()).then(async data=>{
       setAuthenticated(Boolean(data.authenticated));
       if(!data.user)return;
@@ -48,14 +74,16 @@ export default function Checkout(){
 
   async function syncCartToCore(){
     if(authenticated!==true)return;
-    const response=await fetch('/api/cart',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({items:items.map(item=>({variantId:String(item.variantId),quantity:Number(item.quantity)})),couponCode:form.coupon.trim().toUpperCase()||undefined})});
+    const canonicalItems=normalizeCart(items);
+    if(canonicalItems.length!==items.length) setItems(canonicalItems);
+    const response=await fetch('/api/cart',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({items:canonicalItems.map(item=>({variantId:String(item.variantId),quantity:Number(item.quantity)})),couponCode:form.coupon.trim().toUpperCase()||undefined})});
     const data=await response.json().catch(()=>({}));
     if(!response.ok)throw new Error(data.error||'Unable to sync your bag. Please refresh and try again.');
   }
 
   async function getFreshQuote(){
     await syncCartToCore();
-    const response=await fetch('/api/checkout/quote',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({items:items.map(item=>({variantId:String(item.variantId),quantity:Number(item.quantity)})),coupon:form.coupon.trim().toUpperCase()||undefined,pincode:form.pincode||undefined})});
+    const response=await fetch('/api/checkout/quote',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({items:normalizeCart(items).map(item=>({variantId:String(item.variantId),quantity:Number(item.quantity)})),coupon:form.coupon.trim().toUpperCase()||undefined,pincode:form.pincode||undefined})});
     const data=await response.json().catch(()=>({}));
     if(!response.ok)throw new Error(data.error||'Unable to validate your bag.');
     return data;
@@ -87,7 +115,6 @@ export default function Checkout(){
 
   const subtotal=Number(quote?.subtotal??clientSubtotal);
   const discount=Number(quote?.discount??0);
-  // Never invent a delivery charge while the authoritative Core quote is unavailable.
   const shipping=Number(quote?.shipping??0);
   const total=Number(quote?.total??Math.max(0,subtotal-discount+shipping));
   const itemCount=items.reduce((sum,item)=>sum+Number(item.quantity||0),0);
@@ -96,6 +123,7 @@ export default function Checkout(){
 
   async function submit(event:FormEvent<HTMLFormElement>){
     event.preventDefault();
+    if(busy)return;
     if(!authenticated){setLoginOpen(true);return;}
     if(!items.length){setStatus('Your bag is empty.');return;}
     if(!addressReady){setStatus('Please complete your delivery address.');setStep(1);return;}
@@ -152,11 +180,8 @@ export default function Checkout(){
 
         {step===1&&<section className="checkout-v3-card"><span className="checkout-v3-kicker">01 · DELIVERY</span><h2>Where should we deliver?</h2><p className="checkout-v3-sub">Choose a saved address or enter a new delivery address.</p>{addresses.length>0&&<div className="checkout-v3-saved"><div className="checkout-v3-saved-head"><span>Saved addresses</span><Link href="/account/addresses">Manage</Link></div>{addresses.map(address=><button type="button" key={address.id} className={`checkout-v3-address ${selectedAddressId===address.id?'active':''}`} onClick={()=>selectAddress(address)}><strong>{address.fullName}{address.isDefault?' · Default':''}</strong><small>{address.line1}, {address.city}, {address.state} - {address.pincode} · {address.phone}</small></button>)}</div>}<div className="checkout-v3-form-grid">{([['fullName','Full name'],['phone','Mobile number'],['line1','Address'],['city','City'],['state','State'],['pincode','Pincode']] as const).map(([field,label])=><label className={field==='line1'?'full':''} key={field}>{label}<input className="checkout-v3-input" required value={form[field]} inputMode={field==='phone'||field==='pincode'?'numeric':undefined} maxLength={field==='pincode'?6:120} onChange={e=>updateField(field,field==='pincode'?e.target.value.replace(/\D/g,'').slice(0,6):e.target.value)}/></label>)}</div><DeliveryPincode weightGrams={Math.max(500,itemCount*500)} cod={paymentMethod==='cod'} onAddress={fillPincode}/>{status&&<div className="checkout-v3-status" role="status">{status}</div>}<div className="checkout-v3-actions"><Link className="checkout-v3-back" href="/cart">← Back to bag</Link><button type="button" className="button dark-button" disabled={!addressReady} onClick={()=>{setStatus('');setStep(2);window.scrollTo({top:0,behavior:'smooth'})}}>Continue to payment</button></div></section>}
 
-        {step===2&&<section className="checkout-v3-card"><span className="checkout-v3-kicker">02 · PAYMENT</span><h2>How would you like to pay?</h2><p className="checkout-v3-sub">All payment methods are protected. You will only be charged after final confirmation.</p><div className="checkout-v3-payment-grid">{paymentOptions.map(option=><button type="button" key={option.id} disabled={option.disabled} className={`checkout-v3-payment ${paymentMethod===option.id?'active':''}`} onClick={()=>{setPaymentMethod(option.id);setStatus('')}}><span className="checkout-v3-payment-icon">{option.icon}</span><span><strong>{option.label}</strong><small>{option.caption}</small></span><span className="checkout-v3-radio"/></button>)}</div>{paymentMethod==='razorpay'&&<div className="checkout-v3-offer"><CheckIcon/><div><b>Online payment benefits</b><span>Fast confirmation, no cash handling, and eligible bank/UPI offers can be applied inside the secure payment gateway.</span></div></div>}{status&&<div className="checkout-v3-status" role="status">{status}</div>}<div className="checkout-v3-actions"><button type="button" className="checkout-v3-back" onClick={()=>{setStatus('');setStep(1);window.scrollTo({top:0,behavior:'smooth'})}}>← Address</button><button type="button" className="button dark-button" onClick={()=>{setStatus('');setStep(3);window.scrollTo({top:0,behavior:'smooth'})}}>Review order</button></div></section>}
-
-        {step===3&&<section className="checkout-v3-card"><span className="checkout-v3-kicker">03 · CONFIRMATION</span><h2>Review & place order</h2><p className="checkout-v3-sub">Check your delivery details and payment method before placing the order.</p><div className="checkout-v3-review"><div className="checkout-v3-review-row"><div>Deliver to</div><strong>{form.fullName}<br/>{form.line1}, {form.city}, {form.state} - {form.pincode}<br/>{form.phone}</strong></div><div className="checkout-v3-review-row"><div>Payment</div><strong>{paymentOptions.find(option=>option.id===paymentMethod)?.label}</strong></div><div className="checkout-v3-review-row"><div>Order total</div><strong>{quote?money(total):'Calculating…'}</strong></div></div>{status&&<div className="checkout-v3-status" role="status">{status}</div>}<button className="button dark-button checkout-v3-place" type="submit" disabled={busy||!quote||!items.length}>{busy?'Processing securely…':paymentMethod==='razorpay'?'Continue to secure payment':`Place order · ${money(total)}`}</button><p className="checkout-v3-note"><ShieldIcon/> By placing your order, you agree to Priyasa terms and the applicable return policy.</p><div className="checkout-v3-actions"><button type="button" className="checkout-v3-back" onClick={()=>{setStatus('');setStep(2);window.scrollTo({top:0,behavior:'smooth'})}}>← Payment</button><Link href="/cart" className="checkout-v3-back">Edit bag</Link></div></section>}
+        {step===2&&<section className="checkout-v3-card"><span className="checkout-v3-kicker">02 · PAYMENT</span><h2>How would you like to pay?</h2><p className="checkout-v3-sub">All payment methods are protected. You will only be charged after final confirmation.</p><div className="checkout-v3-payment-grid">{paymentOptions.map(option=><button type="button" key={option.id} disabled={option.disabled} className={`checkout-v3-payment ${paymentMethod===option.id?'active':''}`} onClick={()=>{setPaymentMethod(option.id);setStatus('')}}><span className="checkout-v3-payment-icon">{option.icon}</span><span><strong>{option.label}</strong><small>{option.caption}</small></span><span className="checkout-v3-radio"/></button>)}</div>{paymentMethod==='razorpay'&&<div className="checkout-v3-offer"><CheckIcon/><div><b>Online payment benefits</b><span>Fast confirmation, no cash handling, and eligible bank/UPI offers can be applied inside the secure payment gateway.</span></div></div>}{status&&<div className="checkout-v3-status" role="status">{status}</div>}<div className="checkout-v3-actions"><button type="button" className="checkout-v3-back" onClick={()=>setStep(1)}>← Delivery address</button><button className="button dark-button" type="submit" disabled={busy||!quote}>{busy?'Processing…':paymentMethod==='cod'?`Place COD order · ${quote?money(total):'…'}`:`Pay ${quote?money(total):'…'} securely`}</button></div></section>}
       </main>
-      <aside className="checkout-v3-side"><div className="checkout-v3-card"><span className="checkout-v3-kicker">SECURE SHOPPING</span><h2>You're almost there</h2><div className="checkout-v3-trust"><div><strong>Secure payment</strong>Protected checkout</div><div><strong>Pan-India delivery</strong>Serviceability checked</div><div><strong>Easy returns</strong>Eligible products</div><div><strong>Order validation</strong>Price & stock checked</div></div></div></aside>
     </form>
     <AuthOtpModal open={loginOpen} onClose={()=>setLoginOpen(false)}/>
   </div>;
