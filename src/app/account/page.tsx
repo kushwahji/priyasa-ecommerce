@@ -30,9 +30,13 @@ async function getCurrentUser(): Promise<UserWithCounts|null> {
   }
 }
 
+function BackArrow(){return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>}
+
+function AccountMobileHead(){return <div className="account-mobile-head"><Link href="/" aria-label="Back to home" className="account-back"><BackArrow/></Link><strong>My Account</strong><Link href="/wishlist" aria-label="Wishlist" className="account-head-icon"><HeartIcon/></Link><Link href="/cart" aria-label="Shopping bag" className="account-head-icon"><BagIcon/></Link></div>}
+
 function GuestAccount(){
   return <div className="account-shell premium-account nykaa-account-v2">
-    <div className="account-mobile-head"><Link href="/" aria-label="Back" className="account-back">‹</Link><strong>My Account</strong><Link href="/wishlist" aria-label="Wishlist" className="account-head-icon"><HeartIcon/></Link></div>
+    <AccountMobileHead/>
     <section className="account-welcome-card"><div className="account-welcome-copy"><span className="account-eyebrow">WELCOME TO PRIYASA</span><h1>Everything you love,<br/><em>in one place.</em></h1><p>Sign in to track orders, save your favourites, manage addresses and unlock personalised offers.</p><Link href="/login" className="account-primary-cta">Login / Sign up <ChevronIcon/></Link></div><div className="account-welcome-art"><UserIcon/></div></section>
     <section className="account-quick-grid" aria-label="Account shortcuts"><Link href="/account/orders"><BagIcon/><strong>Orders</strong><span>Track purchases</span></Link><Link href="/wishlist"><HeartIcon/><strong>Wishlist</strong><span>Saved styles</span></Link><Link href="/offers"><GiftIcon/><strong>Offers</strong><span>Deals & coupons</span></Link><Link href="/help"><HelpIcon/><strong>Help Centre</strong><span>We're here to help</span></Link></section>
     <section className="account-mobile-links"><div className="account-section-heading"><span className="account-eyebrow">MANAGE</span><h2>Your Priyasa account</h2></div>{accountItems.slice(2).map(([label,href,Icon,desc])=><Link href={href} key={label}><span className="account-link-icon"><Icon/></span><span><strong>{label}</strong><small>{desc}</small></span><ChevronIcon/></Link>)}</section>
@@ -42,7 +46,7 @@ function GuestAccount(){
 function LoggedInAccount({user}:{user:UserWithCounts}){
   const initial=(user.name||user.phone||'P').trim().charAt(0).toUpperCase();
   return <div className="account-shell premium-account nykaa-account-v2">
-    <div className="account-mobile-head"><Link href="/" aria-label="Back" className="account-back">‹</Link><strong>My Account</strong><Link href="/wishlist" aria-label="Wishlist" className="account-head-icon"><HeartIcon/></Link></div>
+    <AccountMobileHead/>
     <div className="account-v2-layout">
       <aside className="account-v2-sidebar"><div className="account-profile-mini"><span>{initial}</span><div><strong>{user.name||'Priyasa Customer'}</strong><small>{user.phone}</small><em>Verified member</em></div></div><nav aria-label="Account navigation">{accountItems.map(([label,href,Icon])=><Link href={href} key={label}><Icon/><span>{label}</span><ChevronIcon/></Link>)}<Link className="active" href="/account"><UserIcon/><span>Profile</span><ChevronIcon/></Link></nav></aside>
       <main className="account-v2-main"><div className="account-v2-heading"><div><span className="account-eyebrow">MY PRIYASA</span><h1>Welcome back{user.name?`, ${user.name.split(' ')[0]}`:''}</h1><p>Manage your shopping, orders and account preferences.</p></div><Link href="/account/edit" className="account-outline-cta">Edit Profile</Link></div>
