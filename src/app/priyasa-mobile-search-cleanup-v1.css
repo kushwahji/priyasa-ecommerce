@@ -1,0 +1,15 @@
+/* Home mobile search cleanup: the header Search icon already opens the real search form. */
+@media (max-width:760px){
+  /* Suppress any legacy/CMS home search-bar presentation without touching
+     the header search drawer or the dedicated /search route. */
+  body:not(:has(.search-route)) main .home-reference-v4 .home-search-bar,
+  body:not(:has(.search-route)) main .home-reference-v4 .mobile-search-bar,
+  body:not(:has(.search-route)) main .home-reference-v4 .search-bar,
+  body:not(:has(.search-route)) main .home-reference-v4 .search-box,
+  body:not(:has(.search-route)) main .home-reference-v4 .home-search,
+  body:not(:has(.search-route)) main .home-reference-v4 .mobile-search,
+  body:not(:has(.search-route)) main .home-reference-v4 [class*="search-bar"],
+  body:not(:has(.search-route)) main .home-reference-v4 [class*="search-box"]{
+    display:none!important;
+  }
+}
