@@ -1,0 +1,89 @@
+/* Priyasa mobile home v2 — final alignment and brand treatment. */
+@media(max-width:760px){
+  :root{--p-home-pink:#ff1f68;--p-home-ink:#24232a;--p-home-muted:#707078;--p-home-line:#ececef;--p-home-soft:#fff7f9}
+
+  /* App header: menu / Priyasa icon / search / bag. */
+  .site-header{height:68px!important;min-height:68px!important;grid-template-columns:44px minmax(0,1fr) auto!important;align-items:center!important;gap:8px!important;padding:0 12px!important;box-sizing:border-box!important}
+  .site-header>.mobile-menu{grid-column:1!important;width:42px!important;height:42px!important;margin:0!important;display:grid!important;place-items:center!important}
+  .site-header>.brand-logo-link{grid-column:2!important;width:42px!important;min-width:42px!important;height:42px!important;margin:0 auto!important;display:flex!important;align-items:center!important;justify-content:center!important}
+  .site-header>.brand-logo-link .brand-lockup{width:42px!important;height:42px!important;display:flex!important;align-items:center!important;justify-content:center!important}
+  .site-header>.brand-logo-link .brand-logo-full{display:none!important}
+  .site-header>.brand-logo-link .brand-logo-mobile{display:block!important;width:42px!important;height:42px!important;max-width:42px!important;max-height:42px!important;object-fit:contain!important}
+  .site-header>.actions{grid-column:3!important;display:flex!important;align-items:center!important;gap:0!important;min-width:76px!important}
+  .site-header>.actions .header-icon{display:grid!important;width:38px!important;height:42px!important;flex:0 0 38px!important;place-items:center!important}
+  .site-header>.actions .header-icon svg{width:23px!important;height:23px!important}
+  .site-header>.actions .header-account-trigger,.site-header>.actions .header-icon:nth-child(3){display:none!important}
+  .site-header>.actions .header-icon[aria-label="Search"]{display:grid!important}
+  .site-header>.actions .header-icon[aria-label^="Shopping bag"]{display:grid!important}
+
+  /* Home content shares one 12px alignment grid. */
+  main{padding-bottom:82px!important;overflow-x:hidden!important}
+  .home-reference-v4{width:100%!important;max-width:100%!important;margin:0!important;padding:0!important;overflow:hidden!important}
+  .home-reference-v4 .home-section{width:100%!important;box-sizing:border-box!important;padding:24px 12px!important;margin:0!important}
+  .home-reference-v4 .home-section-head{width:100%!important;box-sizing:border-box!important;display:flex!important;align-items:flex-end!important;justify-content:space-between!important;gap:12px!important;margin:0 0 14px!important}
+  .home-reference-v4 .home-section-head>div{min-width:0!important;flex:1 1 auto!important}
+  .home-reference-v4 .home-section-head h2{margin:2px 0 0!important;font-size:26px!important;line-height:1.08!important;letter-spacing:-.02em!important}
+  .home-reference-v4 .home-section-head p{margin:6px 0 0!important;font-size:11px!important;line-height:1.4!important;color:var(--p-home-muted)!important}
+  .home-reference-v4 .home-view-all{flex:none!important;white-space:nowrap!important;font-size:10px!important;font-weight:800!important}
+
+  /* Hero/campaign blocks never exceed the page width or acquire legacy gutters. */
+  .home-reference-v4 .home-hero-multi,.home-reference-v4 .home-hero-multi.home-section{padding:0!important;margin:0!important;width:100%!important}
+  .home-reference-v4 .home-fallback-hero{margin:12px!important;width:calc(100% - 24px)!important;box-sizing:border-box!important;border-radius:14px!important;overflow:hidden!important}
+  .home-reference-v4 .home-image-highlight-section{padding:0 12px 12px!important;margin:0!important}
+  .home-reference-v4 .home-image-highlight-section>*{width:100%!important;box-sizing:border-box!important;margin:0!important}
+
+  /* Service promises stay in four equal columns and never clip labels. */
+  .home-reference-v4 .home-service-promises{width:100%!important;box-sizing:border-box!important;padding:10px 12px!important;margin:0!important;overflow:hidden!important}
+  .home-reference-v4 .home-service-promises-inner{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;width:100%!important;box-sizing:border-box!important}
+  .home-reference-v4 .home-service-promise{min-width:0!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;text-align:center!important;padding:10px 5px!important;box-sizing:border-box!important;border-right:1px solid var(--p-home-line)!important}
+  .home-reference-v4 .home-service-promise:last-child{border-right:0!important}
+  .home-reference-v4 .home-service-promise svg{width:25px!important;height:25px!important;flex:none!important;margin-bottom:7px!important}
+  .home-reference-v4 .home-service-promise strong{display:block!important;font-size:9px!important;line-height:1.25!important;white-space:normal!important;overflow:visible!important}
+  .home-reference-v4 .home-service-promise small{display:none!important}
+
+  /* Affiliate / CMS cards use the same outer rhythm as every other home section. */
+  .home-reference-v4 .affiliate-home{width:calc(100% - 24px)!important;margin:12px!important;box-sizing:border-box!important;padding:24px 18px!important;border-radius:0!important;overflow:hidden!important}
+  .home-reference-v4 .affiliate-home>div{min-width:0!important;max-width:100%!important}
+  .home-reference-v4 .affiliate-home h2{margin:8px 0 0!important;font-size:30px!important;line-height:1.08!important;letter-spacing:-.02em!important}
+  .home-reference-v4 .affiliate-home p{margin:12px 0 18px!important;font-size:13px!important;line-height:1.65!important}
+  .home-reference-v4 .affiliate-home .button{display:flex!important;align-items:center!important;justify-content:center!important;width:100%!important;min-height:54px!important;box-sizing:border-box!important;margin:0!important}
+  .home-reference-v4 .affiliate-home-card{margin-top:18px!important;width:100%!important;box-sizing:border-box!important}
+
+  /* Product and editorial rails remain inside the same 12px grid. */
+  .home-reference-v4 .home-product-section .home-product-grid{width:100%!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:12px 9px!important;overflow:visible!important;margin:0!important;padding:0!important}
+  .home-reference-v4 .home-product-section .home-product-grid>.product-card{width:100%!important;min-width:0!important;margin:0!important}
+  .home-reference-v4 .home-casual-section{padding:24px 12px 22px!important}
+  .home-reference-v4 .home-casual-grid{width:100%!important;box-sizing:border-box!important;display:flex!important;gap:9px!important;overflow-x:auto!important;padding:0 1px 5px!important;scrollbar-width:none!important}
+  .home-reference-v4 .home-casual-grid::-webkit-scrollbar{display:none!important}
+
+  /* Mobile menu drawer: branded icon, balanced welcome copy, clear login CTA. */
+  .mobile-drawer{width:min(370px,92vw)!important;max-width:370px!important;overflow:hidden!important}
+  .mobile-drawer-head{height:70px!important;min-height:70px!important;box-sizing:border-box!important;padding:10px 14px!important}
+  .mobile-drawer-brand{display:flex!important;align-items:center!important;gap:9px!important;min-width:0!important}
+  .mobile-drawer-brand-icon{display:block!important;width:42px!important;height:42px!important;min-width:42px!important;object-fit:contain!important}
+  .mobile-drawer-brand-name{display:block!important;font-family:Georgia,'Times New Roman',serif!important;font-size:25px!important;line-height:1!important;font-weight:700!important;letter-spacing:.01em!important;color:#a91f56!important}
+  .mobile-drawer-brand>span:last-child{display:none!important}
+  .mobile-drawer-head>button:last-child{width:42px!important;height:42px!important;min-width:42px!important}
+
+  .mobile-drawer-account{display:grid!important;grid-template-columns:42px minmax(0,1fr) 118px!important;align-items:center!important;gap:9px!important;margin:12px 14px!important;padding:15px!important;box-sizing:border-box!important}
+  .mobile-drawer-account>div{display:contents!important}
+  .mobile-drawer-account>div>svg{grid-column:1!important;width:30px!important;height:30px!important;margin:0!important;align-self:center!important}
+  .mobile-drawer-account>div>div{grid-column:2!important;min-width:0!important}
+  .mobile-drawer-account>div strong{font-size:15px!important;line-height:1.15!important}
+  .mobile-drawer-account>div span{margin-top:4px!important;font-size:10px!important;line-height:1.4!important}
+  .mobile-drawer-account>button{grid-column:3!important;width:100%!important;height:48px!important;margin:0!important;min-width:0!important;padding:0 9px!important;white-space:normal!important;line-height:1.15!important}
+  .mobile-drawer-search{margin:0 14px 8px!important}
+  .mobile-drawer-search button{width:100%!important;box-sizing:border-box!important}
+  .mobile-drawer-nav{min-height:0!important;overflow:auto!important}
+}
+
+@media(max-width:390px){
+  .site-header{padding-left:9px!important;padding-right:9px!important;grid-template-columns:40px minmax(0,1fr) auto!important}
+  .site-header>.brand-logo-link,.site-header>.brand-logo-link .brand-lockup,.site-header>.brand-logo-link .brand-logo-mobile{width:40px!important;height:40px!important;max-width:40px!important;max-height:40px!important}
+  .site-header>.actions{min-width:72px!important}
+  .site-header>.actions .header-icon{width:36px!important;flex-basis:36px!important}
+  .home-reference-v4 .home-section{padding-left:10px!important;padding-right:10px!important}
+  .home-reference-v4 .affiliate-home{width:calc(100% - 20px)!important;margin-left:10px!important;margin-right:10px!important}
+  .mobile-drawer-account{grid-template-columns:38px minmax(0,1fr) 110px!important;padding:13px!important;gap:7px!important}
+  .mobile-drawer-account>button{font-size:12px!important}
+}
