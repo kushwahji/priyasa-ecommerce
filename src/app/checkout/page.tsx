@@ -107,6 +107,20 @@ export default function Checkout(){
     return data;
   }
 
+  async function ensureDeliveryAddress(){
+    if(selectedAddressId)return selectedAddressId;
+    setStatus('Saving delivery address securely…');
+    const response=await fetch('/api/customer/addresses',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({label:'Home',recipient_name:form.fullName.trim(),phone:form.phone.trim(),line1:form.line1.trim(),line2:null,city:form.city.trim(),state:form.state.trim(),postal_code:form.pincode.trim(),country:'IN',is_default:addresses.length===0})});
+    const data=await response.json().catch(()=>({}));
+    if(!response.ok)throw new Error(data.error||'Unable to save your delivery address.');
+    const saved=data?.data??data;
+    const id=String(saved?.id??'');
+    if(!id)throw new Error('Delivery address was saved without a valid reference. Please try again.');
+    setSelectedAddressId(id);
+    setAddresses(current=>[...current,{id,fullName:form.fullName.trim(),phone:form.phone.trim(),line1:form.line1.trim(),city:form.city.trim(),state:form.state.trim(),pincode:form.pincode.trim(),isDefault:current.length===0}]);
+    return id;
+  }
+
   useEffect(()=>{
     let cancelled=false;
     const timer=window.setTimeout(async()=>{
@@ -118,7 +132,7 @@ export default function Checkout(){
   },[items,form.coupon,authenticated,form.pincode]);
 
   function selectAddress(address:Address){setSelectedAddressId(address.id);setForm(current=>({...current,fullName:address.fullName,phone:address.phone,line1:address.line1,city:address.city,state:address.state,pincode:address.pincode}));}
-  function updateField(field:string,value:string){setForm(current=>({...current,[field]:value}));if(field!=='phone')setSelectedAddressId('');}
+  function updateField(field:string,value:string){setForm(current=>({...current,[field]:value}));if(field!=='coupon')setSelectedAddressId('');}
   function fillPincode(address:{pincode:string;city:string;state:string;area?:string}){setForm(current=>({...current,pincode:address.pincode,city:address.city||current.city,state:address.state||current.state,line1:!current.line1&&address.area?address.area:current.line1}));setSelectedAddressId('');}
 
   const subtotal=Number(quote?.subtotal??clientSubtotal),discount=Number(quote?.discount??0),shipping=Number(quote?.shipping??0),total=Number(quote?.total??Math.max(0,subtotal-discount+shipping));
@@ -132,7 +146,8 @@ export default function Checkout(){
     setBusy(true);setStatus('Rechecking price, stock and offer…');
     try{
       const freshQuote=await getFreshQuote();setQuote(freshQuote);if(freshQuote.codAvailable===false&&paymentMethod==='cod')throw new Error('Cash on Delivery is not available for this order.');
-      const orderResponse=await fetch('/api/orders',{method:'POST',headers:{'Content-Type':'application/json','Idempotency-Key':crypto.randomUUID()},body:JSON.stringify({addressId:selectedAddressId||undefined,coupon:form.coupon.trim().toUpperCase()||undefined,paymentMethod})});
+      const addressId=await ensureDeliveryAddress();
+      const orderResponse=await fetch('/api/orders',{method:'POST',headers:{'Content-Type':'application/json','Idempotency-Key':crypto.randomUUID()},body:JSON.stringify({addressId,coupon:form.coupon.trim().toUpperCase()||undefined,paymentMethod})});
       const order=await orderResponse.json().catch(()=>({}));if(!orderResponse.ok)throw new Error(order.error||'Unable to create order.');
       if(paymentMethod==='cod'){window.localStorage.removeItem('priyasa_cart');window.location.href=`/checkout/success?order=${encodeURIComponent(order.orderNumber)}`;return}
       setStatus('Opening secure payment…');
