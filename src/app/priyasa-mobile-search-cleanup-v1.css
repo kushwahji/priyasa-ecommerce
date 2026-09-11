@@ -13,3 +13,6 @@
     display:none!important;
   }
 }
+
+/* Premium app-shell layer is loaded last so older reference styles cannot undo it. */
+@import './priyasa-mobile-app-shell-v3.css';
