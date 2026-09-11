@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { priyasaApi, apiError } from '@/lib/priyasa-api';
 
-const PUBLIC = new Set(['home', 'settings', 'categories', 'collections', 'products', 'shipping/serviceability']);
+const PUBLIC = new Set(['home', 'cms', 'settings', 'categories', 'collections', 'products', 'shipping/serviceability']);
 const METHODS = new Set(['GET', 'POST', 'PUT', 'PATCH', 'DELETE']);
 
 export async function ALL(req: NextRequest, { params }: { params: Promise<{ path: string[] }> }) {
@@ -28,13 +28,8 @@ export async function ALL(req: NextRequest, { params }: { params: Promise<{ path
 
   const body = method === 'GET' || method === 'DELETE' ? undefined : await req.text();
   try {
-    const { response, body: result } = await priyasaApi(`/api/v1/storefront/${endpoint}${req.nextUrl.search}`, {
-      method,
-      headers,
-      body,
-    });
-    const payload = result ?? {};
-    return NextResponse.json(payload, { status: response.status });
+    const { response, body: result } = await priyasaApi(`/api/v1/storefront/${endpoint}${req.nextUrl.search}`, { method, headers, body });
+    return NextResponse.json(result ?? {}, { status: response.status });
   } catch (error) {
     return NextResponse.json({ error: apiError(error, 'Storefront API unavailable') }, { status: 502 });
   }
