@@ -1,0 +1,46 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { cookies } from 'next/headers';
+import { priyasaApi, apiError } from '@/lib/priyasa-api';
+
+const PUBLIC_PREFIXES = [
+  'home', 'cms', 'settings', 'categories', 'collections', 'products',
+  'shipping/serviceability', 'shipping/methods',
+];
+const METHODS = new Set(['GET', 'POST', 'PUT', 'PATCH', 'DELETE']);
+
+function isPublic(endpoint: string) {
+  return PUBLIC_PREFIXES.some(prefix => endpoint === prefix || endpoint.startsWith(`${prefix}/`));
+}
+
+export async function ALL(req: NextRequest, { params }: { params: Promise<{ path: string[] }> }) {
+  const method = req.method.toUpperCase();
+  if (!METHODS.has(method)) return NextResponse.json({ error: 'Method not allowed' }, { status: 405 });
+  const { path } = await params;
+  const endpoint = Array.isArray(path) ? path.join('/') : '';
+  if (!endpoint) return NextResponse.json({ error: 'Storefront endpoint required' }, { status: 400 });
+
+  const jar = await cookies();
+  const token = jar.get('priyasa_access_token')?.value;
+  if (!isPublic(endpoint) && !token) {
+    return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
+  }
+
+  const headers = new Headers();
+  if (token) headers.set('Authorization', `Bearer ${token}`);
+  const contentType = req.headers.get('content-type');
+  if (contentType) headers.set('Content-Type', contentType);
+  for (const name of ['idempotency-key', 'x-request-id']) {
+    const value = req.headers.get(name);
+    if (value) headers.set(name === 'idempotency-key' ? 'Idempotency-Key' : 'X-Request-Id', value);
+  }
+
+  const body = method === 'GET' || method === 'DELETE' ? undefined : await req.text();
+  try {
+    const { response, body: result } = await priyasaApi(`/api/v1/storefront/${endpoint}${req.nextUrl.search}`, { method, headers, body });
+    return NextResponse.json(result ?? {}, { status: response.status, headers: { 'Cache-Control': method === 'GET' ? 'private, no-store' : 'no-store' } });
+  } catch (error) {
+    return NextResponse.json({ error: apiError(error, 'Storefront API unavailable') }, { status: 502 });
+  }
+}
+
+export { ALL as GET, ALL as POST, ALL as PUT, ALL as PATCH, ALL as DELETE };
