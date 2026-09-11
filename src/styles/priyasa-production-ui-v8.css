@@ -1,0 +1,76 @@
+/* PRIYASA production UI v8 — final responsive alignment layer */
+
+/* Keep the mobile shell aligned to the reference: compact header, search discovery, five-item bottom navigation. */
+@media (max-width: 760px) {
+  body { padding-bottom: 72px; }
+  .site-header { min-height: 62px; padding-left: 12px; padding-right: 12px; }
+  .site-header .brand-logo-link img { max-height: 42px; width: auto; }
+  .site-header .actions { gap: 4px; }
+  .site-header .actions .header-account-trigger,
+  .site-header .actions a[aria-label="Wishlist"] { display: none; }
+
+  .mobile-storefront-discovery { padding: 8px 16px 10px; }
+  .mobile-home-search { min-height: 48px; border-radius: 25px; padding: 0 16px; display: flex; align-items: center; gap: 11px; }
+  .mobile-home-search svg { width: 22px; height: 22px; flex: none; }
+  .mobile-home-search span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+  .mobile-bottom-nav {
+    position: fixed !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    z-index: 120 !important;
+    display: grid !important;
+    grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+    height: 68px !important;
+    padding: 7px 8px calc(7px + env(safe-area-inset-bottom)) !important;
+    background: rgba(255,255,255,.98) !important;
+    border-top: 1px solid #ececf0 !important;
+    box-shadow: 0 -5px 22px rgba(25,25,35,.07) !important;
+  }
+  .mobile-bottom-nav a { min-width: 0; display: flex !important; flex-direction: column !important; align-items: center !important; justify-content: center !important; gap: 3px !important; text-decoration: none !important; }
+  .mobile-bottom-nav a svg { width: 23px !important; height: 23px !important; }
+  .mobile-bottom-nav a small { font-size: 10px !important; line-height: 1 !important; white-space: nowrap; }
+  .mobile-bottom-nav a.is-active svg,
+  .mobile-bottom-nav a.is-active small { color: #ff1f68 !important; }
+
+  .home-managed-v1 { width: 100%; overflow: clip; }
+  .home-managed-v1 .home-managed-hero { margin-top: 0 !important; }
+  .home-managed-v1 .home-managed-products,
+  .home-managed-v1 .home-editorial-section,
+  .home-managed-v1 .home-flash-sale,
+  .home-managed-v1 .home-reviews { width: 100%; box-sizing: border-box; }
+  .home-managed-v1 .home-section-head { padding-inline: 0; }
+  .home-managed-v1 .home-view-all { min-height: 32px; display: inline-flex; align-items: center; }
+  .home-managed-v1 .home-product-rail,
+  .home-managed-v1 .home-editorial-rail,
+  .home-managed-v1 .home-review-rail { overscroll-behavior-x: contain; -webkit-overflow-scrolling: touch; }
+
+  /* Reference-style editorial cards: 3 visible on a phone with the next card peeking. */
+  .home-managed-v1 .home-editorial-card { flex-basis: 42vw !important; aspect-ratio: 1 / 1.08 !important; }
+
+  /* Product rails: approximately 3 cards in the viewport, horizontally scrollable. */
+  .home-managed-v1 .home-product-rail-item { flex-basis: 30.5vw !important; }
+
+  /* Product discovery grid: two comfortable cards per row. */
+  .home-managed-v1 .home-more-products .home-product-grid { grid-template-columns: repeat(2, minmax(0,1fr)) !important; }
+
+  /* Checkout/account/product pages share the same horizontal gutter. */
+  .storefront-page,
+  .account-shell,
+  .checkout-v3-layout,
+  .checkout-v3-head { box-sizing: border-box; max-width: 100%; }
+  .storefront-page, .account-shell { overflow-x: clip; }
+  .pdp-page, .cart-page, .account-main, .section { max-width: 100%; }
+}
+
+@media (min-width: 761px) {
+  .mobile-bottom-nav { display: none !important; }
+}
+
+@media (max-width: 380px) {
+  .site-header .brand-logo-link img { max-height: 38px; }
+  .mobile-bottom-nav { height: 65px !important; }
+  .mobile-bottom-nav a svg { width: 21px !important; height: 21px !important; }
+  .mobile-bottom-nav a small { font-size: 9px !important; }
+}
