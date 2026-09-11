@@ -2,17 +2,16 @@
 @media (max-width:680px){
   body:has(.account-mobile-head) .site-header,
   body:has(.ecomus-pdp .pdp-mobile-head) .site-header{display:none!important}
-
   .account-mobile-head{height:62px!important;display:grid!important;grid-template-columns:40px minmax(0,1fr) 40px 40px!important;align-items:center!important;gap:3px!important;padding:0 10px!important;background:#fff!important;border-bottom:1px solid #ececf0!important;position:sticky!important;top:0!important;z-index:190!important}
   .account-mobile-head strong{position:absolute!important;width:1px!important;height:1px!important;overflow:hidden!important;clip:rect(0 0 0 0)!important;white-space:nowrap!important}
   .account-mobile-head .account-back,.account-mobile-head .account-head-icon{width:40px!important;height:40px!important;display:grid!important;place-items:center!important;color:#282c3f!important;text-decoration:none!important;border:0!important;background:transparent!important;padding:0!important}
   .account-mobile-head .account-back{font-size:0!important;grid-column:1!important}
-  .account-mobile-head .account-back:before{content:'←';font-size:30px!important;line-height:1!important;font-weight:400!important;transform:translateY(-1px)!important}
+  .account-mobile-head .account-back:before{display:none!important;content:none!important}
   .account-mobile-head .account-head-icon:first-of-type{grid-column:3!important}
   .account-mobile-head .account-head-icon:last-of-type{grid-column:4!important;position:relative!important}
   .account-mobile-head:after{content:'';grid-column:2!important;grid-row:1!important;justify-self:start!important;width:116px!important;height:38px!important;background:url('/images/priyasa-logo.svg') left center/116px auto no-repeat!important;pointer-events:none!important}
+  .account-mobile-head .account-back svg{width:29px!important;height:29px!important}
   .account-mobile-head .account-head-icon svg{width:26px!important;height:26px!important;stroke-width:1.8!important}
-
   .mobile-menu-backdrop{position:fixed!important;inset:0!important;background:rgba(24,27,36,.48)!important;z-index:300!important;backdrop-filter:blur(1.5px)!important}
   .mobile-drawer{position:fixed!important;left:0!important;top:0!important;bottom:0!important;width:min(382px,92vw)!important;max-width:92vw!important;height:100svh!important;background:#fff!important;z-index:310!important;box-shadow:12px 0 34px rgba(24,27,36,.18)!important;border:0!important;border-radius:0!important;overflow:hidden!important}
   .mobile-drawer-head{height:70px!important;min-height:70px!important;padding:0 14px!important;display:flex!important;align-items:center!important;justify-content:space-between!important;border-bottom:1px solid #ededf0!important;background:#fff!important}
@@ -21,13 +20,11 @@
   .mobile-drawer-brand:before,.mobile-drawer-brand:after{display:none!important;content:none!important}
   .mobile-drawer-head>button:last-child{width:44px!important;height:44px!important;min-width:44px!important;border:0!important;border-radius:50%!important;background:#f6f6f7!important;color:#282c3f!important;display:grid!important;place-items:center!important}
   .mobile-drawer-head>button:last-child svg{width:24px!important;height:24px!important}
-
   .mobile-drawer-account{margin:14px 14px 12px!important;padding:16px!important;border:1px solid #f0dce3!important;border-radius:16px!important;background:linear-gradient(135deg,#fff7f9,#fff)!important;box-shadow:0 5px 16px rgba(40,44,63,.04)!important}
   .mobile-drawer-account>div>svg{width:32px!important;height:32px!important;color:#d21967!important}
   .mobile-drawer-account>div strong{font-size:16px!important;line-height:1.1!important}
   .mobile-drawer-account>div span{font-size:11px!important;line-height:1.4!important;color:#686b78!important}
   .mobile-drawer-account>button{height:46px!important;margin-top:12px!important;border-radius:10px!important;background:#ff3f6c!important;box-shadow:0 7px 18px rgba(255,63,108,.18)!important;font-size:14px!important}
-
   .mobile-drawer-search{margin:0 14px 8px!important}
   .mobile-drawer-search button{width:100%!important;min-height:54px!important;padding:0 15px!important;display:flex!important;align-items:center!important;gap:12px!important;border:1px solid #dedfe5!important;border-radius:12px!important;background:#fff!important;color:#282c3f!important;text-align:left!important}
   .mobile-drawer-search button svg{width:22px!important;height:22px!important;flex:none!important}
@@ -42,10 +39,10 @@
   .mobile-drawer-foot a{min-height:58px!important;padding:5px 1px!important;gap:5px!important;color:#3d414d!important}
   .mobile-drawer-foot a svg{width:23px!important;height:23px!important;color:#cf2168!important}
   .mobile-drawer-foot a span{font-size:9px!important;font-weight:800!important}
-
   .ecomus-pdp .pdp-mobile-head{height:62px!important;padding:0 10px!important;display:grid!important;grid-template-columns:40px minmax(0,1fr) 40px 40px!important;align-items:center!important;gap:3px!important;background:#fff!important;border-bottom:1px solid #ececf0!important;box-shadow:0 1px 5px rgba(40,44,63,.03)!important;position:sticky!important;top:0!important;z-index:180!important}
   .ecomus-pdp .pdp-mobile-head .back{font-size:0!important;width:40px!important;height:40px!important;display:grid!important;place-items:center!important;color:#282c3f!important;text-decoration:none!important;grid-column:1!important}
-  .ecomus-pdp .pdp-mobile-head .back:before{content:'←';font-size:30px!important;line-height:1!important}
+  .ecomus-pdp .pdp-mobile-head .back:before{display:none!important;content:none!important}
+  .ecomus-pdp .pdp-mobile-head .back svg{width:29px!important;height:29px!important}
   .ecomus-pdp .pdp-mobile-head h1{grid-column:2!important;grid-row:1!important;justify-self:start!important;width:116px!important;height:38px!important;margin:0!important;background:url('/images/priyasa-logo.svg') left center/116px auto no-repeat!important;font-size:0!important}
   .ecomus-pdp .pdp-mobile-head .actions{grid-column:3/5!important;grid-row:1!important;display:grid!important;grid-template-columns:40px 40px!important;justify-content:end!important;gap:3px!important}
   .ecomus-pdp .pdp-mobile-head .actions a{width:40px!important;height:40px!important;display:grid!important;place-items:center!important;color:#282c3f!important}
