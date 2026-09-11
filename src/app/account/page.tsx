@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { cookies } from 'next/headers';
-import { db } from '@/lib/db';
+import { priyasaApi } from '@/lib/priyasa-api';
 import { UserIcon, GiftIcon, HeartIcon, BagIcon, MapPinIcon, HelpIcon, WalletIcon, ReturnIcon, CreditCardIcon, ChevronIcon } from '@/components/StorefrontIcons';
 
 const accountItems = [
@@ -15,23 +15,42 @@ const accountItems = [
   ['Help Centre', '/help', HelpIcon, 'Orders, payments and support'],
 ] as const;
 
-type UserWithCounts = { id:string; name:string|null; phone:string; email:string|null; createdAt:Date; _count:{orders:number;addresses:number;notifications:number} };
+type UserWithCounts = { id:string; name:string|null; phone:string; email:string|null; createdAt:string; _count:{orders:number;addresses:number} };
+
+async function coreData(path:string, token:string) {
+  const { response, body } = await priyasaApi(path, { headers: { Authorization: `Bearer ${token}` } });
+  if (!response.ok) return null;
+  return (body as any)?.data ?? null;
+}
 
 async function getCurrentUser(): Promise<UserWithCounts|null> {
   try {
     const jar = await cookies();
-    const id = jar.get('priyasa_local_user_id')?.value;
-    const phone = jar.get('priyasa_mobile')?.value;
-    if (!id && !phone) return null;
-    if (id) return await db.user.findUnique({where:{id},include:{_count:{select:{orders:true,addresses:true,notifications:true}}}}) as UserWithCounts|null;
-    return await db.user.findUnique({where:{phone:phone!},include:{_count:{select:{orders:true,addresses:true,notifications:true}}}}) as UserWithCounts|null;
+    const token = jar.get('priyasa_access_token')?.value;
+    if (!token) return null;
+    const [profile, orders, addresses] = await Promise.all([
+      coreData('/api/v1/storefront/profile', token),
+      coreData('/api/v1/storefront/orders', token),
+      coreData('/api/v1/storefront/addresses', token),
+    ]);
+    if (!profile) return null;
+    const orderRows = Array.isArray(orders) ? orders : Array.isArray(orders?.data) ? orders.data : [];
+    const addressRows = Array.isArray(addresses) ? addresses : Array.isArray(addresses?.data) ? addresses.data : [];
+    const name = [profile.first_name, profile.last_name].filter(Boolean).join(' ').trim();
+    return {
+      id: String(profile.id),
+      name: name || null,
+      phone: String(profile.phone || profile.mobile || ''),
+      email: profile.email || null,
+      createdAt: String(profile.created_at || profile.createdAt || new Date().toISOString()),
+      _count: { orders: Number(orders?.total ?? orders?.meta?.total ?? orderRows.length), addresses: addressRows.length },
+    };
   } catch {
     return null;
   }
 }
 
 function BackArrow(){return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>}
-
 function AccountMobileHead(){return <div className="account-mobile-head"><Link href="/" aria-label="Back to home" className="account-back"><BackArrow/></Link><strong>My Account</strong><Link href="/wishlist" aria-label="Wishlist" className="account-head-icon"><HeartIcon/></Link><Link href="/cart" aria-label="Shopping bag" className="account-head-icon"><BagIcon/></Link></div>}
 
 function GuestAccount(){
