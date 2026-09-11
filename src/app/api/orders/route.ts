@@ -4,12 +4,12 @@ import { priyasaApi, apiError } from '@/lib/priyasa-api';
 
 const PAYMENT_METHODS = new Set(['razorpay', 'cod']);
 
-async function getAuthenticatedAddress(token: string, requestedId: unknown) {
-  if (requestedId) return String(requestedId);
+async function validateAuthenticatedAddress(token: string, requestedId: unknown) {
+  const addressId = typeof requestedId === 'string' ? requestedId.trim() : String(requestedId ?? '').trim();
+  if (!addressId) return null;
 
-  // Checkout may arrive here without an address id when the customer has
-  // entered an address but has not selected a saved-address card. Never
-  // invent an address: use an existing default/first address only.
+  // Never substitute another saved/default address. Checkout must use the
+  // exact address selected (or just saved) by the customer.
   const { response, body } = await priyasaApi('/api/v1/storefront/addresses', {
     method: 'GET',
     headers: { Authorization: `Bearer ${token}` },
@@ -18,8 +18,8 @@ async function getAuthenticatedAddress(token: string, requestedId: unknown) {
 
   const data = (body as any)?.data ?? body;
   const addresses = Array.isArray(data) ? data : Array.isArray(data?.data) ? data.data : [];
-  const preferred = addresses.find((address: any) => Boolean(address?.is_default)) ?? addresses[0];
-  return preferred?.id ? String(preferred.id) : null;
+  const owned = addresses.find((address: any) => String(address?.id ?? '') === addressId);
+  return owned?.id ? String(owned.id) : null;
 }
 
 export async function POST(req: Request) {
@@ -30,11 +30,16 @@ export async function POST(req: Request) {
   if (!input || typeof input !== 'object') return NextResponse.json({ error: 'Invalid checkout data.' }, { status: 400 });
   const body = input as Record<string, unknown>;
 
-  const shippingAddressId = await getAuthenticatedAddress(token, body.addressId || body.shipping_address_id);
+  const requestedAddressId = body.addressId || body.shipping_address_id;
+  if (!requestedAddressId) {
+    return NextResponse.json({ error: 'Please select or save this delivery address before placing your order.' }, { status: 400 });
+  }
+
+  const shippingAddressId = await validateAuthenticatedAddress(token, requestedAddressId);
   const couponCode = body.coupon || body.coupon_code || undefined;
   const paymentMethod = String(body.paymentMethod || body.payment_method || 'razorpay').toLowerCase();
 
-  if (!shippingAddressId) return NextResponse.json({ error: 'Please save a delivery address before placing your order.' }, { status: 400 });
+  if (!shippingAddressId) return NextResponse.json({ error: 'The selected delivery address is unavailable. Please choose or save it again.' }, { status: 422 });
   if (!PAYMENT_METHODS.has(paymentMethod)) {
     return NextResponse.json({ error: 'Unsupported payment method. Please choose online payment or Cash on Delivery.' }, { status: 422 });
   }
