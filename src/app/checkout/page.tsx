@@ -55,11 +55,7 @@ export default function Checkout(){
   const [status,setStatus]=useState('');
 
   useEffect(()=>{
-    try {
-      const normalized=normalizeCart(JSON.parse(window.localStorage.getItem('priyasa_cart')||'[]'));
-      setItems(normalized);
-      window.localStorage.setItem('priyasa_cart',JSON.stringify(normalized));
-    } catch { setItems([]); }
+    try{const normalized=normalizeCart(JSON.parse(window.localStorage.getItem('priyasa_cart')||'[]'));setItems(normalized);window.localStorage.setItem('priyasa_cart',JSON.stringify(normalized));}catch{setItems([])}
     void fetch('/api/customer/session',{cache:'no-store'}).then(r=>r.json()).then(async data=>{
       setAuthenticated(Boolean(data.authenticated));
       if(!data.user)return;
@@ -75,7 +71,6 @@ export default function Checkout(){
   async function syncCartToCore(){
     if(authenticated!==true)return;
     const canonicalItems=normalizeCart(items);
-    if(canonicalItems.length!==items.length) setItems(canonicalItems);
     const response=await fetch('/api/cart',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({items:canonicalItems.map(item=>({variantId:String(item.variantId),quantity:Number(item.quantity)})),couponCode:form.coupon.trim().toUpperCase()||undefined})});
     const data=await response.json().catch(()=>({}));
     if(!response.ok)throw new Error(data.error||'Unable to sync your bag. Please refresh and try again.');
@@ -83,7 +78,8 @@ export default function Checkout(){
 
   async function getFreshQuote(){
     await syncCartToCore();
-    const response=await fetch('/api/checkout/quote',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({items:normalizeCart(items).map(item=>({variantId:String(item.variantId),quantity:Number(item.quantity)})),coupon:form.coupon.trim().toUpperCase()||undefined,pincode:form.pincode||undefined})});
+    const canonicalItems=normalizeCart(items);
+    const response=await fetch('/api/checkout/quote',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({items:canonicalItems.map(item=>({variantId:String(item.variantId),quantity:Number(item.quantity)})),coupon:form.coupon.trim().toUpperCase()||undefined,pincode:form.pincode||undefined})});
     const data=await response.json().catch(()=>({}));
     if(!response.ok)throw new Error(data.error||'Unable to validate your bag.');
     return data;
@@ -94,17 +90,8 @@ export default function Checkout(){
     const timer=window.setTimeout(async()=>{
       if(!items.length){setQuote(null);return;}
       if(authenticated!==true)return;
-      try{
-        const data=await getFreshQuote();
-        if(cancelled)return;
-        setQuote(data);
-        if(data.codAvailable===false && paymentMethod==='cod')setPaymentMethod('razorpay');
-        setStatus('');
-      }catch(error){
-        if(cancelled)return;
-        setQuote(null);
-        setStatus(error instanceof Error?error.message:'Unable to calculate your order.');
-      }
+      try{const data=await getFreshQuote();if(cancelled)return;setQuote(data);if(data.codAvailable===false&&paymentMethod==='cod')setPaymentMethod('razorpay');setStatus('');}
+      catch(error){if(cancelled)return;setQuote(null);setStatus(error instanceof Error?error.message:'Unable to calculate your order.');}
     },220);
     return()=>{cancelled=true;window.clearTimeout(timer)};
   },[items,form.coupon,authenticated,form.pincode]);
@@ -133,15 +120,11 @@ export default function Checkout(){
     try{
       const freshQuote=await getFreshQuote();
       setQuote(freshQuote);
-      if(freshQuote.codAvailable===false && paymentMethod==='cod')throw new Error('Cash on Delivery is not available for this order.');
+      if(freshQuote.codAvailable===false&&paymentMethod==='cod')throw new Error('Cash on Delivery is not available for this order.');
       const orderResponse=await fetch('/api/orders',{method:'POST',headers:{'Content-Type':'application/json','Idempotency-Key':crypto.randomUUID()},body:JSON.stringify({addressId:selectedAddressId||undefined,coupon:form.coupon.trim().toUpperCase()||undefined,paymentMethod})});
       const order=await orderResponse.json().catch(()=>({}));
       if(!orderResponse.ok)throw new Error(order.error||'Unable to create order.');
-      if(paymentMethod==='cod'){
-        window.localStorage.removeItem('priyasa_cart');
-        window.location.href=`/checkout/success?order=${encodeURIComponent(order.orderNumber)}`;
-        return;
-      }
+      if(paymentMethod==='cod'){window.localStorage.removeItem('priyasa_cart');window.location.href=`/checkout/success?order=${encodeURIComponent(order.orderNumber)}`;return;}
       setStatus('Opening secure payment…');
       const paymentResponse=await fetch('/api/payments/razorpay',{method:'POST',headers:{'Content-Type':'application/json','Idempotency-Key':crypto.randomUUID()},body:JSON.stringify({orderId:order.orderId})});
       const payment=await paymentResponse.json().catch(()=>({}));
@@ -150,24 +133,15 @@ export default function Checkout(){
       await loadRazorpay();
       if(!window.Razorpay)throw new Error('Payment gateway unavailable.');
       const razorpay=new window.Razorpay({key:payment.keyId,amount:payment.amount,currency:payment.currency||'INR',name:'PRIYASA',description:`Order ${payment.orderNumber||order.orderNumber}`,order_id:payment.razorpayOrderId,theme:{color:'#a81132'},handler:async(gatewayResponse:any)=>{
-        try{
-          setStatus('Verifying payment securely…');
-          const verification=await fetch('/api/payments/razorpay/verify',{method:'POST',headers:{'Content-Type':'application/json','Idempotency-Key':crypto.randomUUID()},body:JSON.stringify({orderId:order.orderId,razorpay_order_id:gatewayResponse?.razorpay_order_id,razorpay_payment_id:gatewayResponse?.razorpay_payment_id,razorpay_signature:gatewayResponse?.razorpay_signature})});
-          const result=await verification.json().catch(()=>({}));
-          if(!verification.ok)throw new Error(result.error||'Payment verification failed.');
-          window.localStorage.removeItem('priyasa_cart');
-          window.location.href=`/checkout/success?order=${encodeURIComponent(order.orderNumber)}`;
-        }catch(error){setBusy(false);setStatus(error instanceof Error?error.message:'Payment verification failed. Please contact support.');}
+        try{setStatus('Verifying payment securely…');const verification=await fetch('/api/payments/razorpay/verify',{method:'POST',headers:{'Content-Type':'application/json','Idempotency-Key':crypto.randomUUID()},body:JSON.stringify({orderId:order.orderId,razorpay_order_id:gatewayResponse?.razorpay_order_id,razorpay_payment_id:gatewayResponse?.razorpay_payment_id,razorpay_signature:gatewayResponse?.razorpay_signature})});const result=await verification.json().catch(()=>({}));if(!verification.ok)throw new Error(result.error||'Payment verification failed.');window.localStorage.removeItem('priyasa_cart');window.location.href=`/checkout/success?order=${encodeURIComponent(order.orderNumber)}`;}
+        catch(error){setBusy(false);setStatus(error instanceof Error?error.message:'Payment verification failed. Please contact support.');}
       },modal:{ondismiss:()=>{setBusy(false);setStatus('Payment was not completed. Your order remains available in My Orders so you can retry.');}}});
       razorpay.on('payment.failed',(failure:any)=>{setBusy(false);setStatus(failure?.error?.description||'Payment failed. Please retry.');});
       razorpay.open();
     }catch(error){setBusy(false);setStatus(error instanceof Error?error.message:'Checkout failed.');}
   }
 
-  const paymentOptions=[
-    {id:'razorpay' as const,label:'Online payment',caption:'UPI · Cards · Net Banking',icon:<UpiIcon/>,disabled:false},
-    {id:'cod' as const,label:'Cash on Delivery',caption:'Pay when your order arrives',icon:<CashIcon/>,disabled:!codAvailable},
-  ];
+  const paymentOptions=[{id:'razorpay' as const,label:'Online payment',caption:'UPI · Cards · Net Banking',icon:<UpiIcon/>,disabled:false},{id:'cod' as const,label:'Cash on Delivery',caption:'Pay when your order arrives',icon:<CashIcon/>,disabled:!codAvailable}];
 
   if(authenticated===false&&!loginOpen)return <div className="storefront-page priyasa-checkout-v3"><div className="checkout-v3-login"><span className="checkout-v3-kicker">PRIYASA CHECKOUT</span><h1>Sign in to continue</h1><p>Use your mobile number to securely place the order and receive delivery updates.</p><button className="button dark-button" type="button" onClick={()=>setLoginOpen(true)}>Continue with Mobile</button><Link className="button button-light" href="/cart">Back to Bag</Link></div><AuthOtpModal open={loginOpen} onClose={()=>setLoginOpen(false)}/></div>;
 
@@ -180,8 +154,11 @@ export default function Checkout(){
 
         {step===1&&<section className="checkout-v3-card"><span className="checkout-v3-kicker">01 · DELIVERY</span><h2>Where should we deliver?</h2><p className="checkout-v3-sub">Choose a saved address or enter a new delivery address.</p>{addresses.length>0&&<div className="checkout-v3-saved"><div className="checkout-v3-saved-head"><span>Saved addresses</span><Link href="/account/addresses">Manage</Link></div>{addresses.map(address=><button type="button" key={address.id} className={`checkout-v3-address ${selectedAddressId===address.id?'active':''}`} onClick={()=>selectAddress(address)}><strong>{address.fullName}{address.isDefault?' · Default':''}</strong><small>{address.line1}, {address.city}, {address.state} - {address.pincode} · {address.phone}</small></button>)}</div>}<div className="checkout-v3-form-grid">{([['fullName','Full name'],['phone','Mobile number'],['line1','Address'],['city','City'],['state','State'],['pincode','Pincode']] as const).map(([field,label])=><label className={field==='line1'?'full':''} key={field}>{label}<input className="checkout-v3-input" required value={form[field]} inputMode={field==='phone'||field==='pincode'?'numeric':undefined} maxLength={field==='pincode'?6:120} onChange={e=>updateField(field,field==='pincode'?e.target.value.replace(/\D/g,'').slice(0,6):e.target.value)}/></label>)}</div><DeliveryPincode weightGrams={Math.max(500,itemCount*500)} cod={paymentMethod==='cod'} onAddress={fillPincode}/>{status&&<div className="checkout-v3-status" role="status">{status}</div>}<div className="checkout-v3-actions"><Link className="checkout-v3-back" href="/cart">← Back to bag</Link><button type="button" className="button dark-button" disabled={!addressReady} onClick={()=>{setStatus('');setStep(2);window.scrollTo({top:0,behavior:'smooth'})}}>Continue to payment</button></div></section>}
 
-        {step===2&&<section className="checkout-v3-card"><span className="checkout-v3-kicker">02 · PAYMENT</span><h2>How would you like to pay?</h2><p className="checkout-v3-sub">All payment methods are protected. You will only be charged after final confirmation.</p><div className="checkout-v3-payment-grid">{paymentOptions.map(option=><button type="button" key={option.id} disabled={option.disabled} className={`checkout-v3-payment ${paymentMethod===option.id?'active':''}`} onClick={()=>{setPaymentMethod(option.id);setStatus('')}}><span className="checkout-v3-payment-icon">{option.icon}</span><span><strong>{option.label}</strong><small>{option.caption}</small></span><span className="checkout-v3-radio"/></button>)}</div>{paymentMethod==='razorpay'&&<div className="checkout-v3-offer"><CheckIcon/><div><b>Online payment benefits</b><span>Fast confirmation, no cash handling, and eligible bank/UPI offers can be applied inside the secure payment gateway.</span></div></div>}{status&&<div className="checkout-v3-status" role="status">{status}</div>}<div className="checkout-v3-actions"><button type="button" className="checkout-v3-back" onClick={()=>setStep(1)}>← Delivery address</button><button className="button dark-button" type="submit" disabled={busy||!quote}>{busy?'Processing…':paymentMethod==='cod'?`Place COD order · ${quote?money(total):'…'}`:`Pay ${quote?money(total):'…'} securely`}</button></div></section>}
+        {step===2&&<section className="checkout-v3-card"><span className="checkout-v3-kicker">02 · PAYMENT</span><h2>How would you like to pay?</h2><p className="checkout-v3-sub">All payment methods are protected. You will only be charged after final confirmation.</p><div className="checkout-v3-payment-grid">{paymentOptions.map(option=><button type="button" key={option.id} disabled={option.disabled} className={`checkout-v3-payment ${paymentMethod===option.id?'active':''}`} onClick={()=>{setPaymentMethod(option.id);setStatus('')}}><span className="checkout-v3-payment-icon">{option.icon}</span><span><strong>{option.label}</strong><small>{option.caption}</small></span><span className="checkout-v3-radio"/></button>)}</div>{paymentMethod==='razorpay'&&<div className="checkout-v3-offer"><CheckIcon/><div><b>Online payment benefits</b><span>Fast confirmation, no cash handling, and eligible bank/UPI offers can be applied inside the secure payment gateway.</span></div></div>}{status&&<div className="checkout-v3-status" role="status">{status}</div>}<div className="checkout-v3-actions"><button type="button" className="checkout-v3-back" onClick={()=>{setStatus('');setStep(1);window.scrollTo({top:0,behavior:'smooth'})}}>← Address</button><button type="button" className="button dark-button" onClick={()=>{setStatus('');setStep(3);window.scrollTo({top:0,behavior:'smooth'})}}>Review order</button></div></section>}
+
+        {step===3&&<section className="checkout-v3-card"><span className="checkout-v3-kicker">03 · CONFIRMATION</span><h2>Review & place order</h2><p className="checkout-v3-sub">Check your delivery details and payment method before placing the order.</p><div className="checkout-v3-review"><div className="checkout-v3-review-row"><div>Deliver to</div><strong>{form.fullName}<br/>{form.line1}, {form.city}, {form.state} - {form.pincode}<br/>{form.phone}</strong></div><div className="checkout-v3-review-row"><div>Payment</div><strong>{paymentOptions.find(option=>option.id===paymentMethod)?.label}</strong></div><div className="checkout-v3-review-row"><div>Order total</div><strong>{quote?money(total):'Calculating…'}</strong></div></div>{status&&<div className="checkout-v3-status" role="status">{status}</div>}<button className="button dark-button checkout-v3-place" type="submit" disabled={busy||!quote||!items.length}>{busy?'Processing securely…':paymentMethod==='razorpay'?'Continue to secure payment':`Place order · ${money(total)}`}</button><p className="checkout-v3-note"><ShieldIcon/> By placing your order, you agree to Priyasa terms and the applicable return policy.</p><div className="checkout-v3-actions"><button type="button" className="checkout-v3-back" onClick={()=>{setStatus('');setStep(2);window.scrollTo({top:0,behavior:'smooth'})}}>← Payment</button><Link href="/cart" className="checkout-v3-back">Edit bag</Link></div></section>}
       </main>
+      <aside className="checkout-v3-side"><div className="checkout-v3-card"><span className="checkout-v3-kicker">SECURE SHOPPING</span><h2>You're almost there</h2><div className="checkout-v3-trust"><div><strong>Secure payment</strong>Protected checkout</div><div><strong>Pan-India delivery</strong>Serviceability checked</div><div><strong>Easy returns</strong>Eligible products</div><div><strong>Order validation</strong>Price & stock checked</div></div></div></aside>
     </form>
     <AuthOtpModal open={loginOpen} onClose={()=>setLoginOpen(false)}/>
   </div>;
