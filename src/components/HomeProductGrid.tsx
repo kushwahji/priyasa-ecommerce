@@ -4,7 +4,7 @@ import type {Product}from'@/lib/catalog';
 import {ProductCard}from'@/components/ProductCard';
 
 export default function HomeProductGrid({products,initialVisible=10,step=10}:{products:Product[];initialVisible?:number;step?:number}){
- const gridMode=products.length>=18;
+ const gridMode=initialVisible>=18||products.length>=18;
  const effectiveInitial=gridMode?Math.min(6,products.length):Math.min(initialVisible,products.length);
  const effectiveStep=gridMode?6:step;
  const [visible,setVisible]=useState(effectiveInitial);
