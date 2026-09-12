@@ -1,7 +1,9 @@
 name: CI
 on:
   push:
-    branches: [main]
+    branches:
+      - main
+      - feature/full-e2e-api-integration
   pull_request:
     branches: [main]
 jobs:
