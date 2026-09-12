@@ -1,0 +1,552 @@
+/* Priyasa mobile marketplace parity v3.
+   Final overrides for the supplied Myntra-style mobile references.
+   Commerce data and business rules remain in Priyasa Core API. */
+
+@media (max-width: 760px) {
+  /* Flash Sale: two dense product cards per row, not a horizontal one-card rail. */
+  .home-flash-sale .home-product-grid,
+  .home-reference-v4 .home-flash-sale .home-product-grid {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 8px !important;
+    overflow: visible !important;
+    padding: 0 !important;
+    scroll-snap-type: none !important;
+  }
+
+  .home-flash-sale .product-card,
+  .home-reference-v4 .home-flash-sale .product-card {
+    width: auto !important;
+    min-width: 0 !important;
+    flex: initial !important;
+    border: 1px solid #e8e8e8 !important;
+    border-radius: 8px !important;
+    overflow: hidden !important;
+    background: #fff !important;
+    box-shadow: none !important;
+  }
+
+  .home-flash-sale .product-media,
+  .home-reference-v4 .home-flash-sale .product-media {
+    aspect-ratio: 3 / 4 !important;
+    min-height: 0 !important;
+  }
+
+  .home-flash-sale .product-card img,
+  .home-reference-v4 .home-flash-sale .product-card img {
+    width: 100% !important;
+    height: 100% !important;
+    aspect-ratio: auto !important;
+    object-fit: cover !important;
+  }
+
+  .home-flash-sale .product-info,
+  .home-reference-v4 .home-flash-sale .product-info {
+    padding: 8px !important;
+  }
+
+  .home-flash-sale .product-info h3,
+  .home-reference-v4 .home-flash-sale .product-info h3 {
+    font-size: 12px !important;
+    line-height: 1.3 !important;
+    margin: 3px 0 5px !important;
+  }
+
+  .home-flash-sale .home-load-more {
+    margin-top: 10px !important;
+  }
+
+  /* Remove the duplicate three-item hero service strip. The home page owns the
+     canonical four-item service strip below the merchandising content. */
+  .home-hero-service-promises {
+    display: none !important;
+  }
+
+  /* Canonical service strip: four equal marketplace promises. */
+  .home-service-promises {
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 10px 0 !important;
+    background: #fff !important;
+    border-top: 1px solid #e8e8e8 !important;
+    border-bottom: 1px solid #e8e8e8 !important;
+  }
+
+  .home-service-promises-inner {
+    display: grid !important;
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  }
+
+  .home-service-promise {
+    min-width: 0 !important;
+    padding: 5px 4px !important;
+    display: grid !important;
+    justify-items: center !important;
+    text-align: center !important;
+    gap: 4px !important;
+    border-right: 1px solid #ededed !important;
+  }
+
+  .home-service-promise:last-child {
+    border-right: 0 !important;
+  }
+
+  .home-service-promise svg {
+    width: 22px !important;
+    height: 22px !important;
+  }
+
+  .home-service-promise strong {
+    display: block !important;
+    max-width: 100% !important;
+    overflow: hidden !important;
+    white-space: nowrap !important;
+    text-overflow: ellipsis !important;
+    font-size: 9px !important;
+    line-height: 1.2 !important;
+  }
+
+  .home-service-promise small {
+    display: none !important;
+  }
+
+  /* Mobile hero/banner: compact marketplace campaign proportions rather than a
+     tall editorial crop. Keep the CTA readable over the image. */
+  .premium-home-hero {
+    aspect-ratio: 2.05 / 1 !important;
+    min-height: 0 !important;
+    max-height: 245px !important;
+  }
+
+  .premium-home-hero .home-hero-copy {
+    left: 16px !important;
+    right: 16px !important;
+    bottom: 18px !important;
+    width: auto !important;
+    max-width: 80% !important;
+  }
+
+  .premium-home-hero .home-hero-copy .eyebrow,
+  .premium-home-hero .home-hero-copy h1,
+  .premium-home-hero .home-hero-copy p {
+    display: none !important;
+  }
+
+  .premium-home-hero .home-hero-copy .button {
+    min-height: 42px !important;
+    padding: 0 18px !important;
+    font-size: 10px !important;
+    background: #111 !important;
+    border-radius: 0 !important;
+  }
+
+  .premium-home-hero .home-hero-shade {
+    background: linear-gradient(180deg, rgba(20,10,14,0) 30%, rgba(20,10,14,.06) 50%, rgba(20,10,14,.68) 100%) !important;
+  }
+
+  .premium-home-hero .home-hero-image {
+    object-position: center center !important;
+  }
+
+  /* Fallback campaign banner gets the same Myntra-style compact treatment. */
+  .home-fallback-hero {
+    position: relative !important;
+    min-height: 220px !important;
+    height: 220px !important;
+    overflow: hidden !important;
+    border-radius: 0 !important;
+  }
+
+  .home-fallback-hero .hero-fallback-media {
+    position: absolute !important;
+    inset: 0 !important;
+    background-size: cover !important;
+    background-position: center 42% !important;
+  }
+
+  .home-fallback-hero .hero-fallback-copy {
+    position: absolute !important;
+    left: 50% !important;
+    bottom: 22px !important;
+    transform: translateX(-50%) !important;
+    width: auto !important;
+    max-width: calc(100% - 40px) !important;
+    margin: 0 !important;
+    text-align: center !important;
+    z-index: 2 !important;
+  }
+
+  .home-fallback-hero .hero-fallback-copy .eyebrow,
+  .home-fallback-hero .hero-fallback-copy h1,
+  .home-fallback-hero .hero-fallback-copy p {
+    display: none !important;
+  }
+
+  .home-fallback-hero .hero-fallback-copy .button {
+    display: inline-flex !important;
+    min-height: 44px !important;
+    padding: 0 24px !important;
+    background: #111 !important;
+    color: #fff !important;
+    border-radius: 0 !important;
+    font-size: 11px !important;
+    font-weight: 800 !important;
+    white-space: nowrap !important;
+  }
+
+  /* PDP: compact Myntra-style hierarchy and a purchase bar that sits above the
+     five-item bottom navigation instead of covering it. */
+  .ecomus-pdp {
+    background: #f6f6f8 !important;
+    padding-bottom: 0 !important;
+  }
+
+  .ecomus-pdp .pdp-info {
+    background: #fff !important;
+    padding: 18px 16px 12px !important;
+  }
+
+  .ecomus-pdp .pdp-info > h1 {
+    margin: 8px 0 12px !important;
+    font-family: Arial, Helvetica, sans-serif !important;
+    font-size: 22px !important;
+    line-height: 1.24 !important;
+    font-weight: 700 !important;
+    letter-spacing: -.4px !important;
+  }
+
+  .ecomus-pdp .pdp-price {
+    padding-bottom: 12px !important;
+  }
+
+  .ecomus-pdp .pdp-description,
+  .ecomus-pdp .pdp-highlight-row {
+    font-size: 11px !important;
+  }
+
+  .ecomus-pdp .pdp-details-stack {
+    background: #f6f6f8 !important;
+    padding: 0 0 125px !important;
+  }
+
+  .ecomus-pdp .pdp-section-tabs {
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 70 !important;
+    display: grid !important;
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    background: #fff !important;
+    border-top: 1px solid #eee !important;
+    border-bottom: 1px solid #ddd !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .ecomus-pdp .pdp-section-tabs a {
+    min-width: 0 !important;
+    padding: 13px 4px !important;
+    text-align: center !important;
+    color: #686b78 !important;
+    font-size: 10px !important;
+    font-weight: 700 !important;
+    text-decoration: none !important;
+    border-bottom: 2px solid transparent !important;
+  }
+
+  .ecomus-pdp .pdp-section-tabs a.active {
+    color: #ff3f6c !important;
+    border-bottom-color: #ff3f6c !important;
+  }
+
+  .ecomus-pdp .pdp-detail-card,
+  .ecomus-pdp .pdp-accordion-list {
+    background: #fff !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    margin: 8px 0 0 !important;
+    padding: 14px 16px !important;
+  }
+
+  .ecomus-pdp .pdp-card-heading {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 10px !important;
+    margin-bottom: 12px !important;
+  }
+
+  .ecomus-pdp .pdp-card-heading h2 {
+    margin: 0 !important;
+    font-family: Arial, Helvetica, sans-serif !important;
+    font-size: 16px !important;
+    line-height: 1.25 !important;
+    font-weight: 800 !important;
+    color: #282c3f !important;
+  }
+
+  .ecomus-pdp .pdp-card-heading span,
+  .ecomus-pdp .pdp-card-heading a {
+    font-size: 8px !important;
+    color: #94969f !important;
+    font-weight: 700 !important;
+    letter-spacing: .08em !important;
+    text-transform: uppercase !important;
+  }
+
+  .ecomus-pdp .pdp-highlights-grid {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 8px !important;
+  }
+
+  .ecomus-pdp .pdp-highlight-item {
+    min-height: 58px !important;
+    padding: 10px !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    background: #fafafa !important;
+    border: 1px solid #eee !important;
+    border-radius: 6px !important;
+  }
+
+  .ecomus-pdp .pdp-highlight-item b {
+    color: #ff3f6c !important;
+    font-size: 14px !important;
+  }
+
+  .ecomus-pdp .pdp-highlight-item span {
+    font-size: 10px !important;
+    line-height: 1.3 !important;
+    color: #282c3f !important;
+  }
+
+  .ecomus-pdp .pdp-service-list,
+  .ecomus-pdp .pdp-offer-row {
+    display: grid !important;
+    gap: 0 !important;
+  }
+
+  .ecomus-pdp .pdp-service-list > div,
+  .ecomus-pdp .pdp-offer-row {
+    min-height: 58px !important;
+    padding: 10px 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    border-top: 1px solid #eee !important;
+  }
+
+  .ecomus-pdp .pdp-service-list > div:first-child,
+  .ecomus-pdp .pdp-offer-row:first-child {
+    border-top: 0 !important;
+  }
+
+  .ecomus-pdp .pdp-service-list b,
+  .ecomus-pdp .pdp-offer-row > b {
+    flex: 0 0 30px !important;
+    width: 30px !important;
+    height: 30px !important;
+    display: grid !important;
+    place-items: center !important;
+    border-radius: 50% !important;
+    background: #fff2f5 !important;
+    color: #ff3f6c !important;
+  }
+
+  .ecomus-pdp .pdp-service-list strong,
+  .ecomus-pdp .pdp-offer-row strong {
+    display: block !important;
+    font-size: 11px !important;
+    color: #282c3f !important;
+  }
+
+  .ecomus-pdp .pdp-service-list small,
+  .ecomus-pdp .pdp-offer-row small {
+    display: block !important;
+    margin-top: 2px !important;
+    font-size: 9px !important;
+    line-height: 1.4 !important;
+    color: #686b78 !important;
+  }
+
+  .ecomus-pdp .pdp-offer-row em {
+    margin-left: auto !important;
+    font-size: 20px !important;
+    color: #94969f !important;
+    font-style: normal !important;
+  }
+
+  .ecomus-pdp .pdp-description-copy {
+    margin: 0 0 12px !important;
+    color: #686b78 !important;
+    font-size: 11px !important;
+    line-height: 1.6 !important;
+  }
+
+  .ecomus-pdp .pdp-attributes-table {
+    border-top: 1px solid #eee !important;
+  }
+
+  .ecomus-pdp .pdp-attributes-table > div {
+    display: grid !important;
+    grid-template-columns: 38% 62% !important;
+    gap: 8px !important;
+    padding: 9px 0 !important;
+    border-bottom: 1px solid #eee !important;
+  }
+
+  .ecomus-pdp .pdp-attributes-table span {
+    color: #94969f !important;
+    font-size: 10px !important;
+  }
+
+  .ecomus-pdp .pdp-attributes-table strong {
+    color: #282c3f !important;
+    font-size: 10px !important;
+    font-weight: 600 !important;
+  }
+
+  .ecomus-pdp .pdp-accordion-list {
+    padding: 0 16px !important;
+  }
+
+  .ecomus-pdp .pdp-accordion-list details {
+    border-bottom: 1px solid #eee !important;
+  }
+
+  .ecomus-pdp .pdp-accordion-list summary {
+    min-height: 54px !important;
+    padding: 12px 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 10px !important;
+    list-style: none !important;
+    cursor: pointer !important;
+  }
+
+  .ecomus-pdp .pdp-accordion-list summary::-webkit-details-marker {
+    display: none !important;
+  }
+
+  .ecomus-pdp .pdp-accordion-list summary span {
+    font-size: 12px !important;
+    font-weight: 700 !important;
+    color: #282c3f !important;
+  }
+
+  .ecomus-pdp .pdp-accordion-list summary small {
+    max-width: 48% !important;
+    overflow: hidden !important;
+    white-space: nowrap !important;
+    text-overflow: ellipsis !important;
+    font-size: 9px !important;
+    color: #94969f !important;
+  }
+
+  .ecomus-pdp .pdp-accordion-list details > div {
+    padding: 0 0 14px !important;
+    color: #686b78 !important;
+    font-size: 10px !important;
+    line-height: 1.6 !important;
+  }
+
+  .ecomus-pdp .pdp-reviews-card {
+    padding-bottom: 18px !important;
+  }
+
+  .ecomus-pdp .pdp-similar-grid {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 8px !important;
+  }
+
+  .ecomus-pdp .pdp-mobile-trust-strip {
+    margin: 8px 0 0 !important;
+    padding: 12px 6px !important;
+    display: grid !important;
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    gap: 0 !important;
+    background: #fff !important;
+    border-top: 1px solid #eee !important;
+    border-bottom: 1px solid #eee !important;
+  }
+
+  .ecomus-pdp .pdp-mobile-trust-strip > span {
+    min-width: 0 !important;
+    display: grid !important;
+    justify-items: center !important;
+    gap: 4px !important;
+    text-align: center !important;
+    border-right: 1px solid #eee !important;
+  }
+
+  .ecomus-pdp .pdp-mobile-trust-strip > span:last-child {
+    border-right: 0 !important;
+  }
+
+  .ecomus-pdp .pdp-mobile-trust-strip b {
+    color: #ff3f6c !important;
+    font-size: 18px !important;
+  }
+
+  .ecomus-pdp .pdp-mobile-trust-strip small {
+    font-size: 8px !important;
+    line-height: 1.2 !important;
+    color: #686b78 !important;
+  }
+
+  .ecomus-pdp .pdp-mobile-purchase {
+    bottom: 64px !important;
+    padding: 8px 10px !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 7px !important;
+    z-index: 95 !important;
+  }
+
+  .ecomus-pdp .pdp-mobile-purchase > div {
+    grid-column: 1 / -1 !important;
+    align-items: center !important;
+    text-align: center !important;
+    min-height: 35px !important;
+  }
+
+  .ecomus-pdp .pdp-mobile-purchase small {
+    font-size: 8px !important;
+  }
+
+  .ecomus-pdp .pdp-mobile-purchase strong {
+    font-size: 16px !important;
+  }
+
+  .ecomus-pdp .pdp-mobile-purchase .button {
+    width: 100% !important;
+    min-height: 46px !important;
+    height: 46px !important;
+    border-radius: 4px !important;
+    font-size: 10px !important;
+    font-weight: 800 !important;
+  }
+
+  .ecomus-pdp .pdp-mobile-purchase .whatsapp-mobile-button {
+    display: none !important;
+  }
+}
+
+@media (max-width: 420px) {
+  .home-flash-sale .product-info h3,
+  .home-reference-v4 .home-flash-sale .product-info h3 {
+    font-size: 11px !important;
+  }
+
+  .home-fallback-hero,
+  .premium-home-hero {
+    max-height: 220px !important;
+  }
+
+  .ecomus-pdp .pdp-info > h1 {
+    font-size: 21px !important;
+  }
+}
