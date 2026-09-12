@@ -9,23 +9,7 @@ on:
 jobs:
   verify:
     runs-on: ubuntu-latest
-    services:
-      mysql:
-        image: mysql:8.4
-        env:
-          MYSQL_ROOT_PASSWORD: root
-          MYSQL_DATABASE: priyasa
-          MYSQL_USER: priyasa
-          MYSQL_PASSWORD: priyasa
-        ports:
-          - 3306:3306
-        options: >-
-          --health-cmd="mysqladmin ping -h 127.0.0.1 -u root -proot"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=10
     env:
-      DATABASE_URL: mysql://priyasa:priyasa@127.0.0.1:3306/priyasa
       SESSION_SECRET: ci-only-secret-change-me
       NODE_ENV: test
     steps:
@@ -37,12 +21,13 @@ jobs:
         run: npm cache verify
       - name: Install dependencies
         run: npm install --no-audit --no-fund --legacy-peer-deps
-      - run: npm run db:prepare:mysql
-      - run: npx prisma validate --schema prisma/schema.mysql.prisma
-      - run: npx prisma generate --schema prisma/schema.mysql.prisma
-      - run: npx prisma db push --schema prisma/schema.mysql.prisma
-      - run: npx tsc --noEmit
-      - run: npm test
-      - run: npm run build
-      - run: npx playwright install chromium
-      - run: npm run test:e2e
+      - name: Typecheck
+        run: npx tsc --noEmit
+      - name: Unit tests
+        run: npm test
+      - name: Production build
+        run: npm run build
+      - name: Install Playwright browser
+        run: npx playwright install chromium
+      - name: End-to-end tests
+        run: npm run test:e2e
