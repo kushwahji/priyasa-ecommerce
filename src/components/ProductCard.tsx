@@ -21,7 +21,6 @@ function readIds(key: string): string[] {
   }
 }
 
-// One shared request for the whole product grid instead of one request per card.
 let wishlistRequest: Promise<WishlistState> | null = null;
 function getWishlistState(): Promise<WishlistState> {
   if (wishlistRequest) return wishlistRequest;
@@ -32,9 +31,7 @@ function getWishlistState(): Promise<WishlistState> {
       const wishlist = Array.isArray(payload.data) ? payload.data : [];
       const ids = new Set<string>();
       for (const item of wishlist) {
-        if (item && typeof item === 'object' && 'id' in item) {
-          ids.add(String((item as { id: unknown }).id));
-        }
+        if (item && typeof item === 'object' && 'id' in item) ids.add(String((item as { id: unknown }).id));
       }
       return { authenticated: Boolean(payload.authenticated), ids };
     })
@@ -51,6 +48,8 @@ export function ProductCard({ product }: Props) {
   const hasDiscount = Number(product.mrp) > Number(product.price) && Number(product.price) > 0;
   const discount = hasDiscount ? Math.max(1, Math.round((1 - Number(product.price) / Number(product.mrp)) * 100)) : 0;
   const colors = useMemo(() => (Array.isArray(product.colors) ? product.colors : []).filter(Boolean).slice(0, 6), [product.colors]);
+  const editorialBadge = String(product.badge || '').trim();
+  const hasDistinctEditorialBadge = Boolean(editorialBadge) && !/^\d{1,3}%\s*OFF$/i.test(editorialBadge) && editorialBadge.toLowerCase() !== `${discount}% off`.toLowerCase();
 
   useEffect(() => {
     let active = true;
@@ -102,29 +101,23 @@ export function ProductCard({ product }: Props) {
     const id = String(product.id);
     if (list.includes(id)) {
       localStorage.setItem(COMPARE_KEY, JSON.stringify(list.filter((itemId) => itemId !== id)));
-      setCompared(false);
-      setMessage('Removed from compare');
-      return;
+      setCompared(false); setMessage('Removed from compare'); return;
     }
     if (list.length >= 4) { setMessage('Compare up to 4 products'); return; }
     localStorage.setItem(COMPARE_KEY, JSON.stringify([...list, id]));
-    setCompared(true);
-    setMessage('Added to compare');
+    setCompared(true); setMessage('Added to compare');
   }
 
   function openQuick() { setQuick(true); document.body.classList.add('quick-view-open'); }
   function closeQuick() { setQuick(false); document.body.classList.remove('quick-view-open'); }
-
-  const colorStyle = (color: string): CSSProperties => ({
-    background: color.toLowerCase().replace(/[^a-z#0-9(),.% -]/g, ''),
-  });
+  const colorStyle = (color: string): CSSProperties => ({ background: color.toLowerCase().replace(/[^a-z#0-9(),.% -]/g, '') });
 
   return <>
     <article className="product-card ecomus-product-card nykaa-product-card">
       <div className="product-media ecomus-product-media nykaa-product-media">
         <div className="ecomus-product-badges nykaa-product-badges">
           {hasDiscount && <span className="nykaa-discount-badge">{discount}% OFF</span>}
-          {product.badge && <span className="nykaa-editorial-badge">{product.badge}</span>}
+          {hasDistinctEditorialBadge && <span className="nykaa-editorial-badge">{editorialBadge}</span>}
         </div>
         <div className="ecomus-product-actions nykaa-product-actions" aria-label="Product actions">
           <button type="button" className={`ecomus-action ecomus-wishlist nykaa-wishlist ${liked ? 'is-active' : ''}`} onClick={toggleWishlist} aria-label={liked ? 'Remove from wishlist' : 'Add to wishlist'} title={liked ? 'Remove from wishlist' : 'Add to wishlist'}>{liked ? '♥' : '♡'}</button>
