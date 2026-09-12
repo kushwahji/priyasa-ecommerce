@@ -19,7 +19,9 @@ export default function HomeProductGrid({ products, initialVisible = 8, step = 8
 
   if (variant === 'carousel') {
     const scroll = (direction: number) => {
-      railRef.current?.scrollBy({ left: direction * Math.max(280, railRef.current.clientWidth * 0.78), behavior: 'smooth' });
+      const rail = railRef.current;
+      if (!rail) return;
+      rail.scrollBy({ left: direction * Math.max(280, rail.clientWidth * 0.78), behavior: 'smooth' });
     };
 
     return (
