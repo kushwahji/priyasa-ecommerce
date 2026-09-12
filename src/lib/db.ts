@@ -31,6 +31,9 @@ type LegacyModel = {
 type LegacyDb = LegacyModel & {
   $transaction<T = LegacyRecord>(fn: (tx: LegacyModel) => Promise<T>): Promise<T>;
   $transaction<T = LegacyRecord>(queries: Promise<T>[]): Promise<T[]>;
+  $queryRawUnsafe<T = LegacyRecord>(...args: any[]): Promise<T>;
+  $executeRawUnsafe(...args: any[]): Promise<number>;
+  $executeRaw(...args: any[]): Promise<number>;
 };
 
 const legacyDbCall = function legacyDbCall(): never {
