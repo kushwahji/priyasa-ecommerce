@@ -23,7 +23,6 @@
 .home-reference-v4 .home-flash-sale .product-card img{aspect-ratio:3/4}
 .home-reference-v4 .home-flash-sale .product-info{background:#fff}
 
-/* Myntra-like mobile home shell: the home should start with the hero, not a category rail. */
 @media(max-width:760px){
   .home-reference-v4 .home-fallback-hero{min-height:0;aspect-ratio:1.35/1}
   .home-reference-v4 .home-fallback-copy{padding:38px 22px 32px;align-self:flex-end}
@@ -34,12 +33,13 @@
   .home-reference-v4 .home-casual-grid::-webkit-scrollbar{display:none}
   .home-reference-v4 .home-casual-card{flex:0 0 72%;min-height:250px;scroll-snap-align:start;border-radius:12px}
   .home-reference-v4 .home-casual-copy strong{font-size:22px}
-  .home-reference-v4 .home-flash-sale .product-grid{display:flex;overflow-x:auto;gap:10px;scroll-snap-type:x mandatory;scrollbar-width:none;padding-bottom:4px}
+  .home-reference-v4 .home-flash-sale .product-grid,
+  .home-reference-v4 .home-flash-sale .home-product-grid{display:flex!important;grid-template-columns:none!important;overflow-x:auto;gap:10px;scroll-snap-type:x mandatory;scrollbar-width:none;padding-bottom:4px}
   .home-reference-v4 .home-flash-sale .product-grid::-webkit-scrollbar{display:none}
-  .home-reference-v4 .home-flash-sale .product-card{flex:0 0 72%;scroll-snap-align:start}
+  .home-reference-v4 .home-flash-sale .home-product-grid .product-card{flex:0 0 72%!important;width:72%!important;max-width:72%!important;scroll-snap-align:start}
+  .home-reference-v4 .home-flash-sale .home-product-grid .product-media img{aspect-ratio:3/4!important;height:auto!important}
 }
 
-/* PLP / Shop: compact, sticky, filter-first mobile hierarchy. */
 .shop-page-v1{background:#fff}
 .shop-page-v1 .plp-mobile-head{display:none}
 .shop-page-v1 .storefront-inner{max-width:1440px;margin:0 auto}
@@ -78,7 +78,6 @@
 .shop-page-v1 .filter-sheet .filter-clear{display:block;margin:4px 0 0}
 .shop-page-v1 .filter-apply{width:100%;position:sticky;bottom:0;margin-top:10px}
 
-/* PDP: Myntra-like commerce hierarchy and persistent mobile actions. */
 .ecomus-pdp{background:#fff}
 .ecomus-pdp .pdp-mobile-head{display:none}
 .ecomus-pdp .pdp-page{max-width:1440px;margin:0 auto}
@@ -105,6 +104,10 @@
 .ecomus-pdp .premium-product-details .detail-body{padding-top:12px;color:#555;font-size:13px;line-height:1.65}
 .ecomus-pdp .premium-product-details .detail-body p{margin:0 0 10px}
 .ecomus-pdp .pdp-mobile-purchase{display:none}
+.ecomus-pdp .pdp-unavailable{max-width:640px;margin:80px auto;padding:40px 24px;text-align:center;border:1px solid #eee;border-radius:16px}
+.ecomus-pdp .pdp-unavailable h1{font-family:Georgia,serif;font-size:38px;margin:12px 0}
+.ecomus-pdp .pdp-unavailable p{color:#666;line-height:1.6;margin:0 0 24px}
+.ecomus-pdp .pdp-unavailable>div{display:flex;justify-content:center;align-items:center;gap:18px;flex-wrap:wrap}
 
 @media(max-width:760px){
   .shop-page-v1 .plp-mobile-head{display:grid;grid-template-columns:38px 1fr auto;align-items:center;gap:10px;height:58px;padding:0 14px;border-bottom:1px solid #eee;position:sticky;top:0;z-index:30;background:#fff}
@@ -129,7 +132,6 @@
   .shop-page-v1 .product-grid.shop{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;padding-top:14px}
   .shop-page-v1 .product-grid.shop .product-card{border-radius:8px}
   .shop-page-v1 .filter-sheet .filter-controls{grid-template-columns:1fr}
-
   .ecomus-pdp .pdp-mobile-head{display:grid;grid-template-columns:38px 1fr auto;align-items:center;gap:10px;height:58px;padding:0 14px;border-bottom:1px solid #eee;position:sticky;top:0;z-index:40;background:#fff}
   .ecomus-pdp .pdp-mobile-head .back{font-size:30px;text-decoration:none;color:#222}
   .ecomus-pdp .pdp-mobile-head h1{font-size:17px;margin:0;font-weight:800}
@@ -154,5 +156,7 @@
   .ecomus-pdp .pdp-mobile-purchase small{font-size:9px;color:#777;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .ecomus-pdp .pdp-mobile-purchase strong{font-size:13px}
   .ecomus-pdp .pdp-mobile-purchase .button{min-height:42px;padding:0 8px;font-size:11px;border-radius:4px}
+  .ecomus-pdp .pdp-unavailable{margin:35px 12px;padding:28px 18px}
+  .ecomus-pdp .pdp-unavailable h1{font-size:29px}
 }
 @media(min-width:761px){.ecomus-pdp .pdp-layout{grid-template-columns:minmax(0,1.05fr) minmax(400px,.95fr)}}
