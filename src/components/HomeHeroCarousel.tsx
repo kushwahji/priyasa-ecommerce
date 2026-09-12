@@ -1,19 +1,111 @@
 'use client';
-import Link from 'next/link';import {useRef,useState}from'react';import {ReturnIcon,ShieldIcon,TruckIcon} from'@/components/StorefrontIcons';
-type Slide={id:string;title?:string|null;subtitle?:string|null;imageUrl?:string|null;mobileImageUrl?:string|null;ctaLabel?:string|null;ctaHref?:string|null};
-export default function HomeHeroCarousel({slides}:{slides:Slide[]}){
- const[active,setActive]=useState(0);const startX=useRef<number|null>(null);const startY=useRef<number|null>(null);
- if(!slides.length)return null;
- const slide=slides[active];const next=()=>setActive(v=>(v+1)%slides.length);const prev=()=>setActive(v=>(v-1+slides.length)%slides.length);const image=slide.imageUrl||'/images/product-placeholder.svg';const mobileImage=slide.mobileImageUrl||image;
- const touchStart=(e:React.TouchEvent)=>{const t=e.changedTouches[0];startX.current=t.clientX;startY.current=t.clientY};
- const touchEnd=(e:React.TouchEvent)=>{if(startX.current===null||startY.current===null)return;const t=e.changedTouches[0],dx=t.clientX-startX.current,dy=t.clientY-startY.current;startX.current=null;startY.current=null;if(Math.abs(dx)<45||Math.abs(dx)<Math.abs(dy))return;dx<0?next():prev()};
- const imageError=(e:React.SyntheticEvent<HTMLImageElement>)=>{const img=e.currentTarget;if(img.dataset.fallback)return;img.dataset.fallback='1';const picture=img.closest('picture');const source=picture?.querySelector('source');if(source)source.removeAttribute('srcset');img.src='/images/product-placeholder.svg'};
- return <><section className="home-hero-carousel premium-home-hero" onTouchStart={touchStart} onTouchEnd={touchEnd} aria-roledescription="carousel" aria-label="Priyasa featured collections">
-  <div className="home-hero-media"><picture><source media="(max-width:760px)" srcSet={mobileImage}/><img key={`${slide.id}-hero`} src={image} alt={slide.title||'Priyasa collection'} className="home-hero-image" onError={imageError}/></picture><div className="home-hero-shade"/></div>
-  <div className="home-hero-copy"><span className="eyebrow">{slide.subtitle||'PRIYASA COLLECTIONS'}</span><h1>{slide.title||'Discover your style'}</h1>{slide.subtitle&&<p>{slide.subtitle}</p>}{slide.ctaHref&&<Link className="button" href={slide.ctaHref}>{slide.ctaLabel||'Shop Now'} →</Link>}</div>
-  {slides.length>1&&<><button type="button" className="home-hero-control home-hero-prev" onClick={prev} aria-label="Previous slide">‹</button><button type="button" className="home-hero-control home-hero-next" onClick={next} aria-label="Next slide">›</button><div className="hero-slide-meta" aria-live="polite"><span>{String(active+1).padStart(2,'0')}</span><i/><span>{String(slides.length).padStart(2,'0')}</span></div><div className="home-hero-dots" role="tablist" aria-label="Featured slides">{slides.map((s,i)=><button type="button" key={s.id} className={i===active?'active':''} onClick={()=>setActive(i)} role="tab" aria-label={`Go to slide ${i+1}`} aria-selected={i===active}/>)}</div></>}
- </section><section className="home-service-promises home-hero-service-promises" aria-label="Priyasa service promises"><div className="home-service-promises-inner"><div className="home-service-promise"><ReturnIcon/><div><strong>7 Days Easy Return</strong><small>Simple & hassle-free returns</small></div></div><div className="home-service-promise"><ShieldIcon/><div><strong>Premium Quality</strong><small>Made with care, made to last</small></div></div><div className="home-service-promise"><TruckIcon/><div><strong>Pan India Delivery</strong><small>We deliver across India</small></div></div></div></section></>;
-}
+import Link from 'next/link';
+import { useEffect, useRef, useState } from 'react';
 
-<style jsx global>{`.premium-home-hero{position:relative!important;width:100%!important;max-width:100%!important;aspect-ratio:2.35/1!important;height:auto!important;min-height:0!important;margin:0!important;overflow:hidden!important;background:#f5efed!important;isolation:isolate!important}.premium-home-hero .home-hero-media{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;overflow:hidden!important}.premium-home-hero .home-hero-media picture{display:block!important;width:100%!important;height:100%!important}.premium-home-hero .home-hero-media .home-hero-image{display:block!important;width:100%!important;height:100%!important;object-fit:cover!important;object-position:center center!important;transition:opacity .25s ease!important}.premium-home-hero .home-hero-shade{position:absolute!important;inset:0!important;pointer-events:none!important;background:linear-gradient(90deg,rgba(20,10,14,.58),rgba(20,10,14,.24) 36%,rgba(20,10,14,.03) 74%),linear-gradient(0deg,rgba(20,10,14,.36),transparent 52%)!important}.premium-home-hero .home-hero-copy{position:absolute!important;left:clamp(34px,7vw,112px)!important;bottom:clamp(42px,7vw,90px)!important;z-index:4!important;width:min(620px,55vw)!important;max-width:620px!important;color:#fff!important;text-shadow:0 2px 20px rgba(0,0,0,.22)!important}.premium-home-hero .home-hero-copy .eyebrow{display:block!important;color:#fff!important;font-size:10px!important;font-weight:700!important;letter-spacing:3.5px!important;text-transform:uppercase!important}.premium-home-hero .home-hero-copy h1{margin:12px 0!important;color:#fff!important;font-size:clamp(42px,5.2vw,72px)!important;line-height:.98!important;letter-spacing:-2.8px!important;font-weight:500!important}.premium-home-hero .home-hero-copy p{margin:0 0 18px!important;color:rgba(255,255,255,.9)!important;font-size:13px!important;line-height:1.55!important;max-width:470px!important}.premium-home-hero .home-hero-copy .button{display:inline-flex!important;align-items:center!important;justify-content:center!important;min-height:46px!important;padding:0 24px!important;border-radius:0!important;background:#1b1b1b!important;color:#fff!important;text-decoration:none!important;font-size:11px!important;font-weight:700!important;letter-spacing:.08em!important;text-transform:uppercase!important}.premium-home-hero .home-hero-control{position:absolute!important;top:50%!important;z-index:6!important;display:grid!important;place-items:center!important;width:44px!important;height:44px!important;padding:0!important;border:1px solid rgba(255,255,255,.72)!important;border-radius:50%!important;background:rgba(255,255,255,.94)!important;color:#1b1b1b!important;transform:translateY(-50%)!important;font-size:28px!important;line-height:1!important;cursor:pointer!important}.premium-home-hero .home-hero-prev{left:22px!important}.premium-home-hero .home-hero-next{right:22px!important}.premium-home-hero .hero-slide-meta{position:absolute!important;right:clamp(22px,4vw,60px)!important;bottom:20px!important;z-index:6!important;display:flex!important;align-items:center!important;gap:10px!important;color:#fff!important;font-size:10px!important;font-weight:700!important;letter-spacing:1.2px!important}.premium-home-hero .hero-slide-meta i{width:28px!important;height:1px!important;background:rgba(255,255,255,.7)!important}.premium-home-hero .home-hero-dots{position:absolute!important;left:50%!important;bottom:18px!important;z-index:6!important;display:flex!important;gap:6px!important;transform:translateX(-50%)!important}.premium-home-hero .home-hero-dots button{width:28px!important;height:2px!important;padding:0!important;border:0!important;background:#fff!important;opacity:.5!important;cursor:pointer!important}.premium-home-hero .home-hero-dots button.active{width:48px!important;opacity:1!important}@media(max-width:900px){.premium-home-hero{aspect-ratio:1.58/1!important}.premium-home-hero .home-hero-copy{left:22px!important;right:22px!important;bottom:42px!important;width:auto!important;max-width:70%!important}.premium-home-hero .home-hero-copy h1{font-size:clamp(30px,6vw,48px)!important;letter-spacing:-1.5px!important;margin:8px 0 10px!important}.premium-home-hero .home-hero-copy p{font-size:11px!important;line-height:1.45!important;max-width:100%!important;margin-bottom:12px!important}.premium-home-hero .home-hero-copy .button{min-height:40px!important;padding:0 18px!important;font-size:10px!important}.premium-home-hero .home-hero-control{width:38px!important;height:38px!important;font-size:24px!important}.premium-home-hero .home-hero-prev{left:12px!important}.premium-home-hero .home-hero-next{right:12px!important}}@media(max-width:760px){.premium-home-hero{aspect-ratio:1.48/1!important}.premium-home-hero .home-hero-copy{left:16px!important;right:16px!important;bottom:42px!important;max-width:78%!important}.premium-home-hero .home-hero-shade{background:linear-gradient(180deg,rgba(20,10,14,0) 25%,rgba(20,10,14,.08) 42%,rgba(20,10,14,.78) 100%)!important}.premium-home-hero .home-hero-copy h1{font-size:clamp(28px,8vw,40px)!important}.premium-home-hero .home-hero-control{width:36px!important;height:36px!important;font-size:22px!important}.premium-home-hero .home-hero-prev{left:9px!important}.premium-home-hero .home-hero-next{right:9px!important}.premium-home-hero .home-hero-dots{left:16px!important;right:auto!important;bottom:13px!important;transform:none!important}.premium-home-hero .home-hero-dots button{width:18px!important}.premium-home-hero .home-hero-dots button.active{width:32px!important}.premium-home-hero .hero-slide-meta{display:none!important}}@media(max-width:480px){.premium-home-hero{aspect-ratio:1.46/1!important}.premium-home-hero .home-hero-copy{bottom:39px!important}.premium-home-hero .home-hero-copy p{display:none!important}.premium-home-hero .home-hero-copy h1{font-size:30px!important}.premium-home-hero .home-hero-control{width:34px!important;height:34px!important}}
-`}</style>
+type Slide = {
+  id: string;
+  title?: string | null;
+  subtitle?: string | null;
+  imageUrl?: string | null;
+  mobileImageUrl?: string | null;
+  ctaLabel?: string | null;
+  ctaHref?: string | null;
+};
+
+export default function HomeHeroCarousel({ slides }: { slides: Slide[] }) {
+  const [active, setActive] = useState(0);
+  const [paused, setPaused] = useState(false);
+  const startX = useRef<number | null>(null);
+  const startY = useRef<number | null>(null);
+
+  useEffect(() => {
+    if (slides.length < 2 || paused) return;
+    const timer = window.setInterval(() => setActive((value) => (value + 1) % slides.length), 5000);
+    return () => window.clearInterval(timer);
+  }, [slides.length, paused]);
+
+  if (!slides.length) return null;
+
+  const slide = slides[Math.min(active, slides.length - 1)];
+  const next = () => setActive((value) => (value + 1) % slides.length);
+  const prev = () => setActive((value) => (value - 1 + slides.length) % slides.length);
+  const image = slide.imageUrl || '/images/product-placeholder.svg';
+  const mobileImage = slide.mobileImageUrl || image;
+
+  const touchStart = (event: React.TouchEvent) => {
+    const touch = event.changedTouches[0];
+    startX.current = touch.clientX;
+    startY.current = touch.clientY;
+  };
+
+  const touchEnd = (event: React.TouchEvent) => {
+    if (startX.current === null || startY.current === null) return;
+    const touch = event.changedTouches[0];
+    const dx = touch.clientX - startX.current;
+    const dy = touch.clientY - startY.current;
+    startX.current = null;
+    startY.current = null;
+    if (Math.abs(dx) < 45 || Math.abs(dx) < Math.abs(dy)) return;
+    if (dx < 0) next(); else prev();
+  };
+
+  const imageError = (event: React.SyntheticEvent<HTMLImageElement>) => {
+    const img = event.currentTarget;
+    if (img.dataset.fallback) return;
+    img.dataset.fallback = '1';
+    const picture = img.closest('picture');
+    const source = picture?.querySelector('source');
+    if (source) source.removeAttribute('srcset');
+    img.src = '/images/product-placeholder.svg';
+  };
+
+  return (
+    <section
+      className="home-hero-carousel premium-home-hero"
+      onTouchStart={touchStart}
+      onTouchEnd={touchEnd}
+      onMouseEnter={() => setPaused(true)}
+      onMouseLeave={() => setPaused(false)}
+      aria-roledescription="carousel"
+      aria-label="Priyasa featured collections"
+    >
+      <div className="home-hero-media">
+        <picture>
+          <source media="(max-width:760px)" srcSet={mobileImage} />
+          <img key={`${slide.id}-hero`} src={image} alt={slide.title || 'Priyasa collection'} className="home-hero-image" onError={imageError} />
+        </picture>
+        <div className="home-hero-shade" />
+      </div>
+
+      <div className="home-hero-copy">
+        <span className="eyebrow">{slide.subtitle || 'PRIYASA COLLECTIONS'}</span>
+        <h1>{slide.title || 'Discover your style'}</h1>
+        {slide.subtitle && <p>{slide.subtitle}</p>}
+        {slide.ctaHref && <Link className="button" href={slide.ctaHref}>{slide.ctaLabel || 'Shop Now'} <span aria-hidden="true">→</span></Link>}
+      </div>
+
+      {slides.length > 1 && (
+        <>
+          <button type="button" className="home-hero-control home-hero-prev" onClick={prev} aria-label="Previous slide">‹</button>
+          <button type="button" className="home-hero-control home-hero-next" onClick={next} aria-label="Next slide">›</button>
+          <div className="home-hero-dots" role="tablist" aria-label="Featured slides">
+            {slides.map((item, index) => (
+              <button
+                type="button"
+                key={item.id}
+                className={index === active ? 'active' : ''}
+                onClick={() => setActive(index)}
+                role="tab"
+                aria-label={`Go to slide ${index + 1}`}
+                aria-selected={index === active}
+              />
+            ))}
+          </div>
+          <div className="hero-slide-meta" aria-live="polite">
+            <span>{String(active + 1).padStart(2, '0')}</span><i /><span>{String(slides.length).padStart(2, '0')}</span>
+          </div>
+        </>
+      )}
+    </section>
+  );
+}

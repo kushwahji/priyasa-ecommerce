@@ -1,0 +1,106 @@
+/* Final mobile header action correction + reference parity. */
+@media(max-width:900px){
+ .site-header>.actions .header-icon:first-child{display:grid!important}
+ .site-header>.actions .header-account-trigger{display:none!important}
+ .site-header>.actions .header-icon:nth-child(3){display:none!important}
+ .site-header>.actions .header-icon:last-child{display:grid!important}
+ .site-header>.actions{gap:0!important}
+ .site-header>.actions .header-icon{width:40px!important;height:40px!important}
+ .site-header>.actions .header-icon svg{width:22px!important;height:22px!important}
+}
+@media(max-width:420px){.site-header>.actions .header-icon{width:38px!important;height:38px!important}}
+
+/* Mobile home reference: menu / full PRIYASA lockup / search / bag. */
+@media(max-width:760px){
+ .site-header{height:72px!important;min-height:72px!important;grid-template-columns:44px minmax(0,1fr) auto!important;gap:6px!important;padding:0 18px!important;border-bottom:0!important;box-shadow:none!important}
+ .site-header>.mobile-menu{width:42px!important;height:42px!important;background:transparent!important}
+ .site-header>.mobile-menu svg{width:30px!important;height:30px!important;stroke-width:1.8!important}
+ .site-header>.brand-logo-link{grid-column:2!important;justify-self:start!important;display:flex!important;width:auto!important;min-width:0!important;height:52px!important;align-items:center!important;justify-content:flex-start!important;margin:0!important}
+ .site-header>.brand-logo-link .brand-lockup{width:auto!important;height:auto!important}
+ .site-header>.brand-logo-link .brand-logo-full{display:block!important;width:174px!important;max-width:174px!important;height:auto!important;max-height:48px!important;object-fit:contain!important}
+ .site-header>.brand-logo-link .brand-logo-mobile{display:none!important}
+ .site-header>.actions{grid-column:3!important;min-width:max-content!important}
+ .site-header>.actions .header-icon{width:40px!important;height:42px!important;flex:0 0 40px!important}
+ .site-header>.actions .header-icon svg{width:26px!important;height:26px!important;stroke-width:1.7!important}
+ .site-header>.actions .header-icon:first-child{display:grid!important}
+ .site-header>.actions .header-account-trigger,.site-header>.actions .header-icon:nth-child(3){display:none!important}
+ .site-header>.actions .header-icon:last-child{display:grid!important}
+
+ /* Search is a full-width row directly below the app header. */
+ .mobile-storefront-discovery{display:block!important;width:100%!important;padding:0 18px 12px!important;background:#fff!important;border-bottom:0!important;box-sizing:border-box!important}
+ .mobile-home-search{display:flex!important;align-items:center!important;width:100%!important;height:48px!important;box-sizing:border-box!important;padding:0 18px!important;gap:13px!important;border:1px solid #e5e3e8!important;border-radius:25px!important;background:#f8f7fa!important;color:#70717a!important;text-decoration:none!important;box-shadow:0 1px 3px rgba(40,44,63,.03) inset!important}
+ .mobile-home-search svg{width:25px!important;height:25px!important;flex:0 0 25px!important;color:#17151a!important;stroke-width:1.8!important}
+ .mobile-home-search span{min-width:0!important;overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important;font-size:14px!important;line-height:1!important;color:#70717a!important}
+
+ /* Remove the entire home category rail/grid. Categories remain discoverable through Shop and the drawer. */
+ .mobile-storefront-tabs,.mobile-storefront-discovery--tabs-only{display:none!important}
+ .home-reference-v4 .category-grid,.home-reference-v4 .category-grid-editorial,.home-reference-v4 .home-category-section{display:none!important}
+
+ /* Reference home canvas: consistent 20px edges and restrained vertical rhythm. */
+ .home-reference-v4{width:100%!important;overflow:hidden!important;background:#fff!important}
+ .home-reference-v4 .home-section{padding-left:20px!important;padding-right:20px!important}
+ .home-reference-v4 .home-hero-multi{padding:10px 20px 0!important;margin:0!important}
+ .home-reference-v4 .home-hero-multi .home-fallback-hero{min-height:390px!important;border-radius:12px!important;overflow:hidden!important}
+ .home-reference-v4 .home-section-head{align-items:flex-end!important;margin-bottom:14px!important}
+ .home-reference-v4 .home-section-head h2{font-size:27px!important;line-height:1.08!important;letter-spacing:-.025em!important}
+ .home-reference-v4 .home-section-head p{font-size:11px!important;line-height:1.35!important}
+ .home-reference-v4 .home-view-all{font-size:12px!important;font-weight:800!important;color:#e91e63!important;white-space:nowrap!important}
+
+ /* Service promises: four equal, aligned columns like the reference. */
+ .home-reference-v4 .home-service-promises{margin:18px 20px 26px!important;padding:0!important;border:0!important;background:#fff7fa!important;border-radius:12px!important;overflow:hidden!important}
+ .home-reference-v4 .home-service-promises-inner{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;width:100%!important}
+ .home-reference-v4 .home-service-promise{min-width:0!important;min-height:132px!important;padding:16px 6px!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;text-align:center!important;border-right:1px solid #f1dce4!important}
+ .home-reference-v4 .home-service-promise:last-child{border-right:0!important}
+ .home-reference-v4 .home-service-promise svg{width:30px!important;height:30px!important;margin-bottom:9px!important;color:#df2867!important;stroke-width:1.7!important}
+ .home-reference-v4 .home-service-promise div{min-width:0!important}
+ .home-reference-v4 .home-service-promise strong{display:block!important;font-size:11px!important;line-height:1.22!important;font-weight:750!important}
+ .home-reference-v4 .home-service-promise small{display:none!important}
+
+ /* Trending/casual cards: 3-up editorial rail, matching the supplied reference. */
+ .home-reference-v4 .home-casual-section{padding:0 20px 26px!important;background:#fff!important}
+ .home-reference-v4 .home-casual-section .home-section-head{margin:0 0 14px!important}
+ .home-reference-v4 .home-casual-section .home-section-head h2{font-size:28px!important}
+ .home-reference-v4 .home-casual-section .home-casual-grid{display:flex!important;gap:10px!important;overflow-x:auto!important;overflow-y:hidden!important;padding:0 0 4px!important;scroll-snap-type:x mandatory!important;scrollbar-width:none!important}
+ .home-reference-v4 .home-casual-section .home-casual-grid::-webkit-scrollbar{display:none!important}
+ .home-reference-v4 .home-casual-section .home-casual-card{flex:0 0 calc((100vw - 60px)/3)!important;width:calc((100vw - 60px)/3)!important;min-width:calc((100vw - 60px)/3)!important;aspect-ratio:3/4!important;border-radius:9px!important;scroll-snap-align:start!important}
+ .home-reference-v4 .home-casual-section .home-casual-copy{padding:10px!important}
+ .home-reference-v4 .home-casual-section .home-casual-copy strong{font-size:13px!important;line-height:1.15!important}
+ .home-reference-v4 .home-casual-section .home-casual-copy span{font-size:8px!important}
+
+ /* Best sellers: compact three-card rail with readable price metadata. */
+ .home-reference-v4 .home-product-section:not(.home-flash-sale){padding:0 20px 26px!important}
+ .home-reference-v4 .home-product-section:not(.home-flash-sale) .home-product-grid{display:flex!important;gap:10px!important;overflow-x:auto!important;overflow-y:hidden!important;padding:0 0 4px!important;scrollbar-width:none!important}
+ .home-reference-v4 .home-product-section:not(.home-flash-sale) .home-product-grid::-webkit-scrollbar{display:none!important}
+ .home-reference-v4 .home-product-section:not(.home-flash-sale) .home-product-grid>.product-card{flex:0 0 calc((100vw - 60px)/3)!important;width:calc((100vw - 60px)/3)!important;min-width:calc((100vw - 60px)/3)!important;border:0!important;border-radius:8px!important;overflow:hidden!important;background:#fff!important}
+ .home-reference-v4 .home-product-section:not(.home-flash-sale) .home-product-grid>.product-card img{width:100%!important;aspect-ratio:3/4!important;object-fit:cover!important;border-radius:8px!important}
+ .home-reference-v4 .home-product-section:not(.home-flash-sale) .product-info{padding:8px 2px 0!important}
+ .home-reference-v4 .home-product-section:not(.home-flash-sale) .product-info h3{font-size:11px!important;line-height:1.25!important;margin:0 0 5px!important;display:-webkit-box!important;-webkit-line-clamp:2!important;-webkit-box-orient:vertical!important;overflow:hidden!important}
+ .home-reference-v4 .home-product-section:not(.home-flash-sale) .price{font-size:12px!important;font-weight:800!important}
+
+ /* The reference does not put the affiliate promotion between core shopping sections. */
+ .home-reference-v4 .affiliate-home{display:none!important}
+
+ /* Bottom navigation is a five-item app bar: Home / Shop / Wishlist / Orders / Account. */
+ .mobile-bottom-nav{height:76px!important;grid-template-columns:repeat(5,minmax(0,1fr))!important;padding:7px 6px calc(7px + env(safe-area-inset-bottom))!important}
+ .mobile-bottom-nav a{min-height:62px!important;gap:3px!important}
+ .mobile-bottom-nav a svg{width:25px!important;height:25px!important}
+ .mobile-bottom-nav a small{font-size:10px!important;font-weight:750!important}
+ main{padding-bottom:92px!important}
+}
+
+@media(max-width:420px){
+ .site-header{padding:0 10px!important;grid-template-columns:42px minmax(0,1fr) auto!important}
+ .site-header>.brand-logo-link .brand-logo-full{width:158px!important;max-width:158px!important}
+ .site-header>.actions .header-icon{width:38px!important;height:40px!important;flex-basis:38px!important}
+ .site-header>.actions .header-icon svg{width:24px!important;height:24px!important}
+ .mobile-storefront-discovery{padding-left:12px!important;padding-right:12px!important}
+ .mobile-home-search{height:46px!important;padding:0 16px!important}
+ .home-reference-v4 .home-section{padding-left:18px!important;padding-right:18px!important}
+ .home-reference-v4 .home-hero-multi{padding-left:18px!important;padding-right:18px!important}
+ .home-reference-v4 .home-service-promises{margin-left:18px!important;margin-right:18px!important}
+ .home-reference-v4 .home-casual-section,.home-reference-v4 .home-product-section:not(.home-flash-sale){padding-left:18px!important;padding-right:18px!important}
+ .home-reference-v4 .home-casual-section .home-casual-card,.home-reference-v4 .home-product-section:not(.home-flash-sale) .home-product-grid>.product-card{flex-basis:calc((100vw - 56px)/3)!important;width:calc((100vw - 56px)/3)!important;min-width:calc((100vw - 56px)/3)!important}
+ .home-reference-v4 .home-service-promise{min-height:122px!important;padding-left:4px!important;padding-right:4px!important}
+ .home-reference-v4 .home-service-promise svg{width:27px!important;height:27px!important}
+ .home-reference-v4 .home-service-promise strong{font-size:10px!important}
+}

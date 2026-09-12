@@ -1,0 +1,159 @@
+/* PRIYASA Home V2 — mobile-first fashion commerce presentation */
+.home-managed-v1{background:#fff;color:#282c3f;overflow:hidden}
+.home-managed-v1 .home-section{width:100%}
+.home-managed-v1 .home-managed-hero{margin:0!important}
+
+/* Hero */
+.home-managed-v1 .premium-home-hero{margin:0 auto 12px!important;width:min(100%,1440px)!important;aspect-ratio:2.05/1!important;border-radius:0 0 18px 18px!important;box-shadow:0 8px 30px rgba(25,25,35,.06)}
+.home-managed-v1 .premium-home-hero .home-hero-copy{left:6%;bottom:12%;width:min(48%,570px)}
+.home-managed-v1 .premium-home-hero .home-hero-copy h1{font-family:Georgia,'Times New Roman',serif;font-size:clamp(42px,5vw,72px);font-weight:500;letter-spacing:-2px}
+.home-managed-v1 .premium-home-hero .home-hero-copy .button{border-radius:999px!important;background:#ff3f6c!important;box-shadow:0 8px 20px rgba(255,63,108,.22);padding:0 26px!important}
+.home-managed-v1 .premium-home-hero .home-hero-copy .button span{margin-left:8px}
+
+/* Four promise strip */
+.home-managed-v1 .home-managed-trust{margin:0 auto 30px!important;max-width:1440px;border-radius:0 0 18px 18px;background:#fff5f8;border:1px solid #fde4eb}
+.home-managed-v1 .home-managed-trust .home-service-promises-inner{max-width:none;padding:12px 18px;display:grid;grid-template-columns:repeat(4,1fr);gap:0}
+.home-managed-v1 .home-managed-trust .home-service-promise{min-height:76px;padding:8px 16px;display:flex;align-items:center;justify-content:center;gap:11px;border-right:1px solid #f5dfe6}
+.home-managed-v1 .home-managed-trust .home-service-promise:last-child{border-right:0}
+.home-managed-v1 .home-managed-trust .home-service-promise svg{width:28px;height:28px;flex:none;color:#ff3f6c}
+.home-managed-v1 .home-managed-trust .home-service-promise strong{font-size:13px;line-height:1.25}
+.home-managed-v1 .home-managed-trust .home-service-promise small{display:block;margin-top:3px;color:#7a7e89;font-size:10px}
+
+/* Common section header */
+.home-managed-v1 .home-section-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin:0 0 16px}
+.home-managed-v1 .home-section-head h2{margin:3px 0 0;font-family:Georgia,'Times New Roman',serif;font-size:clamp(25px,3vw,34px);line-height:1.08;letter-spacing:-.7px;font-weight:600;color:#282c3f}
+.home-managed-v1 .home-kicker{display:block;color:#8b8f99;font-size:9px;font-weight:800;letter-spacing:2px;text-transform:uppercase}
+.home-managed-v1 .home-view-all{color:#ff3f6c;text-decoration:none;font-size:12px;font-weight:800;white-space:nowrap}
+.home-managed-v1 .home-view-all:hover{text-decoration:underline}
+
+/* Product rails */
+.home-managed-v1 .home-managed-products{max-width:1440px;margin:0 auto;padding:0 28px 42px}
+.home-managed-v1 .home-product-rail{gap:14px;padding:2px 2px 10px}
+.home-managed-v1 .home-product-rail-item{flex:0 0 calc((100% - 42px)/4)}
+.home-managed-v1 .home-product-rail .product-card{height:100%;background:#fff}
+.home-managed-v1 .home-product-rail .product-media{border-radius:12px;overflow:hidden;background:#f5f5f6}
+.home-managed-v1 .home-product-rail .product-image-link img{transition:transform .35s ease}
+.home-managed-v1 .home-product-rail .product-card:hover .product-image-link img{transform:scale(1.025)}
+.home-managed-v1 .home-product-rail .product-info{padding:10px 2px 2px}
+.home-managed-v1 .home-product-rail .product-category{display:none}
+.home-managed-v1 .home-product-rail .product-info h3{margin:0 0 5px;font-size:13px;line-height:1.35;font-weight:600}
+.home-managed-v1 .home-product-rail .price{font-size:14px;font-weight:800}
+.home-managed-v1 .home-product-rail .mrp{font-size:11px;color:#999;text-decoration:line-through;margin-left:5px}
+.home-managed-v1 .home-product-rail .discount-text{font-size:10px;color:#ff3f6c;font-weight:700;margin-left:5px}
+.home-managed-v1 .home-product-rail .nykaa-discount-badge{font-size:9px;padding:4px 6px;border-radius:5px}
+.home-managed-v1 .home-product-rail .nykaa-wishlist{width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.95);box-shadow:0 4px 14px rgba(20,20,30,.10)}
+.home-managed-v1 .home-product-rail .nykaa-quick{display:none}
+.home-managed-v1 .home-product-rail .nykaa-quick-add{opacity:0;transform:translateY(6px);transition:.2s ease}
+.home-managed-v1 .home-product-rail .product-card:hover .nykaa-quick-add{opacity:1;transform:none}
+
+/* Editorial / casual image rail */
+.home-managed-v1 .home-editorial-section{max-width:1440px;margin:0 auto;padding:0 28px 44px}
+.home-managed-v1 .home-editorial-rail{gap:14px;padding:2px 2px 8px}
+.home-managed-v1 .home-editorial-card{flex:0 0 calc((100% - 70px)/6);aspect-ratio:4/5;border-radius:14px;box-shadow:0 7px 22px rgba(25,25,35,.08)}
+.home-managed-v1 .home-editorial-card:after{background:linear-gradient(180deg,rgba(0,0,0,0) 30%,rgba(17,15,20,.76) 100%)}
+.home-managed-v1 .home-editorial-card span{bottom:55px;font-size:9px;letter-spacing:1.5px}
+.home-managed-v1 .home-editorial-card strong{bottom:31px;font-size:14px;line-height:1.2}
+.home-managed-v1 .home-editorial-card b{bottom:12px;color:#fff;font-size:10px}
+
+/* Flash sale */
+.home-managed-v1 .home-flash-sale{max-width:1440px;margin:0 auto 4px;padding:18px 28px 38px;background:linear-gradient(180deg,#fff7f8,#fff)}
+.home-managed-v1 .home-flash-sale .home-section-head{padding:0 0 2px}
+.home-managed-v1 .home-flash-clock{background:#282c3f;border-radius:7px;font-size:10px;font-weight:800;padding:7px 10px}
+
+/* Offer */
+.home-managed-v1 .home-managed-offer{max-width:1440px;margin:0 auto;padding:0 28px 44px;display:block}
+.home-managed-v1 .home-managed-offer-card{min-height:280px;border-radius:18px;box-shadow:0 8px 28px rgba(25,25,35,.08)}
+.home-managed-v1 .home-managed-offer-card img{min-height:280px}
+.home-managed-v1 .home-managed-offer-copy strong{font-family:Georgia,'Times New Roman',serif}
+.home-managed-v1 .home-managed-offer-copy b{display:inline-flex;padding:10px 15px;border-radius:999px;background:#ff3f6c;color:#fff}
+
+/* 30-product discovery grid */
+.home-managed-v1 .home-more-products{max-width:1440px;padding-bottom:48px}
+.home-managed-v1 .home-more-products .home-product-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px 14px}
+.home-managed-v1 .home-more-products .home-load-more{margin-top:22px}
+.home-managed-v1 .home-more-products .button{border-radius:999px;padding:11px 24px;border:1px solid #ddd;background:#fff;font-weight:700}
+
+/* Reviews */
+.home-managed-v1 .home-reviews{max-width:1440px;margin:0 auto;padding:0 28px 54px}
+.home-managed-v1 .home-review-card{border:1px solid #eee6ea;border-radius:16px;box-shadow:0 8px 24px rgba(25,25,35,.05)}
+.home-managed-v1 .home-review-stars{color:#ff3f6c}
+
+/* Desktop breathing room */
+@media(min-width:1100px){.home-managed-v1 .home-managed-trust{margin-top:0}.home-managed-v1 .home-product-rail-item{flex-basis:calc((100% - 42px)/4)}.home-managed-v1 .home-more-products .home-product-grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
+
+/* Tablet */
+@media(max-width:900px){
+ .home-managed-v1 .premium-home-hero{aspect-ratio:1.72/1!important;border-radius:0 0 16px 16px!important}
+ .home-managed-v1 .home-managed-products,.home-managed-v1 .home-editorial-section,.home-managed-v1 .home-flash-sale,.home-managed-v1 .home-reviews{padding-left:16px;padding-right:16px}
+ .home-managed-v1 .home-product-rail-item{flex-basis:calc((100% - 28px)/3)}
+ .home-managed-v1 .home-more-products .home-product-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:14px 10px}
+}
+
+/* Mobile reference layout */
+@media(max-width:600px){
+ .home-managed-v1{padding-bottom:0}
+ .home-managed-v1 .premium-home-hero{margin:10px 12px 10px!important;width:calc(100% - 24px)!important;aspect-ratio:1.72/1!important;border-radius:16px!important;box-shadow:0 5px 20px rgba(25,25,35,.09)}
+ .home-managed-v1 .premium-home-hero .home-hero-copy{left:18px;bottom:28px;width:58%;max-width:58%}
+ .home-managed-v1 .premium-home-hero .home-hero-copy .eyebrow{font-size:8px;letter-spacing:2.5px}
+ .home-managed-v1 .premium-home-hero .home-hero-copy h1{font-size:31px;line-height:1.03;letter-spacing:-1px;margin:7px 0 10px}
+ .home-managed-v1 .premium-home-hero .home-hero-copy p{display:none}
+ .home-managed-v1 .premium-home-hero .home-hero-copy .button{min-height:38px!important;padding:0 17px!important;font-size:10px!important}
+ .home-managed-v1 .premium-home-hero .home-hero-control{width:32px!important;height:32px!important;font-size:21px!important}
+ .home-managed-v1 .premium-home-hero .home-hero-prev{left:7px!important}.home-managed-v1 .premium-home-hero .home-hero-next{right:7px!important}
+ .home-managed-v1 .premium-home-hero .home-hero-dots{left:auto!important;right:17px!important;bottom:14px!important;transform:none!important;gap:5px!important}
+ .home-managed-v1 .premium-home-hero .home-hero-dots button{width:17px!important;height:5px!important;border-radius:99px!important;background:#fff!important;opacity:.65!important}
+ .home-managed-v1 .premium-home-hero .home-hero-dots button.active{width:29px!important;background:#ff3f6c!important;opacity:1!important}
+ .home-managed-v1 .premium-home-hero .hero-slide-meta{display:none!important}
+
+ .home-managed-v1 .home-managed-trust{margin:0 12px 28px!important;border-radius:14px;background:#fff5f8}
+ .home-managed-v1 .home-managed-trust .home-service-promises-inner{padding:6px 0;grid-template-columns:repeat(4,1fr)}
+ .home-managed-v1 .home-managed-trust .home-service-promise{min-height:78px;padding:8px 3px;display:flex;flex-direction:column;gap:5px;text-align:center;border-right:1px solid #f4e0e6}
+ .home-managed-v1 .home-managed-trust .home-service-promise svg{width:25px;height:25px}
+ .home-managed-v1 .home-managed-trust .home-service-promise strong{font-size:9.5px;line-height:1.25}
+ .home-managed-v1 .home-managed-trust .home-service-promise small{display:none}
+
+ .home-managed-v1 .home-section-head{margin-bottom:12px;align-items:center}
+ .home-managed-v1 .home-section-head h2{font-size:25px}
+ .home-managed-v1 .home-kicker{font-size:8px;letter-spacing:1.5px}
+ .home-managed-v1 .home-view-all{font-size:11px}
+
+ .home-managed-v1 .home-managed-products{padding:0 16px 30px}
+ .home-managed-v1 .home-product-rail{gap:10px;margin-right:-16px;padding-right:16px}
+ .home-managed-v1 .home-product-rail-item{flex-basis:calc((100% - 20px)/3.05)}
+ .home-managed-v1 .home-product-rail .product-media{border-radius:10px}
+ .home-managed-v1 .home-product-rail .product-info{padding-top:7px}
+ .home-managed-v1 .home-product-rail .product-info h3{font-size:11px;line-height:1.3}
+ .home-managed-v1 .home-product-rail .price{font-size:12px}
+ .home-managed-v1 .home-product-rail .mrp{font-size:9px}
+ .home-managed-v1 .home-product-rail .discount-text{font-size:8px}
+ .home-managed-v1 .home-product-rail .nykaa-wishlist{width:28px;height:28px;font-size:18px}
+
+ .home-managed-v1 .home-editorial-section{padding:0 16px 30px}
+ .home-managed-v1 .home-editorial-rail{gap:10px;margin-right:-16px;padding-right:16px}
+ .home-managed-v1 .home-editorial-card{flex:0 0 calc((100% - 20px)/3.05);border-radius:11px}
+ .home-managed-v1 .home-editorial-card span{left:10px;bottom:42px;font-size:7px}
+ .home-managed-v1 .home-editorial-card strong{left:10px;bottom:23px;font-size:11px}
+ .home-managed-v1 .home-editorial-card b{left:10px;bottom:8px;font-size:8px}
+
+ .home-managed-v1 .home-flash-sale{padding:13px 16px 28px}
+ .home-managed-v1 .home-flash-clock{font-size:9px;padding:6px 8px}
+
+ .home-managed-v1 .home-managed-offer{padding:0 16px 30px}
+ .home-managed-v1 .home-managed-offer-card,.home-managed-v1 .home-managed-offer-card img{min-height:190px;border-radius:14px}
+ .home-managed-v1 .home-managed-offer-copy{left:18px}
+ .home-managed-v1 .home-managed-offer-copy span{font-size:8px}
+ .home-managed-v1 .home-managed-offer-copy strong{font-size:28px;margin:6px 0 10px}
+ .home-managed-v1 .home-managed-offer-copy b{font-size:9px;padding:8px 12px}
+
+ .home-managed-v1 .home-more-products{padding-bottom:36px}
+ .home-managed-v1 .home-more-products .home-product-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:16px 10px}
+ .home-managed-v1 .home-more-products .product-card .product-media{border-radius:10px}
+ .home-managed-v1 .home-more-products .product-card h3{font-size:11px;line-height:1.3}
+ .home-managed-v1 .home-more-products .product-card .price{font-size:12px}
+
+ .home-managed-v1 .home-reviews{padding:0 16px 38px}
+ .home-managed-v1 .home-review-rail{gap:10px;margin-right:-16px;padding-right:16px}
+ .home-managed-v1 .home-review-card{flex-basis:82vw;padding:18px;border-radius:14px}
+}
+
+@media(max-width:380px){.home-managed-v1 .home-managed-trust .home-service-promise strong{font-size:8.5px}.home-managed-v1 .premium-home-hero .home-hero-copy h1{font-size:28px}.home-managed-v1 .home-section-head h2{font-size:23px}}

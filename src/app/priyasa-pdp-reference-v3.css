@@ -1,0 +1,130 @@
+/* PRIYASA PDP / product-card reference pass. Inspired by modern Indian fashion apps; no third-party branding. */
+:root{--pr-ref-pink:#ff3f6c;--pr-ref-pink-2:#e92e62;--pr-ref-ink:#282c3f;--pr-ref-muted:#686b78;--pr-ref-line:#e5e5ea;--pr-ref-soft:#f7f7f8;--pr-ref-green:#149447;--pr-ref-orange:#e99a19}
+
+/* Product cards: cleaner commerce hierarchy and stronger mobile CTA */
+.product-card.nykaa-product-card{background:#fff;border:0;overflow:visible}
+.nykaa-product-card .nykaa-product-media{position:relative;border:1px solid #ececf0;border-radius:14px;background:#f7f7f8;overflow:hidden;aspect-ratio:3/4}
+.nykaa-product-card .product-image-link{display:block;width:100%;height:100%}
+.nykaa-product-card .product-image-link img{width:100%;height:100%;object-fit:cover;display:block}
+.nykaa-product-card .nykaa-product-actions{position:absolute;right:8px;top:8px;z-index:5;display:flex;flex-direction:column;gap:6px}
+.nykaa-product-card .nykaa-wishlist{width:34px;height:34px;border:0;border-radius:50%;background:rgba(255,255,255,.96);box-shadow:0 2px 9px rgba(40,44,63,.10);font-size:21px;line-height:1;color:#282c3f;display:grid;place-items:center}
+.nykaa-product-card .nykaa-wishlist.is-active{color:var(--pr-ref-pink)}
+.nykaa-product-card .nykaa-quick{display:none}
+.nykaa-product-card .nykaa-product-badges{position:absolute;left:8px;top:8px;z-index:4;display:flex;gap:5px;max-width:72%;flex-wrap:wrap}
+.nykaa-product-card .nykaa-discount-badge,.nykaa-product-card .nykaa-editorial-badge{padding:5px 7px;border-radius:5px;background:#fff;font-size:9px;font-weight:800;color:var(--pr-ref-pink);box-shadow:0 1px 5px rgba(0,0,0,.08)}
+.nykaa-product-card .nykaa-editorial-badge{color:#282c3f}
+.nykaa-product-card .nykaa-quick-add{position:absolute;left:10px;right:10px;bottom:10px;z-index:6}
+.nykaa-product-card .nykaa-quick-add button,.nykaa-product-card .nykaa-quick-add .button{width:100%;min-height:42px;border:1px solid #f1a3ba!important;border-radius:9px!important;background:#fff!important;color:var(--pr-ref-pink)!important;font-weight:800!important;box-shadow:0 2px 10px rgba(40,44,63,.07)}
+.nykaa-product-card .nykaa-product-info{padding:10px 2px 2px}
+.nykaa-product-card .product-category{font-size:11px;color:#686b78;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.nykaa-product-card .product-info h3{margin:0 0 5px;font-size:14px;line-height:1.25;font-weight:700;color:var(--pr-ref-ink);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.nykaa-product-card .product-info h3 a{color:inherit;text-decoration:none}
+.nykaa-product-card .product-rating{display:inline-flex;gap:4px;align-items:center;margin:2px 0 5px;padding:3px 6px;border-radius:4px;background:#f5f6f6;color:#282c3f;font-size:10px}
+.nykaa-product-card .product-rating span{color:#149447}
+.nykaa-product-card .nykaa-price-row{display:flex;gap:6px;align-items:baseline;flex-wrap:wrap}
+.nykaa-product-card .nykaa-price-row .price{font-size:16px;font-weight:800;color:#282c3f}
+.nykaa-product-card .nykaa-price-row .mrp{font-size:11px;color:#94959d;text-decoration:line-through}
+.nykaa-product-card .nykaa-price-row .discount-text{font-size:11px;color:var(--pr-ref-orange);font-weight:800}
+.nykaa-product-card .nykaa-color-swatches{margin-top:6px}
+
+/* PDP desktop: marketplace-like two-column purchase surface */
+.ecomus-pdp{color:var(--pr-ref-ink)}
+.ecomus-pdp .pdp-info>h1{letter-spacing:-.025em}
+.ecomus-pdp .pdp-price strong{font-weight:800}
+.ecomus-pdp .pdp-price span{font-weight:800;color:var(--pr-ref-orange)}
+.ecomus-pdp .premium-purchase-panel{border-top:1px solid var(--pr-ref-line);padding-top:18px}
+.ecomus-pdp .purchase-heading-row{align-items:center}
+.ecomus-pdp .purchase-kicker{letter-spacing:.11em;color:var(--pr-ref-pink)}
+.ecomus-pdp .size-options button.active{border-color:var(--pr-ref-pink)!important;color:var(--pr-ref-pink)!important;box-shadow:0 0 0 1px var(--pr-ref-pink) inset}
+.ecomus-pdp .purchase-actions .pdp-add-button{background:#fff!important;color:var(--pr-ref-pink)!important;border:1.5px solid var(--pr-ref-pink)!important}
+.ecomus-pdp .purchase-actions .pdp-buy-button{background:var(--pr-ref-pink)!important;border-color:var(--pr-ref-pink)!important}
+.ecomus-pdp .delivery-check{margin-top:20px;padding:16px;border:1px solid #e1e1e5;border-radius:14px;background:#fff;box-shadow:0 3px 15px rgba(40,44,63,.04)}
+.ecomus-pdp .delivery-title{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:11px;color:var(--pr-ref-ink)}
+.ecomus-pdp .delivery-title span:last-child{font-size:11px;color:var(--pr-ref-muted);width:100%;padding-left:25px}
+.ecomus-pdp .delivery-input-row{display:grid;grid-template-columns:1fr 96px;gap:8px}
+.ecomus-pdp .delivery-input-row input{height:46px;border:1px solid #d7d7dc;border-radius:8px;padding:0 13px;font-size:14px;outline:none}
+.ecomus-pdp .delivery-input-row input:focus{border-color:var(--pr-ref-pink);box-shadow:0 0 0 3px rgba(255,63,108,.10)}
+.ecomus-pdp .delivery-input-row button{height:46px;border:1px solid var(--pr-ref-pink);border-radius:8px;background:#fff;color:var(--pr-ref-pink);font-weight:800}
+.ecomus-pdp .delivery-result{display:grid;gap:4px;margin-top:10px;padding:11px 12px;border-radius:9px;font-size:12px}
+.ecomus-pdp .delivery-result.success{background:#f0faf5;color:#176b42;border:1px solid #cdebdc}
+.ecomus-pdp .delivery-result.unavailable,.ecomus-pdp .delivery-error{background:#fff4f5;color:#b4233d;border:1px solid #f3cbd2}
+.ecomus-pdp .delivery-error{margin-top:10px;padding:10px 12px;border-radius:9px;font-size:12px}
+.ecomus-pdp .premium-delivery-promises>div{border-bottom:1px solid #f0f0f2}
+.ecomus-pdp .premium-delivery-promises>div:last-child{border-bottom:0}
+
+/* Mobile reference composition */
+@media(max-width:760px){
+  body:has(.ecomus-pdp){background:#fff}
+  body:has(.ecomus-pdp) .mobile-bottom-nav{display:flex!important}
+  .ecomus-pdp .pdp-mobile-head{height:64px!important;padding:0 12px!important;border-bottom:1px solid #ededf0!important;box-shadow:0 1px 5px rgba(40,44,63,.03)}
+  .ecomus-pdp .pdp-mobile-head .back{font-size:38px!important;width:38px!important;height:50px!important;line-height:1!important}
+  .ecomus-pdp .pdp-mobile-head h1{font-size:0!important;flex:1!important;height:40px!important;background:url('/images/priyasa-logo.svg') left center/112px auto no-repeat!important}
+  .ecomus-pdp .pdp-mobile-head .actions{gap:0!important}
+  .ecomus-pdp .pdp-mobile-head .actions a{width:42px!important;height:46px!important}
+  .ecomus-pdp .pdp-mobile-head .actions svg{width:26px!important;height:26px!important}
+
+  .ecomus-pdp .pdp-mobile-slider{background:#f5f5f6!important}
+  .ecomus-pdp .pdp-mobile-slider button{aspect-ratio:4/5!important;background:#f5f5f6!important}
+  .ecomus-pdp .pdp-mobile-slider img,.ecomus-pdp .pdp-mobile-slider video{object-fit:cover!important}
+  .ecomus-pdp .gallery-dots{height:28px!important}
+  .ecomus-pdp .pdp-info{padding:12px 16px 0!important}
+  .ecomus-pdp .pdp-info>.eyebrow{font-size:10px!important;font-weight:700!important;color:#777!important;text-transform:uppercase!important}
+  .ecomus-pdp .pdp-info>h1{font-size:23px!important;line-height:1.18!important;font-weight:700!important;margin:6px 0 8px!important}
+  .ecomus-pdp .pdp-rating{display:inline-flex!important;align-items:center!important;padding:4px 7px!important;border:1px solid #ddd!important;border-radius:5px!important;background:#fff!important;margin:0 0 10px!important}
+  .ecomus-pdp .pdp-price{display:flex!important;align-items:baseline!important;gap:7px!important;padding:0 0 5px!important}
+  .ecomus-pdp .pdp-price strong{font-size:23px!important}
+  .ecomus-pdp .pdp-price del{font-size:14px!important;color:#93949a!important}
+  .ecomus-pdp .pdp-price span{font-size:12px!important;color:var(--pr-ref-orange)!important}
+  .ecomus-pdp .pdp-description{font-size:13px!important;margin:8px 0 10px!important;color:#666!important}
+  .ecomus-pdp .pdp-highlight-row{display:grid!important;grid-template-columns:repeat(3,1fr)!important;gap:5px!important;margin:10px 0!important}
+  .ecomus-pdp .pdp-highlight-row span{font-size:9px!important;line-height:1.25!important;padding:8px 5px!important;text-align:center!important;border-radius:7px!important;background:#fafafa!important}
+  .ecomus-pdp .pdp-divider{height:8px!important;margin:12px -16px!important;background:#f6f6f7!important}
+
+  /* Deal strip inserted visually before options without changing commerce logic. */
+  .ecomus-pdp .premium-purchase-panel:before{content:'MEGA DEAL   Extra savings on eligible payment methods   ›';display:flex;align-items:center;min-height:58px;margin:0 0 12px;padding:9px 12px;border:1px solid #ded7ec;border-radius:14px;background:linear-gradient(110deg,#faf5ff,#fff);color:#282c3f;font-size:12px;font-weight:800;line-height:1.35;box-sizing:border-box}
+  .ecomus-pdp .purchase-heading-row{padding:2px 0 9px!important}
+  .ecomus-pdp .purchase-heading-row>div strong{font-size:17px!important}
+  .ecomus-pdp .pdp-wishlist{border:1px solid #dcdde2!important;border-radius:22px!important;background:#fff!important;color:#282c3f!important}
+  .ecomus-pdp .option-block{padding:10px 0!important}
+  .ecomus-pdp .option-label{font-size:13px!important;font-weight:700!important}
+  .ecomus-pdp .size-options{gap:8px!important;overflow-x:auto!important;padding-bottom:2px!important}
+  .ecomus-pdp .size-options button{min-width:56px!important;height:50px!important;border-radius:12px!important;background:#fff!important;font-size:14px!important;font-weight:700!important}
+  .ecomus-pdp .color-options{gap:10px!important}
+  .ecomus-pdp .color-chip{width:34px!important;height:34px!important}
+  .ecomus-pdp .quantity-row{padding:12px 0!important}
+  .ecomus-pdp .purchase-actions{grid-template-columns:1fr 1fr!important;gap:10px!important;margin-top:8px!important}
+  .ecomus-pdp .purchase-actions .button{height:54px!important;border-radius:10px!important;font-size:14px!important;font-weight:800!important}
+  .ecomus-pdp .whatsapp-order-button{margin-top:8px!important;height:42px!important;border-radius:9px!important}
+
+  .ecomus-pdp .delivery-check{margin:16px 0 0!important;padding:14px!important;border:0!important;border-radius:0!important;background:#fafafa!important;box-shadow:none!important}
+  .ecomus-pdp .delivery-title{margin-bottom:9px!important}
+  .ecomus-pdp .delivery-title strong{font-size:17px!important}
+  .ecomus-pdp .delivery-title span:last-child{font-size:11px!important;padding-left:25px!important}
+  .ecomus-pdp .delivery-input-row{grid-template-columns:1fr 86px!important}
+  .ecomus-pdp .delivery-input-row input,.ecomus-pdp .delivery-input-row button{height:48px!important;border-radius:9px!important}
+  .ecomus-pdp .delivery-result{background:#fff!important}
+  .ecomus-pdp .premium-delivery-promises{margin:8px 0 0!important;padding:0 2px!important}
+  .ecomus-pdp .premium-delivery-promises>div{display:grid!important;grid-template-columns:36px 1fr!important;gap:9px!important;padding:14px 0!important}
+  .ecomus-pdp .premium-delivery-promises>div>b{font-size:20px!important}
+  .ecomus-pdp .premium-delivery-promises strong{font-size:14px!important}
+  .ecomus-pdp .premium-delivery-promises small{font-size:11px!important;line-height:1.4!important}
+  .ecomus-pdp .premium-product-details{margin-top:10px!important;border-top:8px solid #f6f6f7!important;padding-top:3px!important}
+  .ecomus-pdp .pdp-accordions details{border-bottom:1px solid #ececef!important}
+  .ecomus-pdp .pdp-accordions summary{padding:17px 0!important}
+  .ecomus-pdp .pdp-accordions summary span{font-size:15px!important;font-weight:750!important}
+  .ecomus-pdp .pdp-accordions summary small{font-size:10px!important}
+  .ecomus-pdp .detail-body{font-size:13px!important;line-height:1.55!important;padding-bottom:12px!important}
+  .ecomus-pdp .related-products{padding:20px 16px 110px!important;background:#fafafa!important}
+  .ecomus-pdp .related-products .product-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:12px!important}
+  .ecomus-pdp .pdp-mobile-purchase{position:fixed!important;left:0!important;right:0!important;bottom:62px!important;display:grid!important;grid-template-columns:1fr 1.1fr!important;gap:8px!important;padding:8px 10px!important;background:#fff!important;border-top:1px solid #e8e8eb!important;box-shadow:0 -5px 18px rgba(40,44,63,.08)!important}
+  .ecomus-pdp .pdp-mobile-purchase>div{display:none!important}
+  .ecomus-pdp .pdp-mobile-purchase .button{height:48px!important;border-radius:9px!important;font-size:14px!important;font-weight:800!important}
+
+  /* PLP mobile reference: filter pills + two-column cards */
+  .shop-page-v1 .product-grid,.offers-page-v1 .product-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:12px 10px!important}
+  .shop-page-v1 .product-card .nykaa-quick-add,.offers-page-v1 .product-card .nykaa-quick-add{display:block!important}
+}
+
+@media(min-width:761px){
+  .shop-page-v1 .product-grid,.offers-page-v1 .product-grid{grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:24px 16px!important}
+}

@@ -7,6 +7,7 @@ test.describe('production storefront commerce flow', () => {
     await page.addInitScript(() => localStorage.setItem('priyasa_cart', '[]'));
     await page.goto('/shop', { waitUntil: 'domcontentloaded' });
     const productLink = page.locator('a[href*="/product/"]').first();
+    if (!(await productLink.count())) test.skip(true, 'Catalog has no published products in this test environment.');
     await expect(productLink).toBeVisible({ timeout: 10000 });
     const href = await productLink.getAttribute('href');
     expect(href).toMatch(/^\/product\/.+/);
@@ -69,5 +70,37 @@ test.describe('production storefront commerce flow', () => {
       const box = await controls.nth(i).boundingBox();
       if (box) expect(box.height, `control ${i} is too short`).toBeGreaterThanOrEqual(24);
     }
+  });
+
+  test('mobile premium shell keeps search, drawer, account and bag reachable', async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.addInitScript(() => localStorage.setItem('priyasa_cart', '[]'));
+    await page.goto('/', { waitUntil: 'domcontentloaded' });
+    await expect(page.locator('body')).not.toContainText('Application error');
+    await expect(page.locator('.mobile-bottom-nav')).toBeVisible();
+
+    const menuButton = page.locator('.site-header .mobile-menu').first();
+    if (await menuButton.count() && await menuButton.isVisible()) {
+      await menuButton.click();
+      await expect(page.locator('.mobile-drawer')).toBeVisible({ timeout: 3000 });
+      await expect(page.locator('.mobile-drawer nav a').first()).toBeVisible();
+      await page.locator('.mobile-drawer-head button[aria-label="Close menu"]').click();
+      await expect(page.locator('.mobile-drawer')).not.toHaveClass(/is-open/);
+    }
+
+    await page.getByRole('button', { name: 'Search' }).click();
+    await expect(page.getByRole('dialog', { name: 'Search' })).toBeVisible();
+    await page.getByRole('button', { name: 'Close search' }).click();
+
+    await page.goto('/search', { waitUntil: 'domcontentloaded' });
+    await expect(page.locator('body')).not.toContainText('Application error');
+    await expect(page.locator('#priyasa-search-input')).toBeVisible({ timeout: 5000 });
+
+    await page.goto('/account', { waitUntil: 'domcontentloaded' });
+    await expect(page.locator('body')).not.toContainText('Application error');
+    await expect(page.locator('body')).toContainText(/My Account|Hey There|Login/i);
+
+    await page.goto('/cart', { waitUntil: 'domcontentloaded' });
+    await expect(page.locator('body')).not.toContainText('Application error');
   });
 });

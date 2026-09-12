@@ -1,23 +1,14 @@
 'use client';
 
 import Link from 'next/link';
-import {usePathname} from 'next/navigation';
+import { SearchIcon } from '@/components/StorefrontIcons';
 
-const tabs=[
-  ['ALL','/shop'],
-  ['WOMEN','/category/women'],
-  ['MEN','/category/men'],
-  ['KIDS','/category/kids'],
-  ['NEW IN','/new-arrivals'],
-  ['SALE','/offers'],
-] as const;
-
+/** Mobile home discovery is a search affordance only; category tabs are removed. */
 export default function MobileStorefrontDiscovery(){
-  const pathname=usePathname();
-  if(pathname!=='/') return null;
-  return <section className="mobile-storefront-discovery mobile-storefront-discovery--tabs-only" aria-label="Shop categories">
-    <nav className="mobile-storefront-tabs" aria-label="Shop categories">
-      {tabs.map(([label,href],index)=><Link key={href} href={href} className={index===0?'is-active':''}>{label}</Link>)}
-    </nav>
+  return <section className="mobile-storefront-discovery mobile-storefront-discovery--search" aria-label="Store search">
+    <Link className="mobile-home-search" href="/search" aria-label="Search for products, brands and more">
+      <SearchIcon />
+      <span>Search for products, brands and more...</span>
+    </Link>
   </section>;
 }
