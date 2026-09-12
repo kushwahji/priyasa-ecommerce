@@ -83,8 +83,6 @@ async function Products({ section }: { section: Section }) {
   const requestedLimit = Math.min(Math.max(Number(sectionQuery.limit ?? 8) || 8, 1), 30);
   const isLoadMore = sectionType === 'new_arrivals' || sectionType === 'new-arrivals' || sectionType === 'latest' || sectionType === 'products-latest';
   const productType = isLoadMore ? 'latest' : sectionType;
-  // New Arrivals is the single expandable product section. We prefetch a larger window
-  // while keeping the API-defined initial page size at 8 visible products.
   const fetchLimit = isLoadMore ? Math.min(30, Math.max(requestedLimit, 24)) : requestedLimit;
   const products = await getProductsForHomeSection(productType, fetchLimit, {
     sort: typeof sectionQuery.sort === 'string' ? sectionQuery.sort : undefined,
@@ -197,7 +195,14 @@ export async function renderHomeSections(sections: Section[]) {
     const sectionType = type(section);
     if (sectionType === 'hero_slider' || sectionType === 'hero' || sectionType === 'hero-slide') {
       const heroSlides = slides(section);
-      if (heroSlides.length) output.push(<section className="home-section home-hero-multi" key={String(section.id)}><HomeHeroCarousel slides={heroSlides} /></section>);
+      const heroContent = section.content && !Array.isArray(section.content) ? section.content : {};
+      const autoplay = heroContent.autoplay !== false;
+      const intervalMs = Math.max(2500, Number(heroContent.interval_ms ?? heroContent.intervalMs ?? 4500) || 4500);
+      if (heroSlides.length) output.push(
+        <section className="home-section home-hero-multi" key={String(section.id)}>
+          <HomeHeroCarousel slides={heroSlides} autoplay={autoplay} intervalMs={intervalMs} />
+        </section>
+      );
       continue;
     }
     if (sectionType === 'image-carousel' || sectionType === 'image-slide' || sectionType === 'carousel') {
