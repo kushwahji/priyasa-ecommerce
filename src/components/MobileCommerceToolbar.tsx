@@ -1,10 +1,9 @@
 'use client';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import { MapPinIcon, SearchIcon, ChevronDownIcon } from '@/components/StorefrontIcons';
+import { MapPinIcon, SearchIcon, ChevronIcon } from '@/components/StorefrontIcons';
 
 type Address = { id?: string; line1?: string; city?: string; state?: string; pincode?: string; isDefault?: boolean };
-
 export default function MobileCommerceToolbar(){
   const [address,setAddress]=useState<Address|null>(null);
   useEffect(()=>{
@@ -20,7 +19,7 @@ export default function MobileCommerceToolbar(){
   const location=address?.city||address?.pincode||'Select delivery location';
   return <div className="mobile-commerce-toolbar" aria-label="Mobile shopping tools">
     <Link className="mobile-delivery-bar" href="/account/addresses" aria-label="Change delivery address">
-      <MapPinIcon/><span><small>Deliver to</small><strong>{location}</strong></span><ChevronDownIcon/>
+      <MapPinIcon/><span><small>Deliver to</small><strong>{location}</strong></span><ChevronIcon/>
     </Link>
     <form className="mobile-store-search" action="/search">
       <SearchIcon/><input name="q" placeholder="Search for brands and products" aria-label="Search for brands and products"/><button type="submit">Search</button>
