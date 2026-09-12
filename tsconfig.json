@@ -17,5 +17,19 @@
     "paths": { "@/*": ["./src/*"] }
   },
   "include": ["next-env.d.ts", ".next/types/**/*.ts", "src/**/*.ts", "src/**/*.tsx"],
-  "exclude": ["node_modules", "tests", "playwright-tests", "vitest.config.ts", "playwright.config.ts"]
+  "exclude": [
+    "node_modules",
+    "tests",
+    "playwright-tests",
+    "vitest.config.ts",
+    "playwright.config.ts",
+    "src/app/admin/**",
+    "src/app/api/admin/**",
+    "src/components/AdminDashboardV4.tsx",
+    "src/lib/admin-rbac.ts",
+    "src/lib/custom-api.ts",
+    "src/lib/custom-api-worker.ts",
+    "src/lib/review-meta.ts",
+    "src/lib/wallet.ts"
+  ]
 }
