@@ -9,7 +9,7 @@
 type LegacyRecord = Record<string, any>;
 
 type LegacyModel = {
-  [key: string]: LegacyModel;
+  [key: string]: any;
   (...args: any[]): Promise<LegacyRecord>;
   findMany<T = LegacyRecord>(...args: any[]): Promise<T[]>;
   findFirst<T = LegacyRecord>(...args: any[]): Promise<T | null>;
@@ -23,7 +23,7 @@ type LegacyModel = {
   upsert<T = LegacyRecord>(...args: any[]): Promise<T>;
   delete<T = LegacyRecord>(...args: any[]): Promise<T>;
   deleteMany<T = LegacyRecord>(...args: any[]): Promise<T>;
-  count<T = number>(...args: any[]): Promise<T>;
+  count(...args: any[]): Promise<number>;
   aggregate<T = LegacyRecord>(...args: any[]): Promise<T>;
   groupBy<T = LegacyRecord>(...args: any[]): Promise<T[]>;
 };
