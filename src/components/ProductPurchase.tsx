@@ -9,8 +9,10 @@ type Variant = {
   color?: string;
   size?: string;
   price?: number;
+  mrp?: number;
   stock?: number;
   sku?: string;
+  imageUrls?: string[];
 };
 
 type Product = {
@@ -26,20 +28,44 @@ type Product = {
 
 const WHATSAPP = (process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '917987610989').replace(/\D/g, '');
 const CART_KEY = 'priyasa_cart';
+type CartItem = { variantId: string; productId: string; name: string; price: number; image?: string; quantity: number; color?: string; size?: string };
 
-type CartItem = { variantId: string; productId: string; name: string; price: number; image?: string; quantity: number };
-function localCart(): CartItem[] { try { const value = JSON.parse(localStorage.getItem(CART_KEY) || '[]'); return Array.isArray(value) ? value : []; } catch { return []; } }
+function localCart(): CartItem[] {
+  try {
+    const value = JSON.parse(localStorage.getItem(CART_KEY) || '[]');
+    return Array.isArray(value) ? value : [];
+  } catch {
+    return [];
+  }
+}
 
 async function addCartItem(item: CartItem) {
   const response = await fetch('/api/cart', { cache: 'no-store' });
   const data = await response.json().catch(() => ({}));
   const server: CartItem[] = Array.isArray(data?.data?.items) ? data.data.items : [];
-  const base = response.ok ? server : localCart();
-  const index = base.findIndex((entry) => String(entry.variantId) === String(item.variantId));
-  const next = [...base];
-  if (index >= 0) next[index] = { ...next[index], quantity: Math.min(20, Number(next[index].quantity || 0) + item.quantity) };
+  const authenticatedCart = response.ok && data?.data && Array.isArray(data.data.items);
+
+  if (!authenticatedCart) {
+    const local = localCart();
+    const index = local.findIndex((entry) => String(entry.variantId) === String(item.variantId));
+    const next = [...local];
+    if (index >= 0) next[index] = { ...next[index], ...item, quantity: Math.min(20, Number(next[index].quantity || 0) + item.quantity) };
+    else next.push(item);
+    localStorage.setItem(CART_KEY, JSON.stringify(next));
+    window.dispatchEvent(new Event('priyasa-cart-updated'));
+    return;
+  }
+
+  const index = server.findIndex((entry) => String(entry.variantId) === String(item.variantId));
+  const next = [...server];
+  if (index >= 0) next[index] = { ...next[index], ...item, quantity: Math.min(20, Number(next[index].quantity || 0) + item.quantity) };
   else next.push(item);
-  const save = await fetch('/api/cart', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ items: next.map((entry) => ({ variantId: String(entry.variantId), quantity: Number(entry.quantity) })) }) });
+
+  const save = await fetch('/api/cart', {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ items: next.map((entry) => ({ variantId: String(entry.variantId), quantity: Number(entry.quantity) })) }),
+  });
   const saveData = await save.json().catch(() => ({}));
   if (!save.ok) throw new Error(saveData.error || 'Unable to update your bag.');
   localStorage.setItem(CART_KEY, JSON.stringify(next));
@@ -59,16 +85,19 @@ export function ProductPurchase({ product }: { product: Product }) {
   const [liked, setLiked] = useState(false);
   const [auth, setAuth] = useState(false);
   const [message, setMessage] = useState('');
-  const [busy, setBusy] = useState(false);
+  const [busyAction, setBusyAction] = useState<'cart' | 'buy' | 'whatsapp' | null>(null);
 
   const variant = useMemo(() => {
     if (!variants.length) return null;
-    return variants.find((item) => item.color === color && item.size === size && Number(item.stock || 0) > 0) || null;
+    return variants.find((item) => item.color === color && item.size === size && Number(item.stock || 0) > 0)
+      || variants.find((item) => (!color || item.color === color) && (!size || item.size === size) && Number(item.stock || 0) > 0)
+      || null;
   }, [variants, color, size]);
 
   const price = variant?.price ?? product.price;
   const maxQty = Math.max(1, Math.min(20, Number(variant?.stock || 20)));
   const unavailable = variants.length > 0 && !variant;
+  const busy = busyAction !== null;
 
   useEffect(() => {
     fetch('/api/customer/wishlist', { cache: 'no-store' })
@@ -88,7 +117,7 @@ export function ProductPurchase({ product }: { product: Product }) {
 
   useEffect(() => {
     if (!message) return;
-    const timer = window.setTimeout(() => setMessage(''), 2600);
+    const timer = window.setTimeout(() => setMessage(''), 3200);
     return () => window.clearTimeout(timer);
   }, [message]);
 
@@ -97,28 +126,40 @@ export function ProductPurchase({ product }: { product: Product }) {
     return {
       variantId: variant?.id || product.id,
       productId: product.id,
-      name: variant ? `${product.name} · ${variant.color || color} · ${variant.size || size}` : product.name,
+      name: product.name,
       price,
-      image: product.image,
+      image: variant?.imageUrls?.[0] || product.image,
       quantity: qty,
+      color: variant?.color || color || undefined,
+      size: variant?.size || size || undefined,
     };
   }
 
   async function addToCart() {
     const item = cartItem();
     if (!item) { setMessage('Please select an available color and size.'); return; }
-    setBusy(true); setMessage('');
-    try { await addCartItem(item); setMessage(`${product.name} added to your bag.`); }
-    catch (error) { setMessage(error instanceof Error ? error.message : 'We could not update your bag. Please try again.'); }
-    finally { setBusy(false); }
+    setBusyAction('cart'); setMessage('');
+    try {
+      await addCartItem(item);
+      setMessage(`${product.name} added to your bag.`);
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : 'We could not update your bag. Please try again.');
+    } finally {
+      setBusyAction(null);
+    }
   }
 
   async function buyNow() {
     const item = cartItem();
     if (!item) { setMessage('Please select an available color and size.'); return; }
-    setBusy(true); setMessage('');
-    try { await addCartItem(item); router.push('/checkout'); }
-    catch (error) { setBusy(false); setMessage(error instanceof Error ? error.message : 'We could not start checkout. Please try again.'); }
+    setBusyAction('buy'); setMessage('');
+    try {
+      await addCartItem(item);
+      router.push('/checkout');
+    } catch (error) {
+      setBusyAction(null);
+      setMessage(error instanceof Error ? error.message : 'We could not start checkout. Please try again.');
+    }
   }
 
   async function toggleWishlist() {
@@ -150,10 +191,14 @@ export function ProductPurchase({ product }: { product: Product }) {
 
   function whatsapp() {
     if (unavailable) { setMessage('Please select an available color and size.'); return; }
+    setBusyAction('whatsapp');
     const url = typeof window !== 'undefined' ? window.location.href : `https://priyasa.com/product/${product.slug || ''}`;
-    const text = `Hi PRIYASA 👋\nI want to order this product:\n\n${product.name}\nColor: ${color || 'Any'}\nSize: ${size || 'Any'}\nQuantity: ${qty}\nPrice: ₹${price}\n\nProduct: ${url}`;
-    window.open(`https://wa.me/${WHATSAPP}?text=${encodeURIComponent(text)}`, '_blank', 'noopener,noreferrer');
+    const text = `Hi PRIYASA 👋\nI want to order this product:\n\nProduct: ${product.name}\nColor: ${color || 'Any'}\nSize: ${size || 'Any'}\nQuantity: ${qty}\nPrice: ₹${price.toLocaleString('en-IN')}\n\nProduct link: ${url}`;
+    const whatsappUrl = `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(text)}`;
+    window.location.href = whatsappUrl;
   }
+
+  const colorLabel = (value: string) => value.replace(/[-_]+/g, ' ').replace(/\b\w/g, (char) => char.toUpperCase());
 
   return <div className="purchase-panel premium-purchase-panel">
     <div className="purchase-heading-row">
@@ -163,7 +208,7 @@ export function ProductPurchase({ product }: { product: Product }) {
 
     {colors.length > 0 && <div className="option-block">
       <div className="option-label"><strong>Color</strong><span>{color || 'Select'}</span></div>
-      <div className="color-options">{colors.map((item) => <button type="button" key={item} aria-label={item} title={item} className={`color-chip color-${item.toLowerCase().replaceAll(' ', '-')} ${color === item ? 'active' : ''}`} onClick={() => selectColor(item)}><span /></button>)}</div>
+      <div className="color-options">{colors.map((item) => <button type="button" key={item} aria-label={`Color ${item}`} title={item} className={`color-chip ${color === item ? 'active' : ''}`} onClick={() => selectColor(item)}><span className="color-chip-swatch" aria-hidden="true" /><b>{colorLabel(item)}</b></button>)}</div>
     </div>}
 
     {sizes.length > 0 && <div className="option-block">
@@ -178,16 +223,19 @@ export function ProductPurchase({ product }: { product: Product }) {
 
     <div className="quantity-row"><strong>Quantity</strong><div className="qty-control"><button type="button" aria-label="Decrease quantity" disabled={qty <= 1} onClick={() => setQty(Math.max(1, qty - 1))}>−</button><span>{qty}</span><button type="button" aria-label="Increase quantity" disabled={qty >= maxQty} onClick={() => setQty(Math.min(maxQty, qty + 1))}>+</button></div>{variant && <small>{variant.stock} left</small>}</div>
 
-    <div className="purchase-actions"><button type="button" className="button pdp-add-button" onClick={addToCart} disabled={unavailable || busy}>{busy ? 'Adding…' : 'Add to Bag'}</button><button type="button" className="button dark-button pdp-buy-button" onClick={buyNow} disabled={unavailable || busy}>{busy ? 'Processing…' : 'Buy Now'}</button></div>
-    <button type="button" className="whatsapp-order-button" onClick={whatsapp} disabled={unavailable || busy} aria-label="Order this product on WhatsApp">Order on WhatsApp <span>→</span></button>
+    <div className="purchase-actions">
+      <button type="button" className="button pdp-add-button" onClick={addToCart} disabled={unavailable || busy}>{busyAction === 'cart' ? 'Adding…' : 'Add to Bag'}</button>
+      <button type="button" className="button dark-button pdp-buy-button" onClick={buyNow} disabled={unavailable || busy}>{busyAction === 'buy' ? 'Processing…' : 'Buy Now'}</button>
+    </div>
+    <button type="button" className="whatsapp-order-button" onClick={whatsapp} disabled={unavailable || busy} aria-label="Order this product on WhatsApp">{busyAction === 'whatsapp' ? 'Opening WhatsApp…' : 'Order on WhatsApp'} <span>→</span></button>
     <div className="purchase-trust"><span>✓ Secure payment</span><span>✓ Pan-India delivery</span><span>✓ Easy returns</span></div>
     {message && <div className="storefront-toast is-visible pdp-purchase-toast" role="status" aria-live="polite"><CheckIcon />{message}</div>}
 
     <div className="pdp-mobile-purchase">
-      <div><small>{variant ? `${color} · ${size}` : variants.length ? 'Select options' : 'Ready to order'}</small><strong>₹{price.toLocaleString('en-IN')}</strong></div>
-      <button type="button" className="button" onClick={buyNow} disabled={unavailable || busy}>{busy ? 'Processing…' : 'Buy Now'}</button>
-      <button type="button" className="button dark-button" onClick={addToCart} disabled={unavailable || busy}>{busy ? 'Adding…' : 'Add to Bag'}</button>
-      <button type="button" className="whatsapp-mobile-button" onClick={whatsapp} disabled={unavailable || busy}>Order on WhatsApp</button>
+      <div><small>{variant ? `${color || variant.color || ''}${size || variant.size ? ` · ${size || variant.size}` : ''}` : variants.length ? 'Select options' : 'Ready to order'}</small><strong>₹{price.toLocaleString('en-IN')}</strong></div>
+      <button type="button" className="button" onClick={buyNow} disabled={unavailable || busy}>{busyAction === 'buy' ? 'Processing…' : 'Buy Now'}</button>
+      <button type="button" className="button dark-button" onClick={addToCart} disabled={unavailable || busy}>{busyAction === 'cart' ? 'Adding…' : 'Add to Bag'}</button>
+      <button type="button" className="whatsapp-mobile-button" onClick={whatsapp} disabled={unavailable || busy}>{busyAction === 'whatsapp' ? 'Opening WhatsApp…' : 'Order on WhatsApp'}</button>
     </div>
   </div>;
 }
