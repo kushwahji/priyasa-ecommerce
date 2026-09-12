@@ -10,8 +10,39 @@ type EditorialItem = { id?: string | number; title?: string; subtitle?: string; 
 type ReviewItem = { id: string; rating: number; customer?: string; text: string; product?: string; productImage?: string };
 
 const clean = (value: unknown) => String(value ?? '').replace(/<[^>]*>/g, ' ').replace(/&amp;/g, '&').replace(/\s+/g, ' ').trim();
-const img = (item: any) => item?.image_url || item?.imageUrl || item?.image || '';
 const link = (value: unknown) => { const v = String(value ?? '').trim(); return v && (v.startsWith('/') || v.startsWith('http://') || v.startsWith('https://')) ? v : v ? `/${v}` : '/shop'; };
+
+export function HomeApiStyles() {
+  return <style dangerouslySetInnerHTML={{ __html: `
+.home-api-service-strip .home-service-strip-grid{grid-template-columns:repeat(4,1fr)}
+.home-api-editorial .home-editorial-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+.home-api-reviews .home-review-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+.home-api-offer-banner picture{display:block;position:absolute;inset:0}
+.home-api-offer-banner img{display:block}
+.home-api-offer-banner .home-api-offer-copy{width:min(48%,560px)}
+.home-empty-products{width:min(1320px,calc(100% - 48px));margin:0 auto;padding:28px;text-align:center;background:#fff7f9;border:1px solid #f0e0e5;border-radius:8px;color:#686b78;font-size:12px}
+@media(max-width:760px){
+ .home-api-service-strip .home-service-strip-grid{grid-template-columns:repeat(2,1fr)!important;width:100%!important}
+ .home-api-service-strip .home-service-strip-grid>div{min-height:64px!important;border-bottom:1px solid #eee}
+ .home-api-editorial{padding:26px 0 18px!important}
+ .home-api-editorial .home-editorial-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;width:calc(100% - 24px)!important;gap:9px!important}
+ .home-api-editorial .home-editorial-grid a,.home-api-editorial .home-editorial-grid img{min-height:250px!important;height:250px!important}
+ .home-api-editorial .home-editorial-grid strong{font-size:13px!important}
+ .home-api-editorial .home-editorial-grid small{font-size:9px!important}
+ .home-api-offer-banner{padding:18px 0 26px!important}
+ .home-api-offer-banner>div{width:calc(100% - 20px)!important;min-height:390px!important}
+ .home-api-offer-banner picture,.home-api-offer-banner img{position:absolute!important;inset:0!important;width:100%!important;height:100%!important}
+ .home-api-offer-banner img{object-fit:cover!important}
+ .home-api-offer-banner .home-api-offer-copy{width:100%!important;min-height:390px!important;padding:210px 20px 24px!important;justify-content:flex-end!important;background:linear-gradient(0deg,rgba(255,245,247,.98) 0%,rgba(255,245,247,.8) 42%,transparent 76%)!important}
+ .home-api-offer-banner h2{font-size:25px!important}
+ .home-api-reviews{padding:28px 0!important}
+ .home-api-reviews .home-review-grid{display:flex!important;overflow-x:auto!important;scroll-snap-type:x mandatory!important;padding:0 12px 4px!important;gap:10px!important;scrollbar-width:none!important}
+ .home-api-reviews .home-review-grid::-webkit-scrollbar{display:none}
+ .home-api-reviews .home-review-grid article{flex:0 0 82%!important;scroll-snap-align:start!important}
+ .home-empty-products{width:calc(100% - 24px)!important}
+}
+` }} />;
+}
 
 function Head({ title, subtitle, href, label = 'View All' }: { title?: string | null; subtitle?: string | null; href?: string; label?: string }) {
   return <div className="home-section-head" style={{ width: 'min(1320px, calc(100% - 48px))', margin: '0 auto 18px', display: 'flex', justifyContent: 'space-between', alignItems: 'end', gap: 20 }}><div>{title && <h2>{clean(title)}</h2>}{subtitle && <p>{clean(subtitle)}</p>}</div>{href && <Link className="home-view-all" href={href}>{clean(label)} <span>→</span></Link>}</div>;
@@ -33,7 +64,7 @@ export function HomeOfferBanner({ section }: { section: any }) {
   const content = section?.content || {};
   if (!content.image_url && !content.title && !content.subtitle) return null;
   const cta = content.cta || {};
-  return <section className="home-api-offer-banner" style={{ padding: '28px 0 38px' }}><div style={{ width: 'min(1320px, calc(100% - 48px))', margin: '0 auto', position: 'relative', overflow: 'hidden', borderRadius: 8, minHeight: 310, background: '#fff0f4' }}><picture><source media="(max-width:760px)" srcSet={content.mobile_image_url || content.image_url || ''}/><img src={content.image_url || '/images/product-placeholder.svg'} alt={clean(content.title)} loading="lazy" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}/></picture><div style={{ position: 'relative', zIndex: 1, width: 'min(48%, 560px)', minHeight: 310, padding: '55px 42px', boxSizing: 'border-box', display: 'flex', flexDirection: 'column', justifyContent: 'center', background: 'linear-gradient(90deg, rgba(255,245,247,.98), rgba(255,245,247,.72), transparent)' }}><span style={{ fontSize: 10, fontWeight: 800, letterSpacing: 1.8, color: '#8d1d4e' }}>{clean(content.eyebrow)}</span><h2 style={{ margin: '8px 0', fontSize: 32 }}>{clean(content.title)}</h2><p style={{ margin: '0 0 18px', color: '#686b78', fontSize: 13 }}>{clean(content.subtitle)}</p>{cta.label && <Link className="button dark-button" href={link(cta.href)}>{clean(cta.label)} →</Link>}</div></div></section>;
+  return <section className="home-api-offer-banner" style={{ padding: '28px 0 38px' }}><div style={{ width: 'min(1320px, calc(100% - 48px))', margin: '0 auto', position: 'relative', overflow: 'hidden', borderRadius: 8, minHeight: 310, background: '#fff0f4' }}><picture><source media="(max-width:760px)" srcSet={content.mobile_image_url || content.image_url || ''}/><img src={content.image_url || '/images/product-placeholder.svg'} alt={clean(content.title)} loading="lazy" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}/></picture><div className="home-api-offer-copy" style={{ position: 'relative', zIndex: 1, minHeight: 310, padding: '55px 42px', boxSizing: 'border-box', display: 'flex', flexDirection: 'column', justifyContent: 'center', background: 'linear-gradient(90deg, rgba(255,245,247,.98), rgba(255,245,247,.72), transparent)' }}><span style={{ fontSize: 10, fontWeight: 800, letterSpacing: 1.8, color: '#8d1d4e' }}>{clean(content.eyebrow)}</span><h2 style={{ margin: '8px 0', fontSize: 32 }}>{clean(content.title)}</h2><p style={{ margin: '0 0 18px', color: '#686b78', fontSize: 13 }}>{clean(content.subtitle)}</p>{cta.label && <Link className="button dark-button" href={link(cta.href)}>{clean(cta.label)} →</Link>}</div></div></section>;
 }
 
 export function HomeFlashSale({ section, products }: { section: any; products: Product[] }) {
