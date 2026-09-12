@@ -6,7 +6,7 @@
  * modules that are being removed or migrated. It never connects to a database.
  */
 
-type LegacyRecord = Record<string, any>;
+type LegacyRecord = Record<string, any> & { id: string; role: string };
 
 type LegacyModel = {
   (...args: any[]): Promise<LegacyRecord>;
@@ -34,6 +34,7 @@ type LegacyDb = {
   orderStatusHistory: LegacyModel;
   product: LegacyModel;
   productVariant: LegacyModel;
+  productImage: LegacyModel;
   category: LegacyModel;
   cart: LegacyModel;
   cartItem: LegacyModel;
@@ -54,15 +55,23 @@ type LegacyDb = {
   productQuestion: LegacyModel;
   automation: LegacyModel;
   automationRun: LegacyModel;
+  return: LegacyModel;
   returnRequest: LegacyModel;
   refund: LegacyModel;
   setting: LegacyModel;
+  settings: LegacyModel;
   cms: LegacyModel;
+  cmsSection: LegacyModel;
   customApiConnection: LegacyModel;
   customWebhookDelivery: LegacyModel;
   customApiRequestLog: LegacyModel;
+  webhookEvent: LegacyModel;
+  paymentEvent: LegacyModel;
+  emailOtpChallenge: LegacyModel;
+  idempotencyKey: LegacyModel;
   $transaction<T = LegacyRecord>(fn: (tx: LegacyDb) => Promise<T>): Promise<T>;
   $transaction<T = LegacyRecord>(queries: Promise<T>[]): Promise<T[]>;
+  $queryRaw<T = LegacyRecord>(...args: any[]): Promise<T>;
   $queryRawUnsafe<T = LegacyRecord>(...args: any[]): Promise<T>;
   $executeRawUnsafe(...args: any[]): Promise<number>;
   $executeRaw(...args: any[]): Promise<number>;
