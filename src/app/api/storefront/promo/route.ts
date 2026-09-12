@@ -1,2 +1,9 @@
-import {NextResponse} from 'next/server';import {db} from '@/lib/db';
-export async function GET(){const now=new Date();const [coupon,section]=await Promise.all([db.coupon.findFirst({where:{active:true,startsAt:{lte:now},endsAt:{gte:now}},orderBy:{value:'desc'}}),db.cmsSection.findFirst({where:{key:'offers.popup',active:true,OR:[{startsAt:null},{startsAt:{lte:now}}],AND:[{OR:[{endsAt:null},{endsAt:{gte:now}}]}]},orderBy:{sortOrder:'asc'}})]);if(!coupon&&!section)return NextResponse.json({active:false});return NextResponse.json({active:true,title:section?.title||(coupon?.type==='PERCENTAGE'?`Extra ${coupon.value}% OFF`:`₹${coupon?.value||0} OFF`),subtitle:section?.subtitle||'On eligible styles',code:coupon?.code||null,imageUrl:section?.imageUrl||null,ctaLabel:section?.ctaLabel||'Shop Now',ctaHref:section?.ctaHref||'/offers'});}
+import { NextResponse } from 'next/server';
+
+export const dynamic = 'force-dynamic';
+
+// Promotional content is owned by Priyasa Core/Admin. Store has no local commerce DB.
+// Keep this compatibility endpoint fail-closed until a public storefront promo endpoint is exposed by Core.
+export async function GET() {
+  return NextResponse.json({ active: false }, { headers: { 'Cache-Control': 'no-store' } });
+}
