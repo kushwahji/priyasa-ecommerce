@@ -3,9 +3,11 @@ import Link from 'next/link';import {useEffect,useRef,useState}from'react';
 type Slide={id:string;title?:string|null;subtitle?:string|null;imageUrl?:string|null;mobileImageUrl?:string|null;ctaLabel?:string|null;ctaHref?:string|null};
 export default function HomeHeroCarousel({slides,autoplay=true,intervalMs=4500}:{slides:Slide[];autoplay?:boolean;intervalMs?:number}){
  const[active,setActive]=useState(0);const startX=useRef<number|null>(null);const startY=useRef<number|null>(null);
- if(!slides.length)return null;
- const next=()=>setActive(v=>(v+1)%slides.length);const prev=()=>setActive(v=>(v-1+slides.length)%slides.length);const slide=slides[active];const image=slide.imageUrl||'/images/product-placeholder.svg';const mobileImage=slide.mobileImageUrl||image;
+ const next=()=>setActive(v=>(v+1)%slides.length);const prev=()=>setActive(v=>(v-1+slides.length)%slides.length);
+ useEffect(()=>{if(!slides.length){setActive(0);return}setActive(v=>Math.min(v,slides.length-1))},[slides.length]);
  useEffect(()=>{if(!autoplay||slides.length<2)return;const id=window.setInterval(next,Math.max(2500,intervalMs||4500));return()=>window.clearInterval(id)},[autoplay,intervalMs,slides.length]);
+ if(!slides.length)return null;
+ const slide=slides[active];const image=slide.imageUrl||'/images/product-placeholder.svg';const mobileImage=slide.mobileImageUrl||image;
  const touchStart=(e:React.TouchEvent)=>{const t=e.changedTouches[0];startX.current=t.clientX;startY.current=t.clientY};
  const touchEnd=(e:React.TouchEvent)=>{if(startX.current===null||startY.current===null)return;const t=e.changedTouches[0],dx=t.clientX-startX.current,dy=t.clientY-startY.current;startX.current=null;startY.current=null;if(Math.abs(dx)<45||Math.abs(dx)<Math.abs(dy))return;dx<0?next():prev()};
  const imageError=(e:React.SyntheticEvent<HTMLImageElement>)=>{const img=e.currentTarget;if(img.dataset.fallback)return;img.dataset.fallback='1';const picture=img.closest('picture');const source=picture?.querySelector('source');if(source)source.removeAttribute('srcset');img.src='/images/product-placeholder.svg'};
