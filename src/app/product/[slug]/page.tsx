@@ -6,6 +6,8 @@ import ProductPdpDetails from '@/components/ProductPdpDetails';
 import { BreadcrumbStructuredData } from '@/app/seo-schema';
 import { BagIcon, SearchIcon } from '@/components/StorefrontIcons';
 
+type ProductSchemaVariant = { sku?: string | null; stock?: number | null };
+
 export const dynamic = 'force-dynamic';
 export const dynamicParams = true;
 export const revalidate = 0;
@@ -30,7 +32,8 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
   const images = product.images?.length ? product.images : [product.image];
   const discount = product.mrp > product.price ? Math.round((1 - product.price / product.mrp) * 100) : 0;
   const base = process.env.NEXT_PUBLIC_APP_URL || 'https://priyasa.com';
-  const productJsonLd = { '@context': 'https://schema.org', '@type': 'Product', name: product.name, description: product.description, sku: product.variants?.find((variant) => variant.sku)?.sku || product.id, image: images, brand: { '@type': 'Brand', name: 'PRIYASA' }, category: product.category, url: `${base}/product/${product.slug}`, offers: { '@type': 'Offer', url: `${base}/product/${product.slug}`, priceCurrency: 'INR', price: product.price.toFixed(2), availability: product.variants?.some((variant) => (variant.stock || 0) > 0) ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock', itemCondition: 'https://schema.org/NewCondition' }, ...(product.reviewCount ? { aggregateRating: { '@type': 'AggregateRating', ratingValue: (product.rating || 0).toFixed(1), reviewCount: product.reviewCount } } : {}) };
+  const schemaVariants = (product.variants || []) as ProductSchemaVariant[];
+  const productJsonLd = { '@context': 'https://schema.org', '@type': 'Product', name: product.name, description: product.description, sku: schemaVariants.find((variant) => variant.sku)?.sku || product.id, image: images, brand: { '@type': 'Brand', name: 'PRIYASA' }, category: product.category, url: `${base}/product/${product.slug}`, offers: { '@type': 'Offer', url: `${base}/product/${product.slug}`, priceCurrency: 'INR', price: product.price.toFixed(2), availability: schemaVariants.some((variant) => (variant.stock || 0) > 0) ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock', itemCondition: 'https://schema.org/NewCondition' }, ...(product.reviewCount ? { aggregateRating: { '@type': 'AggregateRating', ratingValue: (product.rating || 0).toFixed(1), reviewCount: product.reviewCount } } : {}) };
 
   return <div className="storefront-page ecomus-pdp">
     <div className="pdp-mobile-head"><Link className="back" href="/" aria-label="Back">‹</Link><strong className="pdp-mobile-brand">PRIYASA</strong><div className="actions"><Link href="/search" aria-label="Search"><SearchIcon /></Link><Link href="/wishlist" aria-label="Wishlist">♡</Link><Link href="/cart" aria-label="Bag"><BagIcon /></Link></div></div>
