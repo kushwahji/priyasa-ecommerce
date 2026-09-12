@@ -25,6 +25,26 @@ type Product = {
 };
 
 const WHATSAPP = (process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '917987610989').replace(/\D/g, '');
+const CART_KEY = 'priyasa_cart';
+
+type CartItem = { variantId: string; productId: string; name: string; price: number; image?: string; quantity: number };
+function localCart(): CartItem[] { try { const value = JSON.parse(localStorage.getItem(CART_KEY) || '[]'); return Array.isArray(value) ? value : []; } catch { return []; } }
+
+async function addCartItem(item: CartItem) {
+  const response = await fetch('/api/cart', { cache: 'no-store' });
+  const data = await response.json().catch(() => ({}));
+  const server: CartItem[] = Array.isArray(data?.data?.items) ? data.data.items : [];
+  const base = response.ok ? server : localCart();
+  const index = base.findIndex((entry) => String(entry.variantId) === String(item.variantId));
+  const next = [...base];
+  if (index >= 0) next[index] = { ...next[index], quantity: Math.min(20, Number(next[index].quantity || 0) + item.quantity) };
+  else next.push(item);
+  const save = await fetch('/api/cart', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ items: next.map((entry) => ({ variantId: String(entry.variantId), quantity: Number(entry.quantity) })) }) });
+  const saveData = await save.json().catch(() => ({}));
+  if (!save.ok) throw new Error(saveData.error || 'Unable to update your bag.');
+  localStorage.setItem(CART_KEY, JSON.stringify(next));
+  window.dispatchEvent(new Event('priyasa-cart-updated'));
+}
 
 export function ProductPurchase({ product }: { product: Product }) {
   const router = useRouter();
@@ -39,6 +59,7 @@ export function ProductPurchase({ product }: { product: Product }) {
   const [liked, setLiked] = useState(false);
   const [auth, setAuth] = useState(false);
   const [message, setMessage] = useState('');
+  const [busy, setBusy] = useState(false);
 
   const variant = useMemo(() => {
     if (!variants.length) return null;
@@ -71,7 +92,7 @@ export function ProductPurchase({ product }: { product: Product }) {
     return () => window.clearTimeout(timer);
   }, [message]);
 
-  function cartItem() {
+  function cartItem(): CartItem | null {
     if (variants.length && !variant) return null;
     return {
       variantId: variant?.id || product.id,
@@ -83,34 +104,21 @@ export function ProductPurchase({ product }: { product: Product }) {
     };
   }
 
-  function addToCart() {
+  async function addToCart() {
     const item = cartItem();
     if (!item) { setMessage('Please select an available color and size.'); return; }
-    try {
-      const key = 'priyasa_cart';
-      const cart = JSON.parse(localStorage.getItem(key) || '[]');
-      const index = cart.findIndex((entry: { variantId: string }) => entry.variantId === item.variantId);
-      if (index >= 0) cart[index] = { ...cart[index], quantity: Math.min(20, Number(cart[index].quantity || 0) + qty) };
-      else cart.push(item);
-      localStorage.setItem(key, JSON.stringify(cart));
-      window.dispatchEvent(new Event('priyasa-cart-updated'));
-      setMessage(`${product.name} added to your bag.`);
-    } catch { setMessage('We could not update your bag. Please try again.'); }
+    setBusy(true); setMessage('');
+    try { await addCartItem(item); setMessage(`${product.name} added to your bag.`); }
+    catch (error) { setMessage(error instanceof Error ? error.message : 'We could not update your bag. Please try again.'); }
+    finally { setBusy(false); }
   }
 
-  function buyNow() {
+  async function buyNow() {
     const item = cartItem();
     if (!item) { setMessage('Please select an available color and size.'); return; }
-    try {
-      const key = 'priyasa_cart';
-      const cart = JSON.parse(localStorage.getItem(key) || '[]');
-      const index = cart.findIndex((entry: { variantId: string }) => entry.variantId === item.variantId);
-      if (index >= 0) cart[index] = { ...cart[index], quantity: Math.min(20, Number(cart[index].quantity || 0) + qty) };
-      else cart.push(item);
-      localStorage.setItem(key, JSON.stringify(cart));
-      window.dispatchEvent(new Event('priyasa-cart-updated'));
-      router.push('/checkout');
-    } catch { setMessage('We could not start checkout. Please try again.'); }
+    setBusy(true); setMessage('');
+    try { await addCartItem(item); router.push('/checkout'); }
+    catch (error) { setBusy(false); setMessage(error instanceof Error ? error.message : 'We could not start checkout. Please try again.'); }
   }
 
   async function toggleWishlist() {
@@ -170,16 +178,16 @@ export function ProductPurchase({ product }: { product: Product }) {
 
     <div className="quantity-row"><strong>Quantity</strong><div className="qty-control"><button type="button" aria-label="Decrease quantity" disabled={qty <= 1} onClick={() => setQty(Math.max(1, qty - 1))}>−</button><span>{qty}</span><button type="button" aria-label="Increase quantity" disabled={qty >= maxQty} onClick={() => setQty(Math.min(maxQty, qty + 1))}>+</button></div>{variant && <small>{variant.stock} left</small>}</div>
 
-    <div className="purchase-actions"><button type="button" className="button pdp-add-button" onClick={addToCart} disabled={unavailable}>Add to Bag</button><button type="button" className="button dark-button pdp-buy-button" onClick={buyNow} disabled={unavailable}>Buy Now</button></div>
-    <button type="button" className="whatsapp-order-button" onClick={whatsapp} disabled={unavailable} aria-label="Order this product on WhatsApp">Order on WhatsApp <span>→</span></button>
+    <div className="purchase-actions"><button type="button" className="button pdp-add-button" onClick={addToCart} disabled={unavailable || busy}>{busy ? 'Adding…' : 'Add to Bag'}</button><button type="button" className="button dark-button pdp-buy-button" onClick={buyNow} disabled={unavailable || busy}>{busy ? 'Processing…' : 'Buy Now'}</button></div>
+    <button type="button" className="whatsapp-order-button" onClick={whatsapp} disabled={unavailable || busy} aria-label="Order this product on WhatsApp">Order on WhatsApp <span>→</span></button>
     <div className="purchase-trust"><span>✓ Secure payment</span><span>✓ Pan-India delivery</span><span>✓ Easy returns</span></div>
     {message && <div className="storefront-toast is-visible pdp-purchase-toast" role="status" aria-live="polite"><CheckIcon />{message}</div>}
 
     <div className="pdp-mobile-purchase">
       <div><small>{variant ? `${color} · ${size}` : variants.length ? 'Select options' : 'Ready to order'}</small><strong>₹{price.toLocaleString('en-IN')}</strong></div>
-      <button type="button" className="button" onClick={buyNow} disabled={unavailable}>Buy Now</button>
-      <button type="button" className="button dark-button" onClick={addToCart} disabled={unavailable}>Add to Bag</button>
-      <button type="button" className="whatsapp-mobile-button" onClick={whatsapp} disabled={unavailable}>Order on WhatsApp</button>
+      <button type="button" className="button" onClick={buyNow} disabled={unavailable || busy}>{busy ? 'Processing…' : 'Buy Now'}</button>
+      <button type="button" className="button dark-button" onClick={addToCart} disabled={unavailable || busy}>{busy ? 'Adding…' : 'Add to Bag'}</button>
+      <button type="button" className="whatsapp-mobile-button" onClick={whatsapp} disabled={unavailable || busy}>Order on WhatsApp</button>
     </div>
   </div>;
 }
