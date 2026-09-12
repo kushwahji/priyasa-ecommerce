@@ -33,7 +33,10 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - run: npm install --no-audit --no-fund
+      - name: Verify npm cache
+        run: npm cache verify
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund --legacy-peer-deps
       - run: npm run db:prepare:mysql
       - run: npx prisma validate --schema prisma/schema.mysql.prisma
       - run: npx prisma generate --schema prisma/schema.mysql.prisma
