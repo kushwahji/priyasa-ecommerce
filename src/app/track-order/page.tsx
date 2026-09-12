@@ -32,11 +32,12 @@ export default async function Track({ searchParams }: { searchParams: Promise<{ 
   let found: OrderRecord | null = null;
 
   if (token && order) {
-    const { response, body } = await priyasaApi<OrdersResponse>('/api/v1/storefront/orders', {
+    const { response, body } = await priyasaApi('/api/v1/storefront/orders', {
       headers: { Authorization: `Bearer ${token}` },
     });
     if (response.ok) {
-      found = orderRows(body).find((item) => String(item?.orderNumber ?? item?.order_number ?? item?.number ?? '') === order) ?? null;
+      const payload = body as OrdersResponse;
+      found = orderRows(payload).find((item) => String(item?.orderNumber ?? item?.order_number ?? item?.number ?? '') === order) ?? null;
     }
   }
 
