@@ -1,19 +1,21 @@
 'use client';
 import Link from 'next/link';
 import {usePathname} from 'next/navigation';
-import {GiftIcon,GridIcon,HomeIcon,UserIcon} from '@/components/StorefrontIcons';
+import {GridIcon,HeartIcon,HomeIcon,BagIcon,UserIcon} from '@/components/StorefrontIcons';
 
 const items=[
   ['Home','/',HomeIcon],
-  ['Categories','/shop',GridIcon],
-  ['Offers','/offers',GiftIcon],
+  ['Shop','/shop',GridIcon],
+  ['Wishlist','/wishlist',HeartIcon],
+  ['Orders','/account/orders',BagIcon],
   ['Account','/account',UserIcon],
 ] as const;
 
 function activeFor(pathname:string,href:string){
   if(href==='/') return pathname==='/';
   if(href==='/shop') return pathname==='/shop'||pathname.startsWith('/category/')||pathname==='/new-arrivals'||pathname==='/collections';
-  if(href==='/offers') return pathname==='/offers'||pathname.startsWith('/offers/');
+  if(href==='/wishlist') return pathname==='/wishlist'||pathname.startsWith('/wishlist/');
+  if(href==='/account/orders') return pathname==='/account/orders'||pathname.startsWith('/account/orders/');
   return pathname==='/account'||pathname.startsWith('/account/')||pathname==='/login';
 }
 
