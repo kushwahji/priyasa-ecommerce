@@ -2,14 +2,23 @@ import Link from 'next/link';
 import { cookies } from 'next/headers';
 import { priyasaApi } from '@/lib/priyasa-api';
 
+type ShipmentRecord = {
+  carrier?: string;
+  provider?: string;
+  trackingNumber?: string;
+  tracking_number?: string;
+  trackingUrl?: string;
+  tracking_url?: string;
+};
+
 type OrderRecord = {
   orderNumber?: string;
   order_number?: string;
   number?: string;
   status?: string;
   orderStatus?: string;
-  shipment?: Record<string, unknown> | null;
-  shipments?: Record<string, unknown>[];
+  shipment?: ShipmentRecord | null;
+  shipments?: ShipmentRecord[];
 };
 
 type OrdersResponse = OrderRecord[] | { data?: OrderRecord[]; orders?: OrderRecord[] } | null;
@@ -32,13 +41,8 @@ export default async function Track({ searchParams }: { searchParams: Promise<{ 
   let found: OrderRecord | null = null;
 
   if (token && order) {
-    const { response, body } = await priyasaApi('/api/v1/storefront/orders', {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    if (response.ok) {
-      const payload = body as OrdersResponse;
-      found = orderRows(payload).find((item) => String(item?.orderNumber ?? item?.order_number ?? item?.number ?? '') === order) ?? null;
-    }
+    const { response, body } = await priyasaApi('/api/v1/storefront/orders', { headers: { Authorization: `Bearer ${token}` } });
+    if (response.ok) found = orderRows(body).find((item) => String(item.orderNumber ?? item.order_number ?? item.number ?? '') === order) ?? null;
   }
 
   const shipment = found?.shipment ?? found?.shipments?.[0] ?? null;
@@ -46,6 +50,10 @@ export default async function Track({ searchParams }: { searchParams: Promise<{ 
   const carrier = shipment?.carrier ?? shipment?.provider;
   const trackingNumber = shipment?.trackingNumber ?? shipment?.tracking_number;
   const trackingUrl = shipment?.trackingUrl ?? shipment?.tracking_url;
+  const orderDisplay = String(found?.orderNumber ?? found?.order_number ?? found?.number ?? order ?? '');
+  const carrierDisplay = String(carrier || 'Shipment');
+  const trackingNumberDisplay = String(trackingNumber || 'Tracking number will appear after dispatch.');
+  const trackingUrlDisplay = typeof trackingUrl === 'string' ? trackingUrl : trackingUrl ? String(trackingUrl) : '';
 
-  return <div className="storefront-page"><div className="page storefront-inner"><div className="breadcrumbs"><Link href="/">Home</Link><span> / </span><Link href="/account/orders">My Orders</Link><span> / </span> Track Order</div><div className="track-page-card"><span className="eyebrow">ORDER TRACKING</span><h1>Track Your Order</h1><p>Enter an order number from My Orders to see the latest status available from Priyasa Core.</p><form className="track-form" method="get"><input className="input" name="order" defaultValue={order || ''} placeholder="PRI-XXXXXXXX"/><button className="button" type="submit">Track Order</button></form>{!token && <div className="checkout-status">Please sign in to track an order.</div>}{token && order && !found && <div className="checkout-status">Order not found for this signed-in customer.</div>}{found && <div className="tracking-result"><div className="tracking-summary"><strong>{found.orderNumber ?? found.order_number ?? found.number ?? order}</strong><span className="order-status">{label(status)}</span></div>{shipment && <div className="shipment-box"><strong>{String(carrier || 'Shipment')}</strong><p>{String(trackingNumber || 'Tracking number will appear after dispatch.')}</p>{trackingUrl && <a href={String(trackingUrl)} target="_blank" rel="noreferrer">Track carrier shipment →</a>}</div>}</div>}</div></div></div>;
+  return <div className="storefront-page"><div className="page storefront-inner"><div className="breadcrumbs"><Link href="/">Home</Link><span> / </span><Link href="/account/orders">My Orders</Link><span> / </span> Track Order</div><div className="track-page-card"><span className="eyebrow">ORDER TRACKING</span><h1>Track Your Order</h1><p>Enter an order number from My Orders to see the latest status available from Priyasa Core.</p><form className="track-form" method="get"><input className="input" name="order" defaultValue={order || ''} placeholder="PRI-XXXXXXXX"/><button className="button" type="submit">Track Order</button></form>{!token && <div className="checkout-status">Please sign in to track an order.</div>}{token && order && !found && <div className="checkout-status">Order not found for this signed-in customer.</div>}{found && <div className="tracking-result"><div className="tracking-summary"><strong>{orderDisplay}</strong><span className="order-status">{label(status)}</span></div>{shipment && <div className="shipment-box"><strong>{carrierDisplay}</strong><p>{trackingNumberDisplay}</p>{trackingUrlDisplay && <a href={trackingUrlDisplay} target="_blank" rel="noreferrer">Track carrier shipment →</a>}</div>}</div>}</div></div></div>;
 }
