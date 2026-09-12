@@ -1,3 +1,0 @@
-import {NextResponse} from 'next/server';import {getSession} from '@/lib/auth';import {db} from '@/lib/db';
-export async function GET(){const s=await getSession();if(!s)return NextResponse.json({error:'Unauthorized'},{status:401});return NextResponse.json({data:await db.notification.findMany({where:{userId:s.userId},orderBy:{createdAt:'desc'},take:50})});}
-export async function PATCH(req:Request){const s=await getSession();if(!s)return NextResponse.json({error:'Unauthorized'},{status:401});const {id}=await req.json().catch(()=>({}));if(!id)return NextResponse.json({error:'id required'},{status:400});const n=await db.notification.updateMany({where:{id,userId:s.userId},data:{readAt:new Date()}});return NextResponse.json({ok:n.count===1});}
