@@ -19,6 +19,8 @@ async function loadRazorpay(){
   return Boolean(window.Razorpay);
 }
 
+function readLocalCart(): CartItem[]{try{const value=JSON.parse(window.localStorage.getItem('priyasa_cart')||'[]');return Array.isArray(value)?value:[]}catch{return[]}}
+
 export default function Checkout(){
   const [form,setForm]=useState({fullName:'',phone:'',line1:'',city:'',state:'',pincode:'',coupon:''});
   const [addresses,setAddresses]=useState<Address[]>([]);
@@ -33,15 +35,31 @@ export default function Checkout(){
   const [status,setStatus]=useState('');
 
   useEffect(()=>{
-    try{setItems(JSON.parse(window.localStorage.getItem('priyasa_cart')||'[]'));}catch{setItems([])}
+    let alive=true;
+    const local=readLocalCart();
+    setItems(local);
     void fetch('/api/customer/session',{cache:'no-store'}).then(r=>r.json()).then(async data=>{
+      if(!alive)return;
       setAuthenticated(Boolean(data.authenticated));
-      if(!data.user)return;
-      setForm(current=>({...current,fullName:data.user.name||current.fullName,phone:data.user.phone||current.phone}));
-      const response=await fetch('/api/customer/addresses',{cache:'no-store'}).then(r=>r.json()).catch(()=>({}));
-      const list:Address[]=response.data||[]; setAddresses(list);
-      const preferred=list.find(a=>a.isDefault)||list[0]; if(preferred)selectAddress(preferred);
-    }).catch(()=>setAuthenticated(false));
+      if(data.user)setForm(current=>({...current,fullName:data.user.name||current.fullName,phone:data.user.phone||current.phone}));
+      if(data.user){
+        const response=await fetch('/api/customer/addresses',{cache:'no-store'}).then(r=>r.json()).catch(()=>({}));
+        if(!alive)return;
+        const list:Address[]=Array.isArray(response.data)?response.data:[]; setAddresses(list);
+        const preferred=list.find(a=>a.isDefault)||list[0]; if(preferred)selectAddress(preferred);
+      }
+      const cartResponse=await fetch('/api/cart',{cache:'no-store'}).catch(()=>null);
+      if(!alive||!cartResponse?.ok)return;
+      const cartData=await cartResponse.json().catch(()=>({}));
+      const server:CartItem[]=Array.isArray(cartData?.data?.items)?cartData.data.items:[];
+      if(server.length===0&&local.length>0){
+        const migrated=await fetch('/api/cart',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({items:local.map(item=>({variantId:String(item.variantId),quantity:Number(item.quantity)}))})}).catch(()=>null);
+        if(!alive)return;
+        if(migrated?.ok){setItems(local);return;}
+      }
+      setItems(server); window.localStorage.setItem('priyasa_cart',JSON.stringify(server));
+    }).catch(()=>{if(alive)setAuthenticated(false)});
+    return()=>{alive=false};
   },[]);
 
   const clientSubtotal=useMemo(()=>items.reduce((sum,item)=>sum+Number(item.price||0)*Number(item.quantity||0),0),[items]);
