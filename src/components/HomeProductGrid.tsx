@@ -5,13 +5,19 @@ import type { Product } from '@/lib/catalog';
 import { ProductCard } from '@/components/ProductCard';
 
 type DisplayConfig = {
-  desktopColumns?: number;
-  tabletColumns?: number;
-  mobileColumns?: number;
+  desktop_columns?: number;
+  tablet_columns?: number;
+  mobile_columns?: number;
   desktop_cards?: number;
   tablet_cards?: number;
   mobile_cards?: number;
+  mobile_scroll?: boolean;
+  desktopColumns?: number;
+  tabletColumns?: number;
+  mobileColumns?: number;
   mobileScroll?: boolean;
+  load_more?: boolean;
+  load_more_step?: number;
 };
 
 type Props = {
@@ -30,13 +36,15 @@ const clampColumns = (value: unknown, fallback: number, max = 6) => {
 
 export default function HomeProductGrid({ products, initialVisible = 8, step = 8, variant = 'load-more', display, ariaLabel = 'Product carousel' }: Props) {
   const railRef = useRef<HTMLDivElement>(null);
+  const loadMoreEnabled = display?.load_more !== false;
   const [visible, setVisible] = useState(Math.min(initialVisible, products.length));
 
   if (!products.length) return null;
 
-  const desktop = clampColumns(display?.desktopColumns ?? display?.desktop_cards, variant === 'carousel' ? 4 : 5);
-  const tablet = clampColumns(display?.tabletColumns ?? display?.tablet_cards, Math.min(3, desktop));
-  const mobile = clampColumns(display?.mobileColumns ?? display?.mobile_cards, 2, 4);
+  const desktop = clampColumns(display?.desktop_columns ?? display?.desktopColumns ?? display?.desktop_cards, variant === 'carousel' ? 4 : 5);
+  const tablet = clampColumns(display?.tablet_columns ?? display?.tabletColumns ?? display?.tablet_cards, Math.min(3, desktop));
+  const mobile = clampColumns(display?.mobile_columns ?? display?.mobileColumns ?? display?.mobile_cards, 2, 4);
+  const mobileScroll = display?.mobile_scroll ?? display?.mobileScroll ?? true;
 
   if (variant === 'carousel') {
     const scroll = (direction: number) => {
@@ -47,7 +55,7 @@ export default function HomeProductGrid({ products, initialVisible = 8, step = 8
 
     return (
       <div
-        className="home-product-carousel"
+        className={`home-product-carousel ${mobileScroll ? 'home-product-carousel--mobile-scroll' : 'home-product-carousel--mobile-grid'}`}
         aria-label={ariaLabel}
         style={{ '--home-carousel-desktop': desktop, '--home-carousel-tablet': tablet, '--home-carousel-mobile': mobile } as React.CSSProperties}
       >
@@ -70,8 +78,9 @@ export default function HomeProductGrid({ products, initialVisible = 8, step = 8
     );
   }
 
-  const shown = products.slice(0, visible);
-  const remaining = products.length - visible;
+  const shown = loadMoreEnabled ? products.slice(0, visible) : products;
+  const remaining = loadMoreEnabled ? products.length - visible : 0;
+  const loadStep = Math.max(1, Number(display?.load_more_step ?? step) || step);
 
   return (
     <>
@@ -83,7 +92,7 @@ export default function HomeProductGrid({ products, initialVisible = 8, step = 8
       </div>
       {remaining > 0 && (
         <div className="home-load-more">
-          <button type="button" className="button button-light" onClick={() => setVisible((current) => Math.min(current + Math.max(1, step), products.length))}>
+          <button type="button" className="button button-light" onClick={() => setVisible((current) => Math.min(current + loadStep, products.length))}>
             Load More <span>({remaining} more)</span> ↓
           </button>
           <small>Showing {visible} of {products.length} styles</small>
@@ -105,6 +114,6 @@ export function HomeProductGridStyles() {
 .home-product-carousel-prev{left:-18px}.home-product-carousel-next{right:-18px}
 .home-load-more{display:grid;justify-items:center;gap:8px;padding:22px 0 4px}.home-load-more small{color:#7b6a6e;font-size:11px}
 @media(max-width:900px){.home-product-grid{grid-template-columns:repeat(var(--home-grid-tablet,3),minmax(0,1fr))!important}.home-product-carousel-item{flex-basis:calc((100% - (var(--home-carousel-tablet,3) - 1)*14px)/var(--home-carousel-tablet,3))}.home-product-carousel-track{gap:14px}.home-product-carousel{width:calc(100% - 32px)}}
-@media(max-width:560px){.home-product-grid{grid-template-columns:repeat(var(--home-grid-mobile,2),minmax(0,1fr))!important}.home-product-carousel-item{flex-basis:calc((100% - (var(--home-carousel-mobile,2) - 1)*10px)/var(--home-carousel-mobile,2))}.home-product-carousel-track{gap:10px;padding-left:1px;padding-right:1px}.home-product-carousel{width:calc(100% - 24px)}.home-product-carousel-control{display:none}}
+@media(max-width:560px){.home-product-grid{grid-template-columns:repeat(var(--home-grid-mobile,2),minmax(0,1fr))!important}.home-product-carousel-item{flex-basis:calc((100% - (var(--home-carousel-mobile,2) - 1)*10px)/var(--home-carousel-mobile,2))}.home-product-carousel-track{gap:10px;padding-left:1px;padding-right:1px}.home-product-carousel{width:calc(100% - 24px)}.home-product-carousel-control{display:none}.home-product-carousel--mobile-grid .home-product-carousel-viewport{overflow:visible}.home-product-carousel--mobile-grid .home-product-carousel-track{display:grid;grid-template-columns:repeat(var(--home-carousel-mobile,2),minmax(0,1fr));overflow:visible;scroll-snap-type:none}.home-product-carousel--mobile-grid .home-product-carousel-item{flex:none;width:auto}}
 ` }} />;
 }
