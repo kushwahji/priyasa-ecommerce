@@ -7,80 +7,41 @@ body:has(.ecomus-pdp) main{margin-top:0!important;padding-top:0!important}
 .ecomus-pdp .pdp-main-image,.ecomus-pdp .pdp-gallery,.ecomus-pdp .pdp-media{position:relative;overflow:hidden}
 .ecomus-pdp .pdp-main-image::before,.ecomus-pdp .pdp-main-image::after,.ecomus-pdp .pdp-gallery::before,.ecomus-pdp .pdp-gallery::after{background:transparent!important;opacity:0!important;content:none!important;display:none!important}
 .ecomus-pdp .gallery-image-button,.ecomus-pdp .gallery-image-button::before,.ecomus-pdp .gallery-image-button::after{background:transparent!important;opacity:1!important;filter:none!important}
-.ecomus-pdp .gallery-image-button img,.ecomus-pdp .pdp-main-image img{opacity:1!important;filter:none!important;mix-blend-mode:normal!important}
+.ecomus-pdp .gallery-image-button img,.ecomus-pdp .pdp-main-image img{opacity:1!important;filter:none!important;mix-blend-mode:normal!important;display:block!important;visibility:visible!important}
 
-/* The normal purchase row is duplicated by the fixed mobile bar; never leave a blank red button in the document flow. */
 @media (max-width:680px){
-  body{overflow-x:hidden}
-  .ecomus-pdp .pdp-page{width:100%;max-width:100%;box-sizing:border-box}
-  .ecomus-pdp .pdp-layout{display:block;width:100%;box-sizing:border-box}
-  .ecomus-pdp .pdp-main-image{margin-top:0!important;border-radius:0!important}
-  .ecomus-pdp .pdp-breadcrumbs,.ecomus-pdp .breadcrumbs,.ecomus-pdp .pdp-breadcrumb{display:none!important}
-  .ecomus-pdp .purchase-actions,.ecomus-pdp .pdp-purchase-actions{display:none!important}
-  .ecomus-pdp .pdp-main-image,.ecomus-pdp .gallery-image-button{min-height:0!important}
+ body{overflow-x:hidden}
+ body:has(.ecomus-pdp)>main{margin:0!important;padding:0!important}
+ body:has(.ecomus-pdp) .site-header,body:has(.ecomus-pdp) header:not(.pdp-mobile-head){display:none!important}
+ .ecomus-pdp{width:100%!important;margin:0!important;padding:0 0 180px!important;overflow-x:hidden!important}
+ .ecomus-pdp .pdp-page,.ecomus-pdp .pdp-layout{width:100%!important;max-width:100%!important;margin:0!important;padding:0!important;box-sizing:border-box!important}
+ .ecomus-pdp .pdp-mobile-head{margin:0!important;padding:0!important}
+ .ecomus-pdp .breadcrumbs,.ecomus-pdp .pdp-breadcrumbs,.ecomus-pdp .pdp-breadcrumb{display:none!important}
+ .ecomus-pdp .premium-pdp-gallery{display:block!important;margin:0!important;padding:0!important}
+ .ecomus-pdp .pdp-main-image{width:100%!important;height:min(118vw,560px)!important;min-height:0!important;max-height:560px!important;margin:0!important;padding:0!important;aspect-ratio:auto!important;border-radius:0!important;background:#fff!important;overflow:hidden!important}
+ .ecomus-pdp .pdp-main-image .gallery-image-button{display:block!important;width:100%!important;height:100%!important;min-height:0!important;margin:0!important;padding:0!important;border:0!important;background:transparent!important;opacity:1!important;filter:none!important}
+ .ecomus-pdp .pdp-main-image .gallery-image-button img{width:100%!important;height:100%!important;object-fit:cover!important;object-position:center!important;opacity:1!important;filter:none!important;mix-blend-mode:normal!important}
+ .ecomus-pdp .purchase-actions,.ecomus-pdp .pdp-purchase-actions,.ecomus-pdp .whatsapp-order-button{display:none!important}
+ .ecomus-pdp .pdp-mobile-purchase{position:fixed!important;left:0!important;right:0!important;bottom:0!important;z-index:2000!important;background:#fff!important;border-top:1px solid #e5e7eb!important;box-shadow:0 -8px 28px rgba(20,20,20,.12)!important;padding:10px 12px calc(10px + env(safe-area-inset-bottom))!important;display:grid!important;grid-template-columns:1fr 1fr!important;gap:8px!important}
+ .ecomus-pdp .pdp-mobile-purchase>div:first-child{grid-column:1/-1!important;display:flex!important;align-items:center!important;justify-content:space-between!important;padding:0 4px!important;min-height:28px!important}
+ .ecomus-pdp .pdp-mobile-purchase>div:first-child small{font-size:11px!important;color:#6b7280!important}
+ .ecomus-pdp .pdp-mobile-purchase>div:first-child strong{font-size:18px!important;color:#202532!important}
+ .ecomus-pdp .pdp-mobile-purchase .button,.ecomus-pdp .pdp-mobile-purchase .mobile-buy-now,.ecomus-pdp .pdp-mobile-purchase .mobile-add-to-bag{width:100%!important;min-height:50px!important;height:50px!important;border-radius:8px!important;font-size:14px!important;font-weight:800!important;display:flex!important;align-items:center!important;justify-content:center!important;text-transform:uppercase!important;white-space:nowrap!important}
+ .ecomus-pdp .pdp-mobile-purchase .button:not(.dark-button){background:#ff3f6c!important;color:#fff!important;border:1px solid #ff3f6c!important}
+ .ecomus-pdp .pdp-mobile-purchase .dark-button{background:#171717!important;color:#fff!important;border:1px solid #171717!important}
+ .ecomus-pdp .pdp-mobile-purchase .whatsapp-mobile-button{grid-column:1/-1!important;width:100%!important;min-height:46px!important;height:46px!important;border:1px solid #25d366!important;background:#fff!important;color:#14863f!important;border-radius:8px!important;font-size:14px!important;font-weight:800!important;display:flex!important;align-items:center!important;justify-content:center!important}
+ .ecomus-pdp .pdp-mobile-purchase .whatsapp-mobile-button svg{width:18px!important;height:18px!important;margin-right:7px!important}
+ body:has(.ecomus-pdp) .mobile-bottom-nav,body:has(.ecomus-pdp) .mobile-nav{display:none!important}
 
-  /* Sticky purchase bar: Buy Now + Add to Bag + one WhatsApp order action. */
-  .ecomus-pdp .pdp-mobile-purchase{position:fixed!important;left:0!important;right:0!important;bottom:0!important;z-index:100!important;background:#fff!important;border-top:1px solid #e5e7eb!important;box-shadow:0 -8px 28px rgba(20,20,20,.10)!important;padding:12px 12px calc(12px + env(safe-area-inset-bottom))!important;display:grid!important;grid-template-columns:1fr 1fr!important;gap:10px!important}
-  .ecomus-pdp .pdp-mobile-purchase>div:first-child{grid-column:1/-1!important;display:flex!important;align-items:center!important;justify-content:space-between!important;padding:0 4px!important}
-  .ecomus-pdp .pdp-mobile-purchase>div:first-child small{font-size:12px!important;color:#6b7280!important}
-  .ecomus-pdp .pdp-mobile-purchase>div:first-child strong{font-size:18px!important;color:#202532!important}
-  .ecomus-pdp .pdp-mobile-purchase .mobile-buy-now,.ecomus-pdp .pdp-mobile-purchase .mobile-add-to-bag{min-height:52px!important;border-radius:10px!important;font-size:15px!important;font-weight:800!important;display:flex!important;align-items:center!important;justify-content:center!important}
-  .ecomus-pdp .pdp-mobile-purchase .whatsapp-mobile-button{grid-column:1/-1!important;min-height:44px!important;border:1px solid #25d366!important;background:#fff!important;color:#14863f!important;border-radius:10px!important;font-size:14px!important;font-weight:800!important;display:flex!important;align-items:center!important;justify-content:center!important}
-  .ecomus-pdp .pdp-mobile-purchase .whatsapp-mobile-button svg{width:19px;height:19px;margin-right:7px}
-  .ecomus-pdp{padding-bottom:170px!important}
+ .otp-backdrop{align-items:flex-end!important;justify-content:stretch!important;padding:0!important;background:rgba(15,18,28,.5)!important;z-index:3000!important}
+ .otp-modal{width:100%!important;max-width:none!important;max-height:min(92dvh,760px)!important;overflow:auto!important;margin:0!important;border-radius:22px 22px 0 0!important;padding:26px 20px calc(22px + env(safe-area-inset-bottom))!important;box-sizing:border-box!important;box-shadow:0 -14px 45px rgba(0,0,0,.2)!important}
+ .otp-phone{width:100%!important;box-sizing:border-box!important}
+ .otp-digits{width:100%!important;gap:7px!important}.otp-digit{width:100%!important;min-width:0!important;height:52px!important}.otp-submit{width:100%!important;min-height:52px!important}
 
-  /* Mobile login = full-width bottom sheet, never a desktop-sized centered modal. */
-  .otp-backdrop{align-items:flex-end!important;justify-content:center!important;padding:0!important;background:rgba(15,18,28,.48)!important}
-  .otp-modal{width:100%!important;max-width:680px!important;max-height:min(88dvh,760px)!important;overflow:auto!important;margin:0!important;border-radius:22px 22px 0 0!important;padding:24px 20px calc(20px + env(safe-area-inset-bottom))!important;box-sizing:border-box!important;box-shadow:0 -14px 40px rgba(0,0,0,.18)!important}
-  .otp-close{top:14px!important;right:14px!important;width:42px!important;height:42px!important}
-  .otp-brand{margin-top:4px!important}
-  .otp-phone{width:100%!important;box-sizing:border-box!important}
-  .otp-digits{gap:7px!important;width:100%!important}
-  .otp-digit{min-width:0!important;width:100%!important;height:52px!important}
-  .otp-submit{width:100%!important;min-height:52px!important}
-
-  /* Cart: compact, one-column mobile bag. */
-  .cart-page,.cart-container{width:100%!important;max-width:100%!important;box-sizing:border-box!important}
-  .cart-page{padding-left:12px!important;padding-right:12px!important}
-  .cart-layout,.cart-content{grid-template-columns:1fr!important;display:block!important}
-  .cart-summary{width:100%!important;position:static!important;box-sizing:border-box!important}
-  .cart-product,.cart-item{width:100%!important;box-sizing:border-box!important}
-  .cart-product-image img,.cart-item img{max-width:100%!important;object-fit:cover!important}
-  .cart-product-bottom,.cart-product-info{min-width:0!important}
-  .cart-checkout{width:100%!important;min-height:52px!important}
-
-  /* Checkout v3 exact selectors: Address -> Payment -> Confirm remains vertical and touch friendly. */
-  .priyasa-checkout-v3{width:100%!important;max-width:100%!important;box-sizing:border-box!important;padding-left:12px!important;padding-right:12px!important;padding-bottom:32px!important}
-  .checkout-v3-head{display:flex!important;align-items:flex-start!important;justify-content:space-between!important;gap:12px!important;flex-wrap:wrap!important}
-  .checkout-v3-title{font-size:26px!important;line-height:1.12!important;margin:0!important}
-  .checkout-v3-secure{font-size:12px!important;white-space:nowrap!important}
-  .checkout-v3-steps{width:100%!important;display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:6px!important;margin:12px 0 18px!important}
-  .checkout-v3-step{min-width:0!important;padding:8px 4px!important;text-align:center!important}
-  .checkout-v3-step span{font-size:11px!important;white-space:nowrap!important}
-  .checkout-v3-layout{display:block!important;width:100%!important;max-width:100%!important}
-  .checkout-v3-main{display:block!important;width:100%!important;min-width:0!important}
-  .checkout-v3-summary,.checkout-v3-card{width:100%!important;max-width:100%!important;box-sizing:border-box!important;border-radius:14px!important}
-  .checkout-v3-form-grid{display:grid!important;grid-template-columns:1fr!important;gap:14px!important}
-  .checkout-v3-form-grid label.full{grid-column:auto!important}
-  .checkout-v3-input{width:100%!important;min-height:50px!important;box-sizing:border-box!important}
-  .checkout-v3-saved{overflow:hidden!important}
-  .checkout-v3-address{width:100%!important;text-align:left!important;box-sizing:border-box!important}
-  .checkout-v3-payment-grid{display:grid!important;grid-template-columns:1fr!important;gap:10px!important}
-  .checkout-v3-payment{width:100%!important;min-height:74px!important;box-sizing:border-box!important;text-align:left!important}
-  .checkout-v3-coupon{display:grid!important;grid-template-columns:minmax(0,1fr) auto!important;width:100%!important;box-sizing:border-box!important}
-  .checkout-v3-coupon input{min-width:0!important;width:100%!important;min-height:48px!important;box-sizing:border-box!important}
-  .checkout-v3-coupon button{min-width:84px!important;min-height:48px!important}
-  .checkout-v3-actions{display:grid!important;grid-template-columns:1fr!important;gap:10px!important}
-  .checkout-v3-actions>*{width:100%!important;min-height:52px!important;box-sizing:border-box!important}
-  .checkout-v3-login{width:100%!important;box-sizing:border-box!important;margin:20px 0!important}
-
-  /* Keep the app bottom nav above the PDP purchase bar rather than covering it. */
-  body:has(.ecomus-pdp) .mobile-bottom-nav,body:has(.ecomus-pdp) .mobile-nav{display:none!important}
+ .cart-page,.cart-container,.priyasa-checkout-v3{width:100%!important;max-width:100%!important;box-sizing:border-box!important}
+ .cart-page{padding:12px!important}.cart-layout,.cart-content{display:block!important;width:100%!important}.cart-summary{width:100%!important;position:static!important}.cart-product,.cart-item{width:100%!important;box-sizing:border-box!important}.cart-product-image img,.cart-item img{max-width:100%!important;object-fit:cover!important}.cart-checkout{width:100%!important;min-height:52px!important}
+ .checkout-v3-layout,.checkout-v3-main{display:block!important;width:100%!important;max-width:100%!important;min-width:0!important}.checkout-v3-form-grid{grid-template-columns:1fr!important}.checkout-v3-form-grid label.full{grid-column:auto!important}.checkout-v3-input{width:100%!important;min-height:50px!important;box-sizing:border-box!important}.checkout-v3-payment-grid{grid-template-columns:1fr!important}.checkout-v3-payment{width:100%!important;min-height:74px!important}.checkout-v3-actions{display:grid!important;grid-template-columns:1fr!important;gap:10px!important}.checkout-v3-actions>*{width:100%!important;min-height:52px!important}
 }
 
-@media (min-width:681px){
-  .otp-modal{max-width:460px}
-  .ecomus-pdp .pdp-mobile-purchase{display:none!important}
-}
-
+@media (min-width:681px){.otp-modal{max-width:460px!important}.ecomus-pdp .pdp-mobile-purchase{display:none!important}}
 img,video{max-width:100%}
