@@ -1,5 +1,6 @@
 'use client';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
 import type { CSSProperties } from 'react';
 import type { Product } from '@/lib/catalog';
@@ -40,6 +41,7 @@ function getWishlistState(): Promise<WishlistState> {
 }
 
 export function ProductCard({ product }: Props) {
+  const router = useRouter();
   const [liked, setLiked] = useState(false);
   const [auth, setAuth] = useState(false);
   const [quick, setQuick] = useState(false);
@@ -110,14 +112,27 @@ export function ProductCard({ product }: Props) {
 
   function openQuick() { setQuick(true); document.body.classList.add('quick-view-open'); }
   function closeQuick() { setQuick(false); document.body.classList.remove('quick-view-open'); }
+  function openProduct(event: React.MouseEvent<HTMLElement>) {
+    const target = event.target as HTMLElement;
+    if (target.closest('a,button,input,select,textarea')) return;
+    router.push(`/product/${product.slug}`);
+  }
+  function onProductKeyDown(event: React.KeyboardEvent<HTMLElement>) {
+    if (event.key === 'Enter' || event.key === ' ') {
+      const target = event.target as HTMLElement;
+      if (target.closest('a,button,input,select,textarea')) return;
+      event.preventDefault();
+      router.push(`/product/${product.slug}`);
+    }
+  }
   const colorStyle = (color: string): CSSProperties => ({ background: color.toLowerCase().replace(/[^a-z#0-9(),.% -]/g, '') });
 
   return <>
-    <article className="product-card ecomus-product-card nykaa-product-card">
+    <article className="product-card ecomus-product-card nykaa-product-card" onClick={openProduct} onKeyDown={onProductKeyDown} tabIndex={0} role="link" aria-label={`View ${product.name}`}>
       <div className="product-media ecomus-product-media nykaa-product-media">
         <div className="ecomus-product-badges nykaa-product-badges">
           {hasDiscount && <span className="nykaa-discount-badge">{discount}% OFF</span>}
-          {hasDistinctEditorialBadge && <span className="nykaa-editorial-badge">{editorialBadge}</span>}
+          {false && hasDistinctEditorialBadge && <span className="nykaa-editorial-badge">{editorialBadge}</span>}
         </div>
         <div className="ecomus-product-actions nykaa-product-actions" aria-label="Product actions">
           <button type="button" className={`ecomus-action ecomus-wishlist nykaa-wishlist ${liked ? 'is-active' : ''}`} onClick={toggleWishlist} aria-label={liked ? 'Remove from wishlist' : 'Add to wishlist'} title={liked ? 'Remove from wishlist' : 'Add to wishlist'}>{liked ? '♥' : '♡'}</button>
