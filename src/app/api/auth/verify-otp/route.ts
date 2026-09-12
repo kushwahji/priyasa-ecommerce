@@ -13,10 +13,7 @@ export async function POST(req:Request){
     const {response,body:result}=await priyasaApi('/api/v1/auth/verify-otp',{method:'POST',body:JSON.stringify(input)});
     if(!response.ok)return NextResponse.json(result,{status:response.status});
 
-    const provider=result as ProviderResult;
-    // Core has historically returned auth data under `data`, while some
-    // deployments return the same fields at the top level. Accept both so a
-    // valid OTP can never be rejected only because of response wrapping.
+    const provider=(result&&typeof result==='object'?result:{}) as ProviderResult;
     const data:ProviderData={...(provider.data||{}),success:provider.data?.success??provider.success,token:provider.data?.token??provider.token,user:provider.data?.user??provider.user,message:provider.data?.message??provider.message};
     const success=data.success!==false;
     if(!success)return NextResponse.json(result,{status:401});
@@ -24,8 +21,6 @@ export async function POST(req:Request){
     const phone=String(data.user?.mobile||input.mobile||'').replace(/\D/g,'').slice(-10);
     if(phone.length!==10)return NextResponse.json({success:false,message:'OTP verified but no valid customer mobile was returned.'},{status:502});
 
-    // Priyasa Core remains the customer/commerce authority. Store only keeps
-    // the signed session and Core access token needed for API requests.
     const subject=String(data.user?.id||phone);
     await setSession({id:subject,role:'CUSTOMER'});
     const jar=await cookies();
@@ -38,7 +33,8 @@ export async function POST(req:Request){
       jar.set('priyasa_access_token',data.token,cookieOptions);
       if(data.user?.id)jar.set('priyasa_user_id',String(data.user.id),cookieOptions);
     }
-    return NextResponse.json({...result,success:true,data:{...(provider.data||{}),...data,success:true}});
+    const responseBody:Record<string,unknown>=provider as Record<string,unknown>;
+    return NextResponse.json({...responseBody,success:true,data:{...(provider.data||{}),...data,success:true}});
   }catch(error){
     return NextResponse.json({success:false,message:apiError(error,'Unable to verify OTP')},{status:502});
   }
