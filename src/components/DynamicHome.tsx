@@ -51,12 +51,10 @@ function OfferBanner({s}:{s:HomeCmsSection}){
 
 function Reviews({s}:{s:HomeCmsSection}){
  const items=itemsOf(s);if(!items.length)return null;
- return <section className="home-reviews" data-testid="home-reviews"><Heading title={clean(s.title||'What our customers say')} subtitle={clean(s.subtitle||'Loved by Priyasa shoppers')} />
-  <div className="home-review-rail">{items.slice(0,12).map((x:any,i:number)=><article className="home-review-card" key={x.id||i}><div className="home-review-stars" aria-label={`${Number(x.rating||5)} out of 5 stars`}>{'★'.repeat(Math.max(1,Math.min(5,Math.round(Number(x.rating||5)))))}</div><h3>{clean(x.title||x.product_name||'Verified purchase')}</h3><p>{clean(x.review||x.comment||x.text||x.content||'Beautiful quality and fit.').slice(0,280)}</p><strong>{clean(x.customer_name||x.name||'Priyasa customer')}</strong>{x.verified!==false&&<small> · Verified Buyer</small>}</article>)}</div>
- </section>;
+ return <section className="home-reviews" data-testid="home-reviews"><Heading title={clean(s.title||'What our customers say')} subtitle={clean(s.subtitle||'Loved by Priyasa shoppers')}/><div className="home-review-rail">{items.slice(0,12).map((x:any,i:number)=><article className="home-review-card" key={x.id||i}><div className="home-review-stars" aria-label={`${Number(x.rating||5)} out of 5 stars`}>{'★'.repeat(Math.max(1,Math.min(5,Math.round(Number(x.rating||5)))))}</div><h3>{clean(x.title||x.product_name||'Verified purchase')}</h3><p>{clean(x.review||x.comment||x.text||x.content||'Beautiful quality and fit.').slice(0,280)}</p><strong>{clean(x.customer_name||x.name||'Priyasa customer')}</strong>{x.verified!==false&&<small> · Verified Buyer</small>}</article>)}</div></section>;
 }
 
-async function Products({title,subtitle,products,rail=false,limit=12,more=false}:{title:string;subtitle?:string;products:any[];rail?:boolean;limit?:number;more?:boolean}){
+async function Products({title,subtitle,products,rail=false,limit=12}:{title:string;subtitle?:string;products:any[];rail?:boolean;limit?:number}){
  const list=products.slice(0,limit);if(!list.length)return null;
  return <section className={`${rail?'home-managed-products':'home-managed-products home-more-products'} home-section`}><Heading title={title} subtitle={subtitle}/>{rail?<ProductRail products={list}/>:<HomeProductGrid products={list} initialVisible={Math.min(8,list.length)} step={8}/>}</section>;
 }
@@ -72,19 +70,19 @@ export default async function DynamicHome({initialSections=[]}:{initialSections?
  const bestSection=sections.find(s=>['trending','best_sellers','best-sellers','products-best'].includes(typeOf(s)));
  const [newProducts,flashProducts,bestProducts]=await Promise.all([
   getCachedStorefrontProducts({limit:12,sort:'newest'}),
-  flashSection?getProductsForHomeSection('sale',12):getProductsForHomeSection('sale',12),
+  getProductsForHomeSection('sale',12),
   getCachedStorefrontProducts({limit:30,sort:'popular'}),
  ]);
- const editorialItems=imageSection?itemsOf(imageSection):newProducts.slice(0,6).map((p:any)=>({id:`product-${p.id}`,title:p.name,subtitle:p.category, image_url:p.image,cta_href:`/product/${encodeURIComponent(p.slug)}`,cta_label:'Shop Now'}));
+ const editorialItems=imageSection?itemsOf(imageSection):newProducts.slice(0,6).map((p:any)=>({id:`product-${p.id}`,title:p.name,subtitle:p.category,image_url:p.image,cta_href:`/product/${encodeURIComponent(p.slug)}`,cta_label:'Shop Now'}));
  const reviewItems=review?itemsOf(review):[];
  return <div className="home-reference-v5 home-managed-v1">
   {hero&&<Hero s={hero}/>}<TrustStrip/>
   <Products title={newSection?.title||'New Arrivals'} subtitle={newSection?.subtitle||'Fresh styles just landed'} products={newProducts} rail limit={12}/>
   {editorialItems.length>0&&<section className="home-editorial-section"><Heading title={imageSection?.title||'Trending Now'} subtitle={imageSection?.subtitle||'Discover the latest edits'}/>{imageSection?.type==='image_carousel'?<HomeImageCarousel slides={editorialItems.slice(0,6).map((x:any,i:number)=>({id:String(x.id||i),title:x.title,subtitle:x.subtitle,imageUrl:x.image_url||x.imageUrl,mobileImageUrl:x.mobile_image_url||x.mobileImageUrl,ctaLabel:x.cta_label||x.ctaLabel||'Shop Now',ctaHref:x.cta_href||x.ctaHref||'/shop'}))}/>:<EditorialRail items={editorialItems}/>}</section>}
-  <section className="home-flash-sale"><div className="home-section-head"><div><span className="home-kicker">LIMITED TIME</span><h2>{clean(flashSection?.title||'Flash Sale')}</h2></div><Link className="home-view-all" href={flashSection?href(flashSection):'/shop?sort=sale'}>{flashSection?label(flashSection):'Shop Sale'} →</Link></div><ProductRail products={flashProducts.slice(0,12)}/></section>
+  <section className="home-flash-sale" data-testid="home-flash-sale"><div className="home-section-head"><div><span className="home-kicker">LIMITED TIME</span><h2>{clean(flashSection?.title||'Flash Sale')}</h2></div><Link className="home-view-all" href={flashSection?href(flashSection):'/shop?sort=sale'}>{flashSection?label(flashSection):'Shop Sale'} →</Link></div><ProductRail products={flashProducts.slice(0,12)}/></section>
   {offer&&<OfferBanner s={offer}/>} 
-  <Products title={bestSection?.title||'Best Sellers'} subtitle={bestSection?.subtitle||'What shoppers are loving'} products={bestProducts} limit={30} more/>
-  {reviewItems.length>0&&<Reviews s={review!review:{id:'reviews',type:'reviews',title:'What our customers say',subtitle:'Real feedback from Priyasa shoppers',content:{items:reviewItems}}}/>} 
-  {sections.filter(s=>s!==hero&&s!==imageSection&&s!==offer&&s!==review&&s!==newSection&&s!==flashSection&&s!==bestSection&&['text','video'].includes(typeOf(s))).map(s=>typeOf(s)==='text'?<section className="home-managed-text home-section" key={s.id}><span className="home-kicker">{clean(s.title||'PRIYASA')}</span><div className="home-rich-copy">{clean(s.content?.html||s.subtitle||'')}</div></section>:null)}
+  <Products title={bestSection?.title||'Best Sellers'} subtitle={bestSection?.subtitle||'What shoppers are loving'} products={bestProducts} limit={30}/>
+  {review&&reviewItems.length>0&&<Reviews s={review}/>} 
+  {sections.filter(s=>s!==hero&&s!==imageSection&&s!==offer&&s!==review&&s!==newSection&&s!==flashSection&&s!==bestSection&&typeOf(s)==='text').map(s=><section className="home-managed-text home-section" key={s.id}><span className="home-kicker">{clean(s.title||'PRIYASA')}</span><div className="home-rich-copy">{clean(s.content?.html||s.subtitle||'')}</div></section>)}
  </div>;
 }
