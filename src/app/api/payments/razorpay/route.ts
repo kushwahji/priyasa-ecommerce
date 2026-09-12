@@ -2,23 +2,26 @@ import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { priyasaApi, apiError } from '@/lib/priyasa-api';
 
+const IDEMPOTENCY_KEY = /^[A-Za-z0-9._:-]{8,128}$/;
+
 export async function POST(req: Request) {
   const token = (await cookies()).get('priyasa_access_token')?.value;
   if (!token) return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
 
   const input = await req.json().catch(() => null) as Record<string, unknown> | null;
-  const orderId = typeof input?.orderId === 'string' ? input.orderId : '';
+  const orderId = typeof input?.orderId === 'string' ? input.orderId.trim() : '';
   if (!orderId) return NextResponse.json({ error: 'orderId required' }, { status: 400 });
 
-  const idempotencyKey = req.headers.get('idempotency-key') || crypto.randomUUID();
+  const idempotencyKey = req.headers.get('idempotency-key')?.trim() || '';
+  if (!IDEMPOTENCY_KEY.test(idempotencyKey)) {
+    return NextResponse.json({ error: 'A valid Idempotency-Key is required to safely start payment.' }, { status: 400 });
+  }
+
   const { response, body: result } = await priyasaApi(
     `/api/v1/storefront/orders/${encodeURIComponent(orderId)}/payment`,
     {
       method: 'POST',
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Idempotency-Key': idempotencyKey,
-      },
+      headers: { Authorization: `Bearer ${token}`, 'Idempotency-Key': idempotencyKey },
       body: JSON.stringify({ provider: 'razorpay' }),
     },
   );
