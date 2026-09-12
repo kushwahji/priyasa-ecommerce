@@ -10,28 +10,15 @@ const clean = (value: unknown) => String(value ?? '')
   .replace(/&#39;|&apos;/g, "'")
   .replace(/\s+/g, ' ')
   .trim();
-
 const image = (value: any) => value?.image_url || value?.imageUrl || value?.image || value?.media?.url || '';
-const href = (value: unknown) => {
-  const v = String(value ?? '').trim();
-  return v && (v.startsWith('/') || v.startsWith('http://') || v.startsWith('https://')) ? v : v ? `/${v}` : null;
-};
+const href = (value: unknown) => { const v = String(value ?? '').trim(); return v && (v.startsWith('/') || v.startsWith('http://') || v.startsWith('https://')) ? v : v ? `/${v}` : null; };
 
 function DynamicCard({ item, index }: { item: any; index: number }) {
   const title = clean(item?.title || item?.name || item?.label);
   const subtitle = clean(item?.subtitle || item?.description || item?.text);
   const src = image(item);
   const to = href(item?.href || item?.url || item?.cta?.href || item?.cta_href || item?.ctaHref);
-  const body = (
-    <>
-      {src ? <div className="home-dynamic-card-media"><img src={src} alt={title} loading="lazy" /></div> : null}
-      {(title || subtitle) ? <div className="home-dynamic-card-copy">
-        {title ? <strong>{title}</strong> : null}
-        {subtitle ? <span>{subtitle}</span> : null}
-        {(item?.cta?.label || item?.cta_label || item?.ctaLabel) ? <small>{clean(item?.cta?.label || item?.cta_label || item?.ctaLabel)} →</small> : null}
-      </div> : null}
-    </>
-  );
+  const body = <>{src ? <div className="home-dynamic-card-media"><img src={src} alt={title} loading="lazy" /></div> : null}{(title || subtitle) ? <div className="home-dynamic-card-copy">{title ? <strong>{title}</strong> : null}{subtitle ? <span>{subtitle}</span> : null}{(item?.cta?.label || item?.cta_label || item?.ctaLabel) ? <small>{clean(item?.cta?.label || item?.cta_label || item?.ctaLabel)} →</small> : null}</div> : null}</>;
   return to ? <Link className="home-dynamic-card" href={to} key={String(item?.id ?? index)}>{body}</Link> : <article className="home-dynamic-card" key={String(item?.id ?? index)}>{body}</article>;
 }
 
@@ -46,22 +33,12 @@ export default function HomeDynamicSection({ section }: { section: any }) {
   const layout = String(content.layout || '').toLowerCase();
   const carousel = layout === 'carousel' || content.carousel === true || mobileScroll;
   const body = clean(content.text || content.description || section?.description || content.html);
-
   if (!values.length && !body && !clean(section?.title) && !clean(section?.subtitle)) return null;
-
   const scroll = (direction: number) => railRef.current?.scrollBy({ left: direction * Math.max(280, railRef.current.clientWidth * 0.78), behavior: 'smooth' });
-
-  return (
-    <section className={`home-section home-dynamic-section ${carousel ? 'home-dynamic-section--carousel' : ''}`} data-home-template={clean(section?.template || content.template || '') || undefined}>
-      {(clean(section?.title) || clean(section?.subtitle)) && <div className="home-section-head"><div>{clean(section?.title) && <h2>{clean(section.title)}</h2>}{clean(section?.subtitle) && <p>{clean(section.subtitle)}</p>}</div>{href(section?.cta_href || section?.ctaHref || content?.cta?.href) && <Link className="home-view-all" href={href(section?.cta_href || section?.ctaHref || content?.cta?.href)!}>{clean(section?.cta_label || section?.ctaLabel || content?.cta?.label || 'View All')} →</Link>}</div>}
-      {body && <div className="home-dynamic-copy"><p>{body}</p></div>}
-      {values.length ? <div className="home-dynamic-rail-wrap">
-        {carousel && values.length > columns ? <button type="button" className="home-dynamic-control home-dynamic-control--prev" onClick={() => scroll(-1)} aria-label="Previous">‹</button> : null}
-        <div ref={railRef} className={`home-dynamic-grid ${carousel ? 'home-dynamic-grid--scroll' : ''}`} style={{ '--home-dynamic-columns': columns, '--home-dynamic-mobile-columns': mobileColumns } as React.CSSProperties}>
-          {values.map((item: any, index: number) => <DynamicCard item={item} index={index} key={String(item?.id ?? index)} />)}
-        </div>
-        {carousel && values.length > columns ? <button type="button" className="home-dynamic-control home-dynamic-control--next" onClick={() => scroll(1)} aria-label="Next">›</button> : null}
-      </div> : null}
-    </section>
-  );
+  return <section className={`home-section home-dynamic-section ${carousel ? 'home-dynamic-section--carousel' : ''}`} data-home-template={clean(section?.template || content.template || '') || undefined}>
+    {(clean(section?.title) || clean(section?.subtitle)) && <div className="home-section-head"><div>{clean(section?.title) && <h2>{clean(section.title)}</h2>}{clean(section?.subtitle) && <p>{clean(section.subtitle)}</p>}</div>{href(section?.cta_href || section?.ctaHref || content?.cta?.href) && <Link className="home-view-all" href={href(section?.cta_href || section?.ctaHref || content?.cta?.href)!}>{clean(section?.cta_label || section?.ctaLabel || content?.cta?.label || 'View All')} →</Link>}</div>}
+    {body && <div className="home-dynamic-copy"><p>{body}</p></div>}
+    {values.length ? <div className="home-dynamic-rail-wrap">{carousel && values.length > columns ? <button type="button" className="home-dynamic-control home-dynamic-control--prev" onClick={() => scroll(-1)} aria-label="Previous">‹</button> : null}<div ref={railRef} className={`home-dynamic-grid ${carousel ? 'home-dynamic-grid--scroll' : ''}`} style={{ '--home-dynamic-columns': columns, '--home-dynamic-mobile-columns': mobileColumns } as React.CSSProperties}>{values.map((item: any, index: number) => <DynamicCard item={item} index={index} key={String(item?.id ?? index)} />)}</div>{carousel && values.length > columns ? <button type="button" className="home-dynamic-control home-dynamic-control--next" onClick={() => scroll(1)} aria-label="Next">›</button> : null}</div> : null}
+    <style jsx global>{` .home-dynamic-section{width:100%;padding:38px 0 30px}.home-dynamic-section .home-section-head{width:min(1320px,calc(100% - 48px));margin:0 auto 18px}.home-dynamic-copy{width:min(1100px,calc(100% - 48px));margin:0 auto 18px;color:#686b78;font-size:13px;line-height:1.7}.home-dynamic-rail-wrap{position:relative;width:min(1320px,calc(100% - 48px));margin:0 auto}.home-dynamic-grid{display:grid;grid-template-columns:repeat(var(--home-dynamic-columns),minmax(0,1fr));gap:16px}.home-dynamic-grid--scroll{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;padding:1px 1px 10px}.home-dynamic-grid--scroll::-webkit-scrollbar{display:none}.home-dynamic-grid--scroll .home-dynamic-card{flex:0 0 calc((100% - (var(--home-dynamic-columns) - 1)*16px)/var(--home-dynamic-columns));scroll-snap-align:start}.home-dynamic-card{display:block;min-width:0;overflow:hidden;border:1px solid #eee;border-radius:8px;background:#fff;color:#282c3f;text-decoration:none;box-shadow:0 1px 3px rgba(0,0,0,.03);transition:transform .2s ease,box-shadow .2s ease}.home-dynamic-card:hover{transform:translateY(-2px);box-shadow:0 8px 22px rgba(0,0,0,.08)}.home-dynamic-card-media{aspect-ratio:1/1.15;background:#f6f6f7;overflow:hidden}.home-dynamic-card-media img{display:block;width:100%;height:100%;object-fit:cover}.home-dynamic-card-copy{display:flex;flex-direction:column;gap:5px;padding:13px 14px}.home-dynamic-card-copy strong{font-size:13px}.home-dynamic-card-copy span{font-size:11px;line-height:1.4;color:#686b78}.home-dynamic-card-copy small{font-size:10px;font-weight:700;letter-spacing:.3px}.home-dynamic-control{position:absolute;top:50%;z-index:3;transform:translateY(-50%);width:40px;height:40px;border:1px solid #ddd;border-radius:50%;background:#fff;color:#282c3f;font-size:25px;line-height:1;box-shadow:0 3px 12px rgba(0,0,0,.1);cursor:pointer}.home-dynamic-control--prev{left:-20px}.home-dynamic-control--next{right:-20px}@media(max-width:900px){.home-dynamic-grid{grid-template-columns:repeat(min(var(--home-dynamic-columns),3),minmax(0,1fr))}.home-dynamic-grid--scroll .home-dynamic-card{flex-basis:calc((100% - 2*12px)/3)}.home-dynamic-rail-wrap,.home-dynamic-section .home-section-head,.home-dynamic-copy{width:calc(100% - 28px)}.home-dynamic-grid{gap:12px}.home-dynamic-card-copy{padding:11px}.home-dynamic-control{display:none}}@media(max-width:600px){.home-dynamic-section{padding:28px 0 24px}.home-dynamic-grid{grid-template-columns:repeat(var(--home-dynamic-mobile-columns),minmax(0,1fr));gap:10px}.home-dynamic-grid--scroll{margin-right:-14px;padding-right:14px}.home-dynamic-grid--scroll .home-dynamic-card{flex-basis:calc((100% - 10px)/var(--home-dynamic-mobile-columns))}.home-dynamic-card-media{aspect-ratio:1/1.22}.home-dynamic-card-copy{gap:4px;padding:9px}.home-dynamic-card-copy strong{font-size:11px}.home-dynamic-card-copy span{font-size:10px}.home-dynamic-card-copy small{font-size:9px}}`}</style>
+  </section>;
 }
