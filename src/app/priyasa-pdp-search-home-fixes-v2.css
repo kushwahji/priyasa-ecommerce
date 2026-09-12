@@ -1,0 +1,352 @@
+/* Final storefront correction layer. Keep this file last in the CSS cascade. */
+
+/* 1) Home CMS order: the API renderer owns the DOM sequence on every viewport. */
+.home-page.home-reference-v4 {
+  display: block !important;
+  position: relative !important;
+  width: 100% !important;
+  height: auto !important;
+  flex-direction: initial !important;
+  grid-template-columns: none !important;
+  grid-auto-flow: initial !important;
+}
+.home-page.home-reference-v4 > .home-section {
+  display: block !important;
+  position: relative !important;
+  order: initial !important;
+  float: none !important;
+  clear: both !important;
+  width: 100% !important;
+  height: auto !important;
+  min-height: 0 !important;
+  transform: none !important;
+}
+@media (max-width: 760px) {
+  .home-page.home-reference-v4 > .home-hero-multi { order: 0 !important; }
+  .home-page.home-reference-v4 > .home-new-arrivals { order: 1 !important; }
+  .home-page.home-reference-v4 > .home-api-offer { order: 2 !important; }
+  .home-page.home-reference-v4 > .home-category-section { order: 3 !important; }
+  .home-page.home-reference-v4 > .home-trending { order: 4 !important; }
+  .home-page.home-reference-v4 > .home-api-banner { order: 5 !important; }
+  .home-page.home-reference-v4 > .home-api-text { order: 6 !important; }
+  .home-page.home-reference-v4 .home-hero-multi,
+  .home-page.home-reference-v4 .home-product-section,
+  .home-page.home-reference-v4 .home-api-offer,
+  .home-page.home-reference-v4 .home-category-section,
+  .home-page.home-reference-v4 .home-api-banner,
+  .home-page.home-reference-v4 .home-api-text {
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+}
+
+/* 2) Header live search: one stable grid, no nested/focus double borders. */
+.e2-panel--search .e2-search-form {
+  position: relative !important;
+  display: grid !important;
+  grid-template-columns: 24px minmax(0, 1fr) auto !important;
+  align-items: center !important;
+  width: min(900px, 100%) !important;
+  min-height: 58px !important;
+  height: 58px !important;
+  margin: 0 auto !important;
+  padding: 0 10px 0 16px !important;
+  box-sizing: border-box !important;
+  border: 1px solid #d8d0d3 !important;
+  border-radius: 7px !important;
+  background: #fff !important;
+  box-shadow: none !important;
+  overflow: visible !important;
+}
+.e2-panel--search .e2-search-form:focus-within {
+  border-color: #ff3f6c !important;
+  box-shadow: 0 0 0 2px rgba(255,63,108,.10) !important;
+}
+.e2-panel--search .e2-search-form > svg {
+  position: static !important;
+  width: 21px !important;
+  height: 21px !important;
+  flex: 0 0 auto !important;
+  color: #8d1d4e !important;
+}
+.e2-panel--search .e2-search-form input {
+  position: static !important;
+  display: block !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  height: 54px !important;
+  margin: 0 !important;
+  padding: 0 8px !important;
+  border: 0 !important;
+  outline: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: #282c3f !important;
+  font-size: 16px !important;
+}
+.e2-panel--search .e2-search-form input:focus {
+  border: 0 !important;
+  outline: 0 !important;
+  box-shadow: none !important;
+}
+.e2-panel--search .e2-search-form > button[type='submit'] {
+  position: static !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-width: 86px !important;
+  min-height: 40px !important;
+  margin: 0 !important;
+  padding: 0 16px !important;
+  border: 0 !important;
+  border-radius: 5px !important;
+  background: #282c3f !important;
+  color: #fff !important;
+}
+.e2-panel--search .e2-search-form .e2-search-clear {
+  position: absolute !important;
+  right: 98px !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  width: 28px !important;
+  height: 28px !important;
+  min-width: 28px !important;
+  min-height: 28px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  color: #686b78 !important;
+  font-size: 21px !important;
+  line-height: 28px !important;
+  box-shadow: none !important;
+  z-index: 2 !important;
+}
+
+@media (max-width: 760px) {
+  .e2-panel--search {
+    top: 0 !important;
+    height: 100dvh !important;
+    max-height: none !important;
+  }
+  .e2-panel--search .e2-panel-head {
+    height: 62px !important;
+    min-height: 62px !important;
+  }
+  .e2-panel--search .e2-search-body {
+    padding: 14px 14px 88px !important;
+    height: calc(100dvh - 62px) !important;
+    max-height: none !important;
+    overflow-y: auto !important;
+    box-sizing: border-box !important;
+  }
+  .e2-panel--search .e2-search-form {
+    grid-template-columns: 24px minmax(0, 1fr) !important;
+    min-height: 56px !important;
+    height: 56px !important;
+    padding: 0 12px !important;
+    border-radius: 8px !important;
+  }
+  .e2-panel--search .e2-search-form input {
+    height: 52px !important;
+    padding: 0 7px !important;
+    font-size: 16px !important;
+  }
+  .e2-panel--search .e2-search-form > button[type='submit'] {
+    display: none !important;
+  }
+  .e2-panel--search .e2-search-form .e2-search-clear {
+    right: 10px !important;
+  }
+  .e2-panel--search .header-search-product-list {
+    width: 100% !important;
+  }
+  .e2-panel--search .header-search-product {
+    grid-template-columns: 64px minmax(0, 1fr) !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+}
+
+/* 3) PDP media: never allow legacy responsive layers to collapse the gallery. */
+.ecomus-pdp .pdp-layout-v2,
+.ecomus-pdp .premium-pdp-gallery,
+.ecomus-pdp .pdp-main-image {
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+.ecomus-pdp .premium-pdp-gallery {
+  display: grid !important;
+  min-width: 0 !important;
+  align-items: start !important;
+}
+.ecomus-pdp .pdp-main-image {
+  position: relative !important;
+  display: block !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  min-height: 360px !important;
+  overflow: hidden !important;
+  background: #f7f7f8 !important;
+}
+.ecomus-pdp .pdp-main-image .gallery-image-button,
+.ecomus-pdp .pdp-main-image .gallery-image-button img {
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+}
+.ecomus-pdp .pdp-main-image .gallery-image-button {
+  position: absolute !important;
+  inset: 0 !important;
+}
+.ecomus-pdp .pdp-main-image .gallery-image-button img {
+  position: absolute !important;
+  inset: 0 !important;
+  object-fit: cover !important;
+  object-position: center center !important;
+}
+.ecomus-pdp .pdp-mobile-slider {
+  display: none !important;
+}
+
+/* 4) PDP variants: expose actual API values rather than empty colour circles. */
+.ecomus-pdp .color-options {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 8px !important;
+}
+.ecomus-pdp .color-chip {
+  min-width: 74px !important;
+  min-height: 42px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 7px !important;
+  padding: 0 10px !important;
+  border: 1px solid #d9d9dd !important;
+  border-radius: 6px !important;
+  background: #fff !important;
+  color: #282c3f !important;
+  cursor: pointer !important;
+}
+.ecomus-pdp .color-chip .color-chip-swatch {
+  width: 16px !important;
+  height: 16px !important;
+  flex: 0 0 16px !important;
+  border: 1px solid #c9c9cc !important;
+  border-radius: 50% !important;
+  background: linear-gradient(135deg, #f1f1f1, #c7c7c7) !important;
+}
+.ecomus-pdp .color-chip b {
+  font-size: 10px !important;
+  font-weight: 700 !important;
+  white-space: nowrap !important;
+}
+.ecomus-pdp .color-chip.active {
+  border-color: #ff3f6c !important;
+  box-shadow: 0 0 0 1px #ff3f6c inset !important;
+  background: #fff7f9 !important;
+}
+.ecomus-pdp .size-options {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 8px !important;
+}
+.ecomus-pdp .size-options button {
+  position: relative !important;
+  min-width: 52px !important;
+  min-height: 42px !important;
+  padding: 0 12px !important;
+  border: 1px solid #d9d9dd !important;
+  border-radius: 5px !important;
+  background: #fff !important;
+  color: #282c3f !important;
+  font-weight: 700 !important;
+}
+.ecomus-pdp .size-options button.active {
+  border-color: #ff3f6c !important;
+  color: #ff3f6c !important;
+  box-shadow: 0 0 0 1px #ff3f6c inset !important;
+}
+.ecomus-pdp .size-options button:disabled {
+  opacity: .45 !important;
+  text-decoration: line-through !important;
+}
+.ecomus-pdp .pdp-selection-warning {
+  margin: 10px 0 !important;
+  padding: 10px 12px !important;
+  border: 1px solid #ffd2dc !important;
+  border-radius: 6px !important;
+  background: #fff5f7 !important;
+  color: #a32047 !important;
+  font-size: 11px !important;
+}
+
+/* 5) Purchase actions: the clicked action alone enters the busy state. */
+.ecomus-pdp .purchase-actions .button:disabled,
+.ecomus-pdp .pdp-mobile-purchase button:disabled {
+  cursor: not-allowed !important;
+}
+.ecomus-pdp .pdp-purchase-toast {
+  position: relative !important;
+  z-index: 20 !important;
+  margin-top: 10px !important;
+}
+
+@media (max-width: 760px) {
+  .ecomus-pdp .premium-pdp-gallery {
+    display: block !important;
+    width: 100% !important;
+    min-height: 0 !important;
+  }
+  .ecomus-pdp .pdp-main-image {
+    width: 100% !important;
+    height: auto !important;
+    min-height: 390px !important;
+    aspect-ratio: 1 / 1.18 !important;
+    max-height: none !important;
+    border-radius: 0 !important;
+  }
+  .ecomus-pdp .pdp-main-image .gallery-image-button,
+  .ecomus-pdp .pdp-main-image .gallery-image-button img {
+    width: 100% !important;
+    height: 100% !important;
+  }
+  .ecomus-pdp .pdp-mobile-slider {
+    display: flex !important;
+    gap: 7px !important;
+    width: 100% !important;
+    padding: 8px 10px !important;
+    overflow-x: auto !important;
+    background: #fff !important;
+    scrollbar-width: none !important;
+  }
+  .ecomus-pdp .pdp-mobile-slider::-webkit-scrollbar { display: none !important; }
+  .ecomus-pdp .pdp-mobile-slider button {
+    flex: 0 0 58px !important;
+    width: 58px !important;
+    height: 70px !important;
+    padding: 0 !important;
+    border: 1px solid #e1e1e4 !important;
+    border-radius: 4px !important;
+    overflow: hidden !important;
+    background: #f7f7f8 !important;
+  }
+  .ecomus-pdp .pdp-mobile-slider button.active {
+    border: 2px solid #ff3f6c !important;
+  }
+  .ecomus-pdp .pdp-mobile-slider img,
+  .ecomus-pdp .pdp-mobile-slider video {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    display: block !important;
+  }
+  .ecomus-pdp .gallery-dots {
+    display: none !important;
+  }
+  .ecomus-pdp .color-chip {
+    min-width: 84px !important;
+  }
+}
