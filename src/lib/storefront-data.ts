@@ -42,27 +42,15 @@ export async function getProductsForHomeSection(type: string, limit = 8): Promis
 export async function getStorefrontProduct(slug: string) {
   try {
     let product: any = null;
-    try {
-      product = (await coreFetch(`/api/v1/storefront/products/${encodeURIComponent(slug)}`)).data || null;
-    } catch (detailError) {
-      console.warn(`[Priyasa storefront] direct product lookup failed for ${slug}; trying catalog fallback: ${detailError instanceof Error ? detailError.message : String(detailError)}`);
-    }
-    if (!product) {
-      const catalog = await coreFetch(`/api/v1/storefront/products?search=${encodeURIComponent(slug)}&per_page=100`);
-      product = listFrom(catalog).find((item: any) => String(item?.slug || '') === String(slug) || String(item?.id || '') === String(slug)) || null;
-    }
+    try { product = (await coreFetch(`/api/v1/storefront/products/${encodeURIComponent(slug)}`)).data || null; } catch (detailError) { console.warn(`[Priyasa storefront] direct product lookup failed for ${slug}; trying catalog fallback: ${detailError instanceof Error ? detailError.message : String(detailError)}`); }
+    if (!product) { const catalog = await coreFetch(`/api/v1/storefront/products?search=${encodeURIComponent(slug)}&per_page=100`); product = listFrom(catalog).find((item: any) => String(item?.slug || '') === String(slug) || String(item?.id || '') === String(slug)) || null; }
     if (!product) return null;
-    const mapped = mapProduct(product);
-    const variants = Array.isArray(product.variants) ? product.variants.filter((v: any) => v?.is_active !== false) : [];
-    let rating = 0, reviewCount = 0;
+    const mapped = mapProduct(product); const variants = Array.isArray(product.variants) ? product.variants.filter((v: any) => v?.is_active !== false) : []; let rating = 0, reviewCount = 0;
     try { const reviews = listFrom(await coreFetch(`/api/v1/storefront/products/${encodeURIComponent(slug)}/reviews`)); reviewCount = reviews.length; rating = reviewCount ? reviews.reduce((sum, review) => sum + Number(review.rating || 0), 0) / reviewCount : 0; } catch {}
     return { ...mapped, variants: variants.map((variant: any) => ({ id: String(variant.id), color: variant.color, size: variant.size, price: Number(variant.price ?? product.price ?? 0), mrp: Number(variant.mrp ?? product.mrp ?? 0), stock: available(variant), sku: variant.sku })), rating, reviewCount, fabric: product?.attributes?.fabric, care: product?.attributes?.care };
-  } catch (error) {
-    console.warn(`[Priyasa storefront] product ${slug} unavailable: ${error instanceof Error ? error.message : String(error)}`);
-    return null;
-  }
+  } catch (error) { console.warn(`[Priyasa storefront] product ${slug} unavailable: ${error instanceof Error ? error.message : String(error)}`); return null; }
 }
 export async function getStorefrontCategories(): Promise<StorefrontCategory[]> { try { return listFrom(await coreFetch('/api/v1/storefront/categories')).map((category: any) => ({ id: String(category.id), name: String(category.name || ''), slug: String(category.slug || category.id), imageUrl: category.image_url || category.imageUrl || category.media?.url || '', description: category.description ? String(category.description) : undefined, products: [], _count: category._count })); } catch (error) { console.warn(`[Priyasa storefront] categories unavailable; rendering fallback: ${error instanceof Error ? error.message : String(error)}`); return []; } }
 export async function getActiveCms(key: string) { return (await coreFetch(`/api/v1/storefront/cms/${encodeURIComponent(key)}`).catch(() => ({ data: null }))).data || null; }
-export async function getHomeCms(): Promise<HomeCmsSection[]> { const data = await getActiveCms('home'); return Array.isArray(data) ? data : Array.isArray(data?.sections) ? data.sections : []; }
+export async function getHomeCms(): Promise<HomeCmsSection[]> { const data = await getActiveCms('home'); const sections = Array.isArray(data) ? data : Array.isArray(data?.sections) ? data.sections : []; if (sections.length) return sections; return [{ id: 'default-home-hero', type: 'hero', title: 'Every You, Beautiful.', subtitle: 'PRIYASA NEW SEASON', imageUrl: 'https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?auto=format&fit=crop&w=1800&q=90', mobileImageUrl: 'https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?auto=format&fit=crop&w=1000&q=90', ctaHref: '/new-arrivals', ctaLabel: 'Shop New Arrivals', sortOrder: 0 }]; }
 export const money = (n: number) => `₹${n.toLocaleString('en-IN')}`;
