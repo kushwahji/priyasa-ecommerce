@@ -9,7 +9,6 @@
 type LegacyRecord = Record<string, any>;
 
 type LegacyModel = {
-  [key: string]: any;
   (...args: any[]): Promise<LegacyRecord>;
   findMany<T = LegacyRecord>(...args: any[]): Promise<T[]>;
   findFirst<T = LegacyRecord>(...args: any[]): Promise<T | null>;
@@ -28,8 +27,41 @@ type LegacyModel = {
   groupBy<T = LegacyRecord>(...args: any[]): Promise<T[]>;
 };
 
-type LegacyDb = LegacyModel & {
-  $transaction<T = LegacyRecord>(fn: (tx: LegacyModel) => Promise<T>): Promise<T>;
+type LegacyDb = {
+  user: LegacyModel;
+  order: LegacyModel;
+  orderItem: LegacyModel;
+  orderStatusHistory: LegacyModel;
+  product: LegacyModel;
+  productVariant: LegacyModel;
+  category: LegacyModel;
+  cart: LegacyModel;
+  cartItem: LegacyModel;
+  coupon: LegacyModel;
+  address: LegacyModel;
+  payment: LegacyModel;
+  auditLog: LegacyModel;
+  notification: LegacyModel;
+  notificationDelivery: LegacyModel;
+  shipment: LegacyModel;
+  shipmentEvent: LegacyModel;
+  inventoryMovement: LegacyModel;
+  review: LegacyModel;
+  reviewMeta: LegacyModel;
+  wishlist: LegacyModel;
+  wishlistPreference: LegacyModel;
+  question: LegacyModel;
+  productQuestion: LegacyModel;
+  automation: LegacyModel;
+  automationRun: LegacyModel;
+  returnRequest: LegacyModel;
+  refund: LegacyModel;
+  setting: LegacyModel;
+  cms: LegacyModel;
+  customApiConnection: LegacyModel;
+  customWebhookDelivery: LegacyModel;
+  customApiRequestLog: LegacyModel;
+  $transaction<T = LegacyRecord>(fn: (tx: LegacyDb) => Promise<T>): Promise<T>;
   $transaction<T = LegacyRecord>(queries: Promise<T>[]): Promise<T[]>;
   $queryRawUnsafe<T = LegacyRecord>(...args: any[]): Promise<T>;
   $executeRawUnsafe(...args: any[]): Promise<number>;
