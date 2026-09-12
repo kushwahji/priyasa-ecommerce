@@ -4,32 +4,15 @@ import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 
 type Review = { id: string; rating: number; customer?: string; text: string; product?: string; productImage?: string };
-
-type Display = {
-  desktop_columns?: number;
-  tablet_columns?: number;
-  mobile_columns?: number;
-  mobile_scroll?: boolean;
-  show_rating?: boolean;
-  show_customer?: boolean;
-  show_product?: boolean;
-  show_product_image?: boolean;
-};
-
+type Display = { desktop_columns?: number; tablet_columns?: number; mobile_columns?: number; mobile_scroll?: boolean; show_rating?: boolean; show_customer?: boolean; show_product?: boolean; show_product_image?: boolean; load_more_step?: number };
 const clean = (value: unknown) => String(value ?? '').replace(/<[^>]*>/g, ' ').replace(/&amp;/g, '&').replace(/\s+/g, ' ').trim();
 const columns = (value: unknown, fallback: number, max = 6) => { const n = Number(value); return Number.isFinite(n) && n >= 1 ? Math.min(max, Math.round(n)) : fallback; };
 const href = (value: unknown) => { const v = String(value ?? '').trim(); return v && (v.startsWith('/') || v.startsWith('http://') || v.startsWith('https://')) ? v : v ? `/${v}` : '/shop'; };
 
 export default function HomeReviewsDynamic({ section, reviews }: { section: any; reviews: Review[] }) {
   const display: Display = section?.content?.display && typeof section.content.display === 'object' ? section.content.display : {};
-  const desktop = columns(display.desktop_columns, 3);
-  const tablet = columns(display.tablet_columns, Math.min(2, desktop));
-  const mobile = columns(display.mobile_columns, 1, 4);
-  const mobileScroll = display.mobile_scroll !== false;
-  const showRating = display.show_rating !== false;
-  const showCustomer = display.show_customer !== false;
-  const showProduct = display.show_product !== false;
-  const showProductImage = display.show_product_image === true && showProduct;
+  const desktop = columns(display.desktop_columns, 3), tablet = columns(display.tablet_columns, Math.min(2, desktop)), mobile = columns(display.mobile_columns, 1, 4);
+  const mobileScroll = display.mobile_scroll !== false, showRating = display.show_rating !== false, showCustomer = display.show_customer !== false, showProduct = display.show_product !== false, showProductImage = display.show_product_image === true && showProduct;
   const limit = Math.max(1, Math.min(30, Number(section?.content?.limit ?? 10) || 10));
   const visible = reviews.slice(0, limit);
   const [remaining, setRemaining] = useState(visible.length);
@@ -40,10 +23,4 @@ export default function HomeReviewsDynamic({ section, reviews }: { section: any;
   return <section className={`home-api-reviews ${mobileScroll ? 'home-reviews--mobile-scroll' : 'home-reviews--mobile-grid'}`} style={{ padding: '38px 0 34px', background: '#fafafa' }}><div className="home-section-head" style={{ width: 'min(1320px, calc(100% - 48px))', margin: '0 auto 18px', display: 'flex', justifyContent: 'space-between', alignItems: 'end', gap: 20 }}><div>{section.title && <h2>{clean(section.title)}</h2>}{section.subtitle && <p>{clean(section.subtitle)}</p>}</div>{cta.href && <Link className="home-view-all" href={href(cta.href)}>{clean(cta.label || 'View All')} <span>→</span></Link>}</div><div className="home-review-grid" style={{ '--review-desktop': desktop, '--review-tablet': tablet, '--review-mobile': mobile } as React.CSSProperties}>{cards.map((review) => <article key={review.id} className="home-review-card" style={{ background: '#fff', border: '1px solid #eee', borderRadius: 8, padding: 18, overflow: 'hidden' }}>{showProductImage && review.productImage && <img src={review.productImage} alt={clean(review.product || 'Reviewed product')} loading="lazy" style={{ width: '100%', aspectRatio: '4/3', objectFit: 'cover', display: 'block', borderRadius: 6, marginBottom: 12 }} />}{showRating && <div aria-label={`${Math.round(review.rating)} out of 5 stars`} style={{ letterSpacing: 2, fontSize: 12 }}>{'★'.repeat(Math.max(0, Math.min(5, Math.round(review.rating))))}</div>}<p style={{ fontSize: 13, lineHeight: 1.6, color: '#444', minHeight: 62 }}>“{clean(review.text)}”</p>{showCustomer && <strong style={{ fontSize: 11 }}>{clean(review.customer || 'Priyasa customer')}</strong>}{showProduct && review.product && <small style={{ display: 'block', marginTop: 5, color: '#686b78' }}>{clean(review.product)}</small>}</article>)}</div>{remaining < visible.length && <div className="home-load-more"><button type="button" className="button button-light" onClick={() => setRemaining((current) => Math.min(current + Math.max(1, Number(display.load_more_step) || 6), visible.length))}>Load More <span>({visible.length - remaining} more)</span> ↓</button></div>}</section>;
 }
 
-export function HomeReviewsDynamicStyles() {
-  return <style dangerouslySetInnerHTML={{ __html: `
-.home-api-reviews .home-review-grid{width:min(1320px,calc(100% - 48px));margin:0 auto;display:grid;grid-template-columns:repeat(var(--review-desktop,3),minmax(0,1fr));gap:14px}
-@media(max-width:900px){.home-api-reviews .home-review-grid{grid-template-columns:repeat(var(--review-tablet,2),minmax(0,1fr))}}
-@media(max-width:760px){.home-api-reviews .home-review-grid{width:calc(100% - 24px);grid-template-columns:repeat(var(--review-mobile,1),minmax(0,1fr));gap:10px}.home-reviews--mobile-scroll .home-review-grid{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none}.home-reviews--mobile-scroll .home-review-grid::-webkit-scrollbar{display:none}.home-reviews--mobile-scroll .home-review-card{flex:0 0 calc((100% - (var(--review-mobile,1) - 1)*10px)/var(--review-mobile,1));scroll-snap-align:start}.home-reviews--mobile-grid .home-review-card{min-width:0}}
-` }} />;
-}
+export function HomeReviewsDynamicStyles() { return <style dangerouslySetInnerHTML={{ __html: `.home-api-reviews .home-review-grid{width:min(1320px,calc(100% - 48px));margin:0 auto;display:grid;grid-template-columns:repeat(var(--review-desktop,3),minmax(0,1fr));gap:14px}@media(max-width:900px){.home-api-reviews .home-review-grid{grid-template-columns:repeat(var(--review-tablet,2),minmax(0,1fr))}}@media(max-width:760px){.home-api-reviews .home-review-grid{width:calc(100% - 24px);grid-template-columns:repeat(var(--review-mobile,1),minmax(0,1fr));gap:10px}.home-reviews--mobile-scroll .home-review-grid{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none}.home-reviews--mobile-scroll .home-review-grid::-webkit-scrollbar{display:none}.home-reviews--mobile-scroll .home-review-card{flex:0 0 calc((100% - (var(--review-mobile,1) - 1)*10px)/var(--review-mobile,1));scroll-snap-align:start}.home-reviews--mobile-grid .home-review-card{min-width:0}}` }} />; }
