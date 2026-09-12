@@ -1,0 +1,82 @@
+/* Priyasa E2E mobile polish — intentionally last in the cascade. */
+@media (max-width:760px){
+  /* 1. Home hero: reduce the excessive mobile banner height. */
+  .premium-home-hero{aspect-ratio:2.02/1!important;min-height:0!important;height:auto!important}
+  .premium-home-hero .home-hero-copy{bottom:30px!important;max-width:72%!important}
+  .premium-home-hero .home-hero-copy h1{font-size:clamp(26px,7.2vw,36px)!important;line-height:1!important;margin:6px 0 9px!important}
+  .premium-home-hero .home-hero-copy .button{min-height:36px!important;padding:0 15px!important;font-size:9px!important}
+  .premium-home-hero .home-hero-control{width:32px!important;height:32px!important;font-size:20px!important}
+
+  /* Home rails: New Arrivals / Trending become true horizontal product carousels. */
+  .home-product-section:not(.home-flash-sale):not(:has(.home-load-more)) .home-product-grid{display:flex!important;grid-template-columns:none!important;gap:10px!important;overflow-x:auto!important;overflow-y:hidden!important;scroll-snap-type:x mandatory!important;scrollbar-width:none!important;padding:0 2px 6px!important}
+  .home-product-section:not(.home-flash-sale):not(:has(.home-load-more)) .home-product-grid::-webkit-scrollbar{display:none!important}
+  .home-product-section:not(.home-flash-sale):not(:has(.home-load-more)) .home-product-grid>.product-card{flex:0 0 70vw!important;width:70vw!important;min-width:70vw!important;scroll-snap-align:start!important;border-radius:10px!important;overflow:hidden!important}
+  .home-product-section:not(.home-flash-sale):not(:has(.home-load-more)) .home-product-grid>.product-card .product-media{aspect-ratio:4/5!important}
+  .home-product-section:not(.home-flash-sale):not(:has(.home-load-more)) .home-product-grid>.product-card .product-info{padding:10px 11px 13px!important}
+  .home-product-section:not(.home-flash-sale):not(:has(.home-load-more)) .home-product-grid>.product-card .product-info h3{font-size:13px!important;line-height:1.28!important}
+
+  /* One dedicated home grid retains two-column layout and load-more behavior. */
+  .home-product-section:has(.home-load-more) .home-product-grid{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:9px!important}
+  .home-product-section:has(.home-load-more) .home-product-grid>.product-card{min-width:0!important;width:100%!important;border-radius:9px!important;overflow:hidden!important}
+  .home-load-more{display:flex!important;flex-direction:column!important;align-items:center!important;gap:6px!important;padding:18px 0 4px!important}
+  .home-load-more .button{min-height:42px!important;border:1px solid #ded6d9!important;border-radius:999px!important;background:#fff!important;color:#242027!important;padding:0 20px!important;font-size:11px!important}
+  .home-load-more small{font-size:9px!important;color:#81777d!important}
+
+  /* Casual / editorial category cards remain swipeable, not stacked vertically. */
+  .home-casual-grid{display:flex!important;overflow-x:auto!important;gap:10px!important;scroll-snap-type:x mandatory!important;scrollbar-width:none!important;padding-bottom:5px!important}
+  .home-casual-grid::-webkit-scrollbar{display:none!important}
+  .home-casual-card{flex:0 0 70vw!important;width:70vw!important;min-width:70vw!important;aspect-ratio:1.08/1!important;scroll-snap-align:start!important;border-radius:10px!important}
+
+  /* Product media hit targets: image/title links must sit above decorative overlays. */
+  .product-card .product-media{position:relative!important}
+  .product-card .product-image-link{position:relative!important;z-index:2!important;display:block!important;pointer-events:auto!important}
+  .product-card .product-image-link img{position:relative!important;z-index:2!important}
+  .product-card .ecomus-product-badges{position:absolute!important;z-index:5!important;pointer-events:none!important}
+  .product-card .ecomus-product-actions{position:absolute!important;z-index:7!important;pointer-events:auto!important}
+  .product-card .ecomus-quick-add{position:absolute!important;z-index:7!important;pointer-events:auto!important}
+  .product-card .product-info{position:relative!important;z-index:4!important}
+  .product-card .product-info h3 a{position:relative!important;z-index:5!important;pointer-events:auto!important}
+
+  /* 5. Shop / PLP header + toolbar: clean two-control mobile layout. */
+  .shop-page-v1 .plp-mobile-head{height:68px!important;min-height:68px!important;display:grid!important;grid-template-columns:42px minmax(0,1fr) 84px!important;align-items:center!important;padding:0 14px!important;border-bottom:1px solid #eee7e9!important;background:#fff!important;position:sticky!important;top:0!important;z-index:120!important}
+  .shop-page-v1 .plp-mobile-head h1{font-size:24px!important;margin:0!important;line-height:1!important;text-align:left!important}
+  .shop-page-v1 .plp-mobile-head .back{font-size:39px!important;line-height:1!important;text-decoration:none!important;color:#252027!important}
+  .shop-page-v1 .plp-mobile-head .actions{display:flex!important;justify-content:flex-end!important;gap:8px!important}
+  .shop-page-v1 .plp-mobile-head .actions a{width:34px!important;height:40px!important;display:grid!important;place-items:center!important;color:#201c22!important}
+  .shop-page-v1 .plp-mobile-head .actions svg{width:24px!important;height:24px!important}
+  .shop-page-v1 .collection-intro{display:block!important;padding:34px 0 22px!important;border-bottom:0!important}
+  .shop-page-v1 .collection-intro h1{font-size:46px!important;line-height:.96!important;letter-spacing:-2px!important;margin:8px 0 12px!important}
+  .shop-page-v1 .collection-intro>p{font-size:14px!important;margin:0!important;color:#777177!important}
+  .shop-page-v1 .category-pills{padding:0 0 18px!important}
+  .shop-page-v1 .shop-toolbar{display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;gap:8px!important;padding:8px 0!important;position:sticky!important;top:68px!important;z-index:110!important;background:#fff!important;border-top:1px solid #eee7e9!important;border-bottom:1px solid #eee7e9!important}
+  .shop-page-v1 .shop-toolbar>span{display:none!important}
+  .shop-page-v1 .shop-toolbar .mobile-filter-trigger{display:flex!important;align-items:center!important;justify-content:center!important;width:100%!important;min-height:48px!important;padding:0 12px!important;border:1px solid #ddd6d9!important;border-radius:8px!important;background:#fff!important;color:#272329!important;font-size:13px!important;font-weight:750!important}
+  .shop-page-v1 .shop-toolbar label{display:block!important;width:100%!important;margin:0!important;position:relative!important}
+  .shop-page-v1 .shop-toolbar label::before{content:'Sort';position:absolute!important;left:13px!important;top:50%!important;transform:translateY(-50%)!important;color:#6e686e!important;font-size:12px!important;font-weight:700!important;pointer-events:none!important;z-index:2!important}
+  .shop-page-v1 .shop-toolbar select{width:100%!important;min-height:48px!important;padding:0 30px 0 60px!important;border:1px solid #ddd6d9!important;border-radius:8px!important;background:#fff!important;color:#252027!important;font-size:12px!important;font-weight:750!important}
+  .shop-page-v1 .desktop-filter-panel{display:none!important}
+  .shop-page-v1 .product-grid.shop{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:9px!important;padding-top:12px!important}
+  .shop-page-v1 .product-grid.shop>.product-card{min-width:0!important;border-radius:9px!important;overflow:hidden!important}
+  .shop-page-v1 .product-grid.shop>.product-card .product-media{aspect-ratio:4/5!important}
+  .shop-page-v1 .product-grid.shop>.product-card .product-info{padding:9px 10px 12px!important}
+  .shop-page-v1 .product-grid.shop>.product-card .product-info h3{font-size:12px!important;line-height:1.3!important}
+
+  /* 7. Footer app badges: compact, balanced with the reference. */
+  .priyasa-footer-app .app-badges{display:flex!important;flex-direction:column!important;align-items:center!important;gap:10px!important;width:100%!important}
+  .priyasa-footer-app .app-badge{width:min(270px,82vw)!important;max-width:270px!important;height:auto!important;min-height:0!important;padding:0!important;border-radius:12px!important;overflow:hidden!important}
+  .priyasa-footer-app .app-badge img{display:block!important;width:100%!important;height:auto!important;max-height:none!important;object-fit:contain!important}
+  .priyasa-footer-app .footer-payment-title{margin-top:26px!important}
+
+  /* Keep the five-item mobile nav stable above the browser safe area. */
+  .mobile-bottom-nav{grid-template-columns:repeat(5,minmax(0,1fr))!important;height:78px!important;min-height:78px!important;padding:7px 6px calc(9px + env(safe-area-inset-bottom))!important}
+  .mobile-bottom-nav a{gap:4px!important;font-size:9px!important}
+  .mobile-bottom-nav a svg{width:26px!important;height:26px!important}
+
+  /* Avoid the browser's fixed bottom nav covering product content. */
+  body{padding-bottom:86px!important}
+}
+
+@media (min-width:761px){
+  /* Desktop keeps editorial rails as a regular product grid. */
+  .home-product-section .home-product-grid{grid-template-columns:repeat(4,minmax(0,1fr))!important}
+}
