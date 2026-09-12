@@ -1,5 +1,5 @@
 import { getHomeApiData } from '@/lib/home-cms-api';
-import { renderHomeSections } from '@/app/home-api-renderer';
+import { renderHomeSections } from '@/app/home-api-renderer-v2';
 import { HomeApiStyles } from '@/components/HomeApiAdvancedSections';
 import { SiteStructuredData } from '@/app/seo-schema';
 
