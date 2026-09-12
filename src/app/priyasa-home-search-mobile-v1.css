@@ -1,0 +1,239 @@
+/* Final mobile home/search overrides. Keep the API-rendered DOM order on every viewport. */
+
+.home-page.home-reference-v4 > .home-section {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+.home-page.home-reference-v4 .home-product-section--carousel {
+  display: block !important;
+}
+
+.home-page.home-reference-v4 .home-product-section--carousel .home-product-carousel {
+  display: block !important;
+  visibility: visible !important;
+}
+
+/* The mobile layout is the same API section sequence as desktop; never substitute
+   a legacy mobile-only category/discovery rail for the CMS page. */
+@media (max-width: 760px) {
+  .home-page.home-reference-v4 {
+    display: block !important;
+    width: 100% !important;
+    overflow: visible !important;
+  }
+
+  .home-page.home-reference-v4 > .home-section {
+    position: relative !important;
+    clear: both !important;
+  }
+
+  .home-page.home-reference-v4 .home-hero-multi,
+  .home-page.home-reference-v4 .home-product-section,
+  .home-page.home-reference-v4 .home-category-section,
+  .home-page.home-reference-v4 .home-api-offer,
+  .home-page.home-reference-v4 .home-api-banner,
+  .home-page.home-reference-v4 .home-api-text {
+    display: block !important;
+    visibility: visible !important;
+  }
+
+  .home-page.home-reference-v4 .home-product-section--carousel .home-product-carousel-viewport {
+    display: block !important;
+    width: 100% !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+
+  .home-page.home-reference-v4 .home-product-section--carousel .home-product-carousel-track {
+    display: flex !important;
+    width: max-content !important;
+  }
+
+  .home-page.home-reference-v4 .home-product-section--carousel .home-product-carousel-item {
+    display: block !important;
+    flex: 0 0 min(72vw, 280px) !important;
+    min-width: min(72vw, 280px) !important;
+  }
+
+  .home-page.home-reference-v4 .home-product-section--carousel .home-product-carousel-control {
+    display: none !important;
+  }
+
+  .home-page.home-reference-v4 .home-new-arrivals .home-product-grid {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    width: 100% !important;
+  }
+
+  /* Do not render the old standalone delivery/search toolbar on home. */
+  .mobile-commerce-toolbar {
+    display: none !important;
+  }
+}
+
+/* Header search drawer: compact Myntra/Nykaa-style live search on mobile. */
+.header-search-product-list {
+  display: grid;
+  gap: 0;
+  margin-top: 4px;
+}
+
+.header-search-product {
+  display: grid;
+  grid-template-columns: 58px minmax(0, 1fr);
+  gap: 12px;
+  align-items: center;
+  padding: 9px 0;
+  color: #282c3f;
+  text-decoration: none;
+  border-bottom: 1px solid #f0f0f2;
+}
+
+.header-search-product img {
+  width: 58px;
+  height: 72px;
+  display: block;
+  object-fit: cover;
+  border-radius: 4px;
+  background: #f7f7f8;
+}
+
+.header-search-product-copy {
+  min-width: 0;
+  display: grid;
+  gap: 4px;
+}
+
+.header-search-product-copy strong {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  font-size: 13px;
+  line-height: 1.25;
+}
+
+.header-search-product-copy small {
+  color: #777b86;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+}
+
+.header-search-product-copy > span {
+  display: flex;
+  align-items: baseline;
+  gap: 7px;
+  flex-wrap: wrap;
+  font-size: 11px;
+}
+
+.header-search-product-copy b { color: #282c3f; }
+.header-search-product-copy del { color: #9a9ca4; }
+.header-search-product-copy em { color: #ff3f6c; font-style: normal; font-weight: 700; }
+
+.header-search-view-all {
+  display: block;
+  margin-top: 12px;
+  padding: 12px;
+  border: 1px solid #e1e1e4;
+  color: #ff3f6c;
+  text-align: center;
+  text-decoration: none;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.header-search-status {
+  padding: 28px 4px;
+  color: #686b78;
+  font-size: 13px;
+  text-align: center;
+}
+
+.e2-search-form { position: relative; }
+.e2-search-form .e2-search-clear {
+  position: absolute;
+  right: 82px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #686b78;
+  font-size: 22px;
+  line-height: 1;
+}
+
+@media (max-width: 760px) {
+  /* Search icon + account + bag in the mobile header; wishlist remains in bottom navigation/account. */
+  .site-header > .actions {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0 !important;
+  }
+
+  .site-header > .actions .header-icon[aria-label="Search"],
+  .site-header > .actions .header-icon[aria-label="Account / Login"],
+  .site-header > .actions .header-icon[aria-label^="Shopping bag"] {
+    display: grid !important;
+  }
+
+  .site-header > .actions .header-icon[aria-label="Wishlist"] {
+    display: none !important;
+  }
+
+  .site-header > .actions .header-icon {
+    width: 38px !important;
+    height: 44px !important;
+    flex: 0 0 38px !important;
+  }
+
+  .site-header > .actions .header-icon svg {
+    width: 21px !important;
+    height: 21px !important;
+  }
+
+  .e2-panel--search {
+    left: 0 !important;
+    right: 0 !important;
+    top: 0 !important;
+    bottom: 0 !important;
+    width: 100% !important;
+    max-width: none !important;
+    height: 100dvh !important;
+    border-radius: 0 !important;
+    z-index: 1002 !important;
+  }
+
+  .e2-panel--search .e2-panel-head {
+    min-height: 58px !important;
+    padding: 0 14px !important;
+  }
+
+  .e2-panel--search .e2-search-body {
+    padding: 12px 14px 88px !important;
+    max-height: calc(100dvh - 58px) !important;
+    overflow-y: auto !important;
+  }
+
+  .e2-panel--search .e2-search-form input {
+    font-size: 16px !important;
+  }
+
+  .header-search-product {
+    grid-template-columns: 64px minmax(0, 1fr);
+    gap: 11px;
+    padding: 10px 0;
+  }
+
+  .header-search-product img {
+    width: 64px;
+    height: 80px;
+  }
+}
