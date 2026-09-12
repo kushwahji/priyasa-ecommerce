@@ -33,6 +33,7 @@ export interface LocalDb {
   $transaction<T extends Promise<any>[]>(queries: T): Promise<any[]>;
   $queryRaw<T = DbRow[]>(...args: any[]): Promise<T>;
   $executeRaw<T = number>(...args: any[]): Promise<T>;
+  $executeRawUnsafe<T = number>(...args: any[]): Promise<T>;
 }
 
 const disabledOperation = (label: string) => (..._args: any[]): never => {
@@ -63,7 +64,7 @@ const disabledDb = new Proxy({} as LocalDb, {
   get(_target, property: string | symbol) {
     const name = String(property);
     if (name === 'then') return undefined;
-    if (name === '$transaction' || name === '$queryRaw' || name === '$executeRaw') {
+    if (name === '$transaction' || name === '$queryRaw' || name === '$executeRaw' || name === '$executeRawUnsafe') {
       return disabledOperation(`db.${name}`);
     }
     return disabledTable(name);
