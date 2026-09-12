@@ -1,0 +1,250 @@
+/* Final production UX correction layer. Loaded after all legacy fidelity layers. */
+
+/* HOME — the Core Home API owns section order on every viewport. */
+.home-page.home-reference-v4 > .home-section,
+.home-page.home-reference-v4 > section,
+.home-page.home-reference-v4 > div {
+  order: initial !important;
+  float: none !important;
+}
+.home-page.home-reference-v4 > .home-section {
+  display: block !important;
+  position: relative !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+/* PDP MEDIA — remove legacy wash/overlay rules and make the source image fully visible. */
+.ecomus-pdp .pdp-main-image,
+.ecomus-pdp .pdp-main-image::before,
+.ecomus-pdp .pdp-main-image::after,
+.ecomus-pdp .gallery-image-button,
+.ecomus-pdp .gallery-image-button::before,
+.ecomus-pdp .gallery-image-button::after {
+  background: transparent !important;
+  opacity: 1 !important;
+  filter: none !important;
+  mix-blend-mode: normal !important;
+}
+.ecomus-pdp .pdp-main-image .gallery-image-button img {
+  opacity: 1 !important;
+  visibility: visible !important;
+  filter: none !important;
+  mix-blend-mode: normal !important;
+  background: transparent !important;
+}
+.ecomus-pdp .pdp-page,
+.ecomus-pdp .pdp-layout-v2 {
+  margin-top: 0 !important;
+}
+
+/* PDP mobile — compact product-first layout, no duplicate/blank in-flow CTA. */
+@media (max-width: 680px) {
+  body:has(.ecomus-pdp) main:has(.ecomus-pdp) { margin: 0 !important; padding: 0 !important; }
+  .ecomus-pdp { padding-bottom: 154px !important; margin: 0 !important; }
+  .ecomus-pdp .pdp-page { padding: 0 !important; margin: 0 !important; }
+  .ecomus-pdp .pdp-layout-v2 { display: block !important; padding: 0 !important; margin: 0 !important; }
+  .ecomus-pdp .pdp-mobile-head { margin: 0 !important; }
+  .ecomus-pdp .pdp-main-image {
+    margin: 0 !important;
+    width: 100% !important;
+    height: min(118vw, 560px) !important;
+    min-height: 0 !important;
+    max-height: 560px !important;
+    aspect-ratio: auto !important;
+    border-radius: 0 !important;
+    overflow: hidden !important;
+  }
+  .ecomus-pdp .pdp-main-image .gallery-image-button,
+  .ecomus-pdp .pdp-main-image .gallery-image-button img {
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    object-fit: cover !important;
+    object-position: center !important;
+  }
+  .ecomus-pdp .pdp-mobile-slider { display: none !important; }
+  .ecomus-pdp .gallery-dots { display: flex !important; padding: 9px 0 !important; }
+  .ecomus-pdp .pdp-info { padding: 15px 14px 0 !important; margin: 0 !important; }
+  .ecomus-pdp .purchase-actions,
+  .ecomus-pdp .whatsapp-order-button { display: none !important; }
+  .ecomus-pdp .purchase-trust { padding-bottom: 14px !important; }
+
+  /* Sticky purchase bar: price row + three real actions, above bottom navigation. */
+  .ecomus-pdp .pdp-mobile-purchase {
+    position: fixed !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 72px !important;
+    z-index: 1001 !important;
+    display: grid !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 7px !important;
+    padding: 8px 10px 9px !important;
+    margin: 0 !important;
+    background: rgba(255,255,255,.98) !important;
+    border-top: 1px solid #e5e6e8 !important;
+    box-shadow: 0 -8px 24px rgba(0,0,0,.10) !important;
+    backdrop-filter: blur(12px) !important;
+  }
+  .ecomus-pdp .pdp-mobile-purchase > div {
+    grid-column: 1 / -1 !important;
+    min-height: 30px !important;
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    padding: 0 2px !important;
+  }
+  .ecomus-pdp .pdp-mobile-purchase > div small { font-size: 10px !important; color: #737781 !important; }
+  .ecomus-pdp .pdp-mobile-purchase > div strong { font-size: 17px !important; color: #171a22 !important; }
+  .ecomus-pdp .pdp-mobile-purchase .button,
+  .ecomus-pdp .pdp-mobile-purchase .whatsapp-mobile-button {
+    width: 100% !important;
+    min-width: 0 !important;
+    height: 46px !important;
+    min-height: 46px !important;
+    padding: 0 5px !important;
+    border-radius: 6px !important;
+    font-size: 11px !important;
+    font-weight: 800 !important;
+    text-transform: uppercase !important;
+    letter-spacing: .02em !important;
+    white-space: nowrap !important;
+  }
+  .ecomus-pdp .pdp-mobile-purchase .button:not(.dark-button) { background: #ff3f6c !important; color: #fff !important; border: 1px solid #ff3f6c !important; }
+  .ecomus-pdp .pdp-mobile-purchase .dark-button { background: #171717 !important; color: #fff !important; border: 1px solid #171717 !important; }
+  .ecomus-pdp .pdp-mobile-purchase .whatsapp-mobile-button { background: #fff !important; color: #167c4d !important; border: 1px solid #167c4d !important; cursor: pointer !important; }
+  .ecomus-pdp .pdp-mobile-purchase button:disabled { opacity: .5 !important; }
+
+  /* Details should start immediately after purchase information; no artificial blank block. */
+  .ecomus-pdp .pdp-details-stack { margin-top: 14px !important; }
+}
+
+/* LOGIN / OTP — desktop modal, mobile bottom sheet. */
+.otp-backdrop { z-index: 2000 !important; }
+@media (max-width: 680px) {
+  .otp-backdrop {
+    align-items: flex-end !important;
+    justify-content: stretch !important;
+    padding: 0 !important;
+    background: rgba(18, 20, 28, .55) !important;
+  }
+  .otp-modal {
+    width: 100% !important;
+    max-width: none !important;
+    max-height: min(92dvh, 760px) !important;
+    overflow-y: auto !important;
+    margin: 0 !important;
+    padding: 26px 20px calc(22px + env(safe-area-inset-bottom)) !important;
+    border-radius: 22px 22px 0 0 !important;
+    background: #fff !important;
+    box-shadow: 0 -14px 45px rgba(0,0,0,.20) !important;
+  }
+  .otp-modal::before {
+    content: '';
+    display: block;
+    width: 42px;
+    height: 4px;
+    margin: -10px auto 18px;
+    border-radius: 999px;
+    background: #d8d9de;
+  }
+  .otp-modal h2 { font-size: 27px !important; margin: 7px 0 8px !important; }
+  .otp-modal .muted { font-size: 13px !important; line-height: 1.5 !important; }
+  .otp-phone { height: 52px !important; }
+  .otp-phone span { display: grid !important; place-items: center !important; min-width: 58px !important; }
+  .otp-phone input { min-width: 0 !important; font-size: 16px !important; }
+  .otp-submit { min-height: 50px !important; border-radius: 7px !important; font-size: 15px !important; }
+  .otp-digits { gap: 7px !important; }
+  .otp-digit { width: 100% !important; min-width: 0 !important; height: 50px !important; border-radius: 7px !important; font-size: 20px !important; }
+  .otp-status { font-size: 12px !important; }
+  .otp-foot { font-size: 10px !important; }
+}
+
+/* CART — professional card hierarchy and mobile-safe summary. */
+@media (min-width: 681px) {
+  .nykaa-cart-v1 .cart-layout { align-items: start !important; }
+  .nykaa-cart-v1 .cart-product { border-bottom: 1px solid #ececf0 !important; }
+  .nykaa-cart-v1 .cart-summary {
+    border: 1px solid #e6e7ea !important;
+    box-shadow: 0 10px 30px rgba(20,20,30,.06) !important;
+    background: #fff !important;
+  }
+}
+@media (max-width: 680px) {
+  .nykaa-cart-v1 { padding-bottom: 88px !important; }
+  .nykaa-cart-v1 .cart-summary { border-top: 8px solid #f5f5f6 !important; }
+  .nykaa-cart-v1 .cart-summary .cart-checkout {
+    position: sticky !important;
+    display: flex !important;
+    bottom: 76px !important;
+    z-index: 100 !important;
+    width: 100% !important;
+    height: 52px !important;
+    margin-top: 16px !important;
+    border-radius: 7px !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+  .nykaa-cart-v1 .cart-product-image img { opacity: 1 !important; filter: none !important; }
+}
+
+/* CHECKOUT — explicit Address → Payment → Confirm step UI. */
+.priyasa-checkout-v3 { min-height: 100dvh !important; }
+.checkout-v3-steps {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  max-width: 1180px !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+.checkout-v3-step { position: relative !important; justify-content: center !important; }
+.checkout-v3-step.active b { box-shadow: 0 0 0 3px rgba(255,63,108,.12) !important; }
+.checkout-v3-layout { max-width: 1180px !important; margin: 0 auto !important; }
+.checkout-v3-card,
+.checkout-v3-summary {
+  border: 1px solid #e7e8eb !important;
+  box-shadow: 0 7px 24px rgba(20,20,30,.045) !important;
+}
+.checkout-v3-item img { opacity: 1 !important; filter: none !important; }
+.checkout-v3-input:focus { border-color: #ff3f6c !important; box-shadow: 0 0 0 3px rgba(255,63,108,.10) !important; outline: none !important; }
+.checkout-v3-address.active,
+.checkout-v3-payment.active { box-shadow: 0 0 0 1px #ff3f6c inset !important; }
+.checkout-v3-actions .button { min-height: 48px !important; }
+@media (max-width: 680px) {
+  .priyasa-checkout-v3 { padding-bottom: 0 !important; }
+  .checkout-v3-head { padding: 12px 14px !important; }
+  .checkout-v3-steps { position: sticky !important; top: 0 !important; width: 100% !important; margin: 0 !important; padding: 8px 10px !important; }
+  .checkout-v3-layout { width: 100% !important; margin: 0 !important; }
+  .checkout-v3-main { padding: 7px !important; }
+  .checkout-v3-card,
+  .checkout-v3-summary { border-radius: 10px !important; box-shadow: 0 2px 10px rgba(20,20,30,.04) !important; }
+  .checkout-v3-form-grid { grid-template-columns: 1fr !important; }
+  .checkout-v3-payment-grid { grid-template-columns: 1fr !important; }
+  .checkout-v3-payment { min-height: 76px !important; }
+  .checkout-v3-actions {
+    position: sticky !important;
+    bottom: 0 !important;
+    z-index: 80 !important;
+    display: flex !important;
+    gap: 8px !important;
+    margin: 16px -14px -14px !important;
+    padding: 10px !important;
+    background: rgba(255,255,255,.98) !important;
+    border-top: 1px solid #e5e6e8 !important;
+    box-shadow: 0 -7px 20px rgba(0,0,0,.07) !important;
+  }
+  .checkout-v3-actions .checkout-v3-back { min-width: 110px !important; display: grid !important; place-items: center !important; }
+  .checkout-v3-actions .button { flex: 1 !important; }
+  .checkout-v3-summary .checkout-v3-item { min-width: 0 !important; }
+  .checkout-v3-summary .checkout-v3-item strong { display: -webkit-box !important; -webkit-line-clamp: 2 !important; -webkit-box-orient: vertical !important; overflow: hidden !important; }
+}
+
+/* Payment page — clean mobile card without horizontal overflow. */
+@media (max-width: 680px) {
+  .payment-page-card { width: 100% !important; max-width: none !important; margin: 0 !important; padding: 14px !important; border: 0 !important; border-radius: 0 !important; box-shadow: none !important; }
+  .payment-page-head { display: flex !important; align-items: flex-start !important; }
+  .payment-method-grid { grid-template-columns: 1fr !important; }
+  .payment-method { min-height: 74px !important; border-radius: 8px !important; }
+}
