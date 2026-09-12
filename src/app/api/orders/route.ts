@@ -3,10 +3,16 @@ import { cookies } from 'next/headers';
 import { priyasaApi, apiError } from '@/lib/priyasa-api';
 
 const PAYMENT_METHODS = new Set(['razorpay', 'cod']);
+const IDEMPOTENCY_KEY = /^[A-Za-z0-9._:-]{8,128}$/;
 
 export async function POST(req: Request) {
   const token = (await cookies()).get('priyasa_access_token')?.value;
   if (!token) return NextResponse.json({ error: 'Please sign in with your mobile number before checkout.' }, { status: 401 });
+
+  const idempotencyKey = req.headers.get('idempotency-key')?.trim() || '';
+  if (!IDEMPOTENCY_KEY.test(idempotencyKey)) {
+    return NextResponse.json({ error: 'A valid Idempotency-Key is required to safely place the order.' }, { status: 400 });
+  }
 
   const input = await req.json().catch(() => null);
   if (!input || typeof input !== 'object') return NextResponse.json({ error: 'Invalid checkout data.' }, { status: 400 });
@@ -21,7 +27,6 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'Unsupported payment method. Please choose online payment or Cash on Delivery.' }, { status: 422 });
   }
 
-  const idempotencyKey = req.headers.get('idempotency-key') || crypto.randomUUID();
   const { response, body: result } = await priyasaApi('/api/v1/storefront/checkout/create-order', {
     method: 'POST',
     headers: { Authorization: `Bearer ${token}`, 'Idempotency-Key': idempotencyKey },
@@ -37,12 +42,18 @@ export async function POST(req: Request) {
   }
 
   const data = (result as any)?.data ?? result;
+  const orderId = data?.order_id ?? data?.orderId ?? data?.id;
+  const orderNumber = data?.order_number ?? data?.orderNumber;
+  if (!orderId || !orderNumber) {
+    return NextResponse.json({ error: 'Order service returned an incomplete order response.' }, { status: 502 });
+  }
+
   return NextResponse.json({
     ...(typeof data === 'object' && data ? data : {}),
-    orderId: data?.order_id ?? data?.orderId ?? data?.id,
-    orderNumber: data?.order_number ?? data?.orderNumber,
+    orderId,
+    orderNumber,
     total: data?.grand_total ?? data?.total,
     status: data?.status,
-    paymentMethod: paymentMethod,
+    paymentMethod,
   }, { status: 201 });
 }
