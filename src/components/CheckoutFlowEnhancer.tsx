@@ -2,7 +2,6 @@
 import {useEffect} from 'react';
 
 const CART_KEY='priyasa_cart';
-const ONLINE_SAVING=70;
 
 export default function CheckoutFlowEnhancer(){
  useEffect(()=>{
@@ -16,10 +15,6 @@ export default function CheckoutFlowEnhancer(){
    const root=document.querySelector('.checkout-v3-steps');if(!root)return;
    root.querySelectorAll<HTMLElement>('.checkout-v3-step').forEach((el,index)=>{if(el.dataset.enhanced)return;el.dataset.enhanced='1';el.setAttribute('role','button');el.setAttribute('tabindex','0');el.setAttribute('aria-label',`Go to checkout step ${index+1}`);const handler=()=>go(index+1);el.addEventListener('click',handler);el.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();handler()}})});
    document.querySelectorAll<HTMLElement>('.checkout-v3-item').forEach((item,index)=>{if(item.dataset.removeEnhanced)return;item.dataset.removeEnhanced='1';const button=document.createElement('button');button.type='button';button.className='checkout-v3-item-remove';button.textContent='Remove';button.setAttribute('aria-label','Remove item from bag');button.addEventListener('click',()=>{try{const items=JSON.parse(localStorage.getItem(CART_KEY)||'[]');const name=item.querySelector('strong')?.textContent?.trim();const next=Array.isArray(items)?items.filter((x:any,i:number)=>!(i===index&&(!name||x.name===name))):[];localStorage.setItem(CART_KEY,JSON.stringify(next));window.dispatchEvent(new Event('priyasa-cart-updated'));window.location.reload()}catch{}});item.appendChild(button)});
-   const payment=[...document.querySelectorAll<HTMLElement>('.checkout-v3-payment')].find(el=>(el.textContent||'').toLowerCase().includes('online payment'));
-   if(payment&&!payment.querySelector('.checkout-v3-online-saving')){const badge=document.createElement('small');badge.className='checkout-v3-online-saving';badge.textContent='PAY ONLINE · SAVE ₹70';payment.appendChild(badge)}
-   const selectedOnline=payment?.classList.contains('active');
-   document.querySelectorAll<HTMLElement>('.checkout-v3-total strong').forEach(total=>{const base=Number(total.dataset.baseTotal||'');if(!Number.isFinite(base)||base<=0){const value=(total.textContent||'').replace(/[^0-9.]/g,'');const parsed=Number(value);if(Number.isFinite(parsed)&&parsed>0)total.dataset.baseTotal=String(parsed)}const original=Number(total.dataset.baseTotal||'0');if(original>0)total.textContent=`₹${(selectedOnline?Math.max(0,original-ONLINE_SAVING):original).toLocaleString('en-IN')}`});
   };
   const observer=new MutationObserver(()=>{if(!cancelled)wire()});observer.observe(document.body,{subtree:true,childList:true,attributes:true,attributeFilter:['class']});wire();
   return()=>{cancelled=true;observer.disconnect()};
