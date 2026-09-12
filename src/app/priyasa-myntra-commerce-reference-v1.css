@@ -3,7 +3,6 @@
 :root{--m-pink:#ff3f6c;--m-ink:#282c3f;--m-muted:#686b78;--m-line:#e6e6e6;--m-soft:#f7f7f7;--m-green:#149a82}
 body{background:#fff!important;color:var(--m-ink)!important}
 main{background:#fff!important}
-/* Myntra-like compact app header */
 .site-header{height:72px!important;min-height:72px!important;padding:0 18px!important;background:#fff!important;border-bottom:1px solid #eee!important;box-shadow:0 1px 5px rgba(0,0,0,.04)!important;gap:8px!important}
 .site-header .brand{min-width:50px!important;width:50px!important;align-items:center!important}
 .site-header .brand strong{font-size:0!important}
@@ -15,15 +14,26 @@ main{background:#fff!important}
 .site-header .actions{margin-left:auto!important;gap:4px!important}
 .site-header .actions .header-icon{width:42px!important;height:48px!important;background:transparent!important;border:0!important;color:var(--m-ink)!important}
 .site-header .actions .header-icon svg{width:25px!important;height:25px!important}
-/* Search + delivery strip placed immediately below header by the existing storefront shell */
-.mobile-reference-toolbar{display:block!important}
-/* Homepage spacing and reference hierarchy */
+/* Myntra-like delivery + search shell */
+.mobile-commerce-toolbar{display:block!important;background:#fff!important;border-bottom:1px solid #f0f0f0!important}
+.mobile-delivery-bar{min-height:46px!important;padding:0 16px!important;display:flex!important;align-items:center!important;gap:9px!important;background:#f5f3ff!important;color:var(--m-ink)!important;text-decoration:none!important;border-bottom:1px solid #eeeaf8!important}
+.mobile-delivery-bar>svg:first-child{width:19px!important;height:19px!important;flex:0 0 auto!important}
+.mobile-delivery-bar>span{min-width:0!important;display:flex!important;align-items:baseline!important;gap:6px!important;flex:1!important;overflow:hidden!important}
+.mobile-delivery-bar small{font-size:10px!important;color:#777!important;flex:0 0 auto!important}
+.mobile-delivery-bar strong{font-size:12px!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}
+.mobile-delivery-bar>svg:last-child{width:18px!important;height:18px!important;transform:rotate(90deg)!important;flex:0 0 auto!important}
+.mobile-store-search{height:64px!important;padding:9px 16px!important;display:flex!important;align-items:center!important;background:#fff!important}
+.mobile-store-search>svg{position:relative!important;width:22px!important;height:22px!important;margin-left:13px!important;margin-right:-34px!important;z-index:2!important;color:#686b78!important;pointer-events:none!important}
+.mobile-store-search input{width:100%!important;height:46px!important;border:1px solid #ddd!important;border-radius:24px!important;background:#fff!important;padding:0 48px!important;color:var(--m-ink)!important;font-size:14px!important;outline:none!important;box-shadow:0 2px 8px rgba(0,0,0,.04)!important}
+.mobile-store-search input::placeholder{color:#777!important}
+.mobile-store-search button{display:none!important}
+/* Homepage spacing */
 .home-reference-v4 .home-section,.home-section{padding:18px 14px!important;background:#fff!important}
 .home-reference-v4 .home-section-head,.home-section-head{margin:0 0 12px!important}
 .home-reference-v4 .home-section-head h2,.home-section-head h2{font:700 20px/1.25 Arial,sans-serif!important;color:var(--m-ink)!important}
 .home-reference-v4 .home-kicker{font-size:10px!important;letter-spacing:1.2px!important;color:#9496a0!important}
 .home-reference-v4 .home-section-head p{font-size:12px!important;color:var(--m-muted)!important}
-/* Casual product rail: compact Myntra-style cards */
+/* Casual product rail */
 .home-reference-v4 .home-flash-sale .home-product-grid,.home-flash-sale .home-product-grid{display:flex!important;gap:10px!important;overflow-x:auto!important;overflow-y:hidden!important;padding:2px 0 8px!important;scroll-snap-type:x proximity!important}
 .home-reference-v4 .home-flash-sale .product-card,.home-flash-sale .product-card{flex:0 0 43vw!important;width:43vw!important;min-width:43vw!important;border:1px solid #ddd!important;border-radius:12px!important;background:#fff!important;box-shadow:none!important;overflow:hidden!important;scroll-snap-align:start!important;transform:none!important}
 .home-reference-v4 .home-flash-sale .product-media,.home-flash-sale .product-media{position:relative!important;background:#f5f5f5!important}
@@ -35,10 +45,9 @@ main{background:#fff!important}
 .home-reference-v4 .home-flash-sale .price,.home-flash-sale .price{font-size:14px!important}
 .home-reference-v4 .home-flash-sale .mrp,.home-flash-sale .mrp{font-size:11px!important;margin-left:0!important}
 .home-reference-v4 .home-flash-sale .discount-text,.home-flash-sale .discount-text{font-size:10px!important;color:#c68a22!important;overflow:hidden!important;text-overflow:ellipsis!important}
-/* White outlined Add button over image */
 .home-flash-sale .nykaa-quick-add{position:absolute!important;left:8px!important;right:8px!important;bottom:8px!important;z-index:7!important}
 .home-flash-sale .nykaa-quick-add .button{width:100%!important;min-height:34px!important;height:34px!important;padding:0 10px!important;border-radius:7px!important;background:#fff!important;color:var(--m-pink)!important;border:1px solid var(--m-pink)!important;box-shadow:0 2px 8px rgba(0,0,0,.08)!important;font-size:12px!important;font-weight:700!important}
-/* Casual image/editorial section: two-up, full image, minimal overlay */
+/* Casual editorial image rail */
 .home-reference-v4 .home-casual-section{padding:18px 14px!important;background:#f7f7f7!important}
 .home-reference-v4 .home-casual-grid{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important;overflow:hidden!important}
 .home-reference-v4 .home-casual-card{width:100%!important;min-width:0!important;aspect-ratio:.72/1!important;border-radius:10px!important;background-size:cover!important;background-position:center!important;overflow:hidden!important;position:relative!important}
@@ -46,13 +55,12 @@ main{background:#fff!important}
 .home-reference-v4 .home-casual-copy small{font-size:8px!important;letter-spacing:.8px!important}
 .home-reference-v4 .home-casual-copy strong{font-size:13px!important;line-height:1.1!important}
 .home-reference-v4 .home-casual-copy span{font-size:8px!important;margin-top:3px!important}
-/* CMS image campaign / offer: edge-to-edge like reference */
+/* Offer / campaign image section */
 .home-reference-v4 .home-image-highlight-section{padding:8px 0 14px!important;background:#fff!important}
 .home-reference-v4 .home-image-highlight-section .campaign-carousel{width:100%!important;margin:0!important;padding:0!important}
 .home-reference-v4 .home-image-highlight-section .campaign-carousel-card{border-radius:0!important;box-shadow:none!important;min-width:100%!important}
 .home-reference-v4 .home-image-highlight-section .campaign-carousel-card img{width:100%!important;display:block!important;object-fit:cover!important}
 .home-reference-v4 .home-image-highlight-section .campaign-carousel-track{gap:0!important;padding:0!important}
-/* Generic promotional split/image cards */
 .home-reference-v4 .home-promo-board,.home-reference-v4 .home-promo-grid{margin:0!important}
 .home-reference-v4 .home-promo-grid{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important}
 /* Service strip */
@@ -78,7 +86,7 @@ main{background:#fff!important}
 .cart-row{display:grid!important;grid-template-columns:82px 1fr!important;gap:10px!important;padding:12px 0!important}
 .cart-row img{width:82px!important;height:105px!important;border-radius:7px!important}
 .summary{border:0!important;border-top:8px solid #f5f5f5!important;padding:16px!important}
-/* Checkout + payment */
+/* Checkout/payment */
 .priyasa-checkout-v3{background:#f6f6f6!important;min-height:100vh!important}
 .checkout-v3-head{position:sticky!important;top:0!important;z-index:30!important;background:#fff!important;padding:14px 16px!important;border-bottom:1px solid var(--m-line)!important}
 .checkout-v3-head .checkout-v3-title{font-size:20px!important;margin:3px 0!important}
@@ -104,7 +112,7 @@ main{background:#fff!important}
 .checkout-v3-coupon button{color:var(--m-pink)!important;background:#fff!important;border:0!important;font-weight:700!important;padding:0 14px!important}
 .payment-page-card{width:100%!important;margin:0!important;border:0!important;box-shadow:none!important;padding:14px!important}
 .payment-method-grid{grid-template-columns:1fr 1fr!important}
-/* Drawer closer to reference */
+/* Drawer */
 .mobile-menu-backdrop{background:rgba(0,0,0,.42)!important}
 .mobile-drawer{width:76vw!important;max-width:520px!important;background:#fff!important}
 .mobile-drawer nav a{font-size:16px!important;min-height:64px!important}
