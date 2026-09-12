@@ -39,20 +39,43 @@ body:has(.ecomus-pdp) main{margin-top:0!important;padding-top:0!important}
   .otp-digit{min-width:0!important;width:100%!important;height:52px!important}
   .otp-submit{width:100%!important;min-height:52px!important}
 
-  /* Cart/checkout: single-column content, fixed-safe totals and touch-friendly controls. */
-  .cart-page,.cart-container,.checkout-page,.checkout-container,.checkout-shell{width:100%!important;max-width:100%!important;box-sizing:border-box!important}
+  /* Cart: compact, one-column mobile bag. */
+  .cart-page,.cart-container{width:100%!important;max-width:100%!important;box-sizing:border-box!important}
   .cart-page{padding-left:12px!important;padding-right:12px!important}
-  .cart-layout,.cart-content,.checkout-layout,.checkout-content{grid-template-columns:1fr!important;display:block!important}
-  .cart-summary,.checkout-summary,.order-summary{width:100%!important;position:static!important;box-sizing:border-box!important}
-  .cart-item,.checkout-card,.address-card,.payment-card{width:100%!important;box-sizing:border-box!important}
-  .cart-item{grid-template-columns:76px minmax(0,1fr)!important;gap:12px!important}
-  .cart-item img{width:76px!important;height:96px!important;object-fit:cover!important}
-  .cart-qty,.quantity-control{min-height:44px!important}
-  .checkout-steps{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:6px!important;overflow:visible!important}
-  .checkout-step{min-width:0!important;text-align:center!important;font-size:11px!important}
-  .checkout-actions button,.checkout-continue,.payment-submit,.place-order{width:100%!important;min-height:52px!important}
-  .payment-methods{grid-template-columns:1fr!important}
-  .checkout-form input,.checkout-form select,.checkout-form textarea{min-height:48px!important;width:100%!important;box-sizing:border-box!important}
+  .cart-layout,.cart-content{grid-template-columns:1fr!important;display:block!important}
+  .cart-summary{width:100%!important;position:static!important;box-sizing:border-box!important}
+  .cart-product,.cart-item{width:100%!important;box-sizing:border-box!important}
+  .cart-product-image img,.cart-item img{max-width:100%!important;object-fit:cover!important}
+  .cart-product-bottom,.cart-product-info{min-width:0!important}
+  .cart-checkout{width:100%!important;min-height:52px!important}
+
+  /* Checkout v3 exact selectors: Address -> Payment -> Confirm remains vertical and touch friendly. */
+  .priyasa-checkout-v3{width:100%!important;max-width:100%!important;box-sizing:border-box!important;padding-left:12px!important;padding-right:12px!important;padding-bottom:32px!important}
+  .checkout-v3-head{display:flex!important;align-items:flex-start!important;justify-content:space-between!important;gap:12px!important;flex-wrap:wrap!important}
+  .checkout-v3-title{font-size:26px!important;line-height:1.12!important;margin:0!important}
+  .checkout-v3-secure{font-size:12px!important;white-space:nowrap!important}
+  .checkout-v3-steps{width:100%!important;display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:6px!important;margin:12px 0 18px!important}
+  .checkout-v3-step{min-width:0!important;padding:8px 4px!important;text-align:center!important}
+  .checkout-v3-step span{font-size:11px!important;white-space:nowrap!important}
+  .checkout-v3-layout{display:block!important;width:100%!important;max-width:100%!important}
+  .checkout-v3-main{display:block!important;width:100%!important;min-width:0!important}
+  .checkout-v3-summary,.checkout-v3-card{width:100%!important;max-width:100%!important;box-sizing:border-box!important;border-radius:14px!important}
+  .checkout-v3-form-grid{display:grid!important;grid-template-columns:1fr!important;gap:14px!important}
+  .checkout-v3-form-grid label.full{grid-column:auto!important}
+  .checkout-v3-input{width:100%!important;min-height:50px!important;box-sizing:border-box!important}
+  .checkout-v3-saved{overflow:hidden!important}
+  .checkout-v3-address{width:100%!important;text-align:left!important;box-sizing:border-box!important}
+  .checkout-v3-payment-grid{display:grid!important;grid-template-columns:1fr!important;gap:10px!important}
+  .checkout-v3-payment{width:100%!important;min-height:74px!important;box-sizing:border-box!important;text-align:left!important}
+  .checkout-v3-coupon{display:grid!important;grid-template-columns:minmax(0,1fr) auto!important;width:100%!important;box-sizing:border-box!important}
+  .checkout-v3-coupon input{min-width:0!important;width:100%!important;min-height:48px!important;box-sizing:border-box!important}
+  .checkout-v3-coupon button{min-width:84px!important;min-height:48px!important}
+  .checkout-v3-actions{display:grid!important;grid-template-columns:1fr!important;gap:10px!important}
+  .checkout-v3-actions>*{width:100%!important;min-height:52px!important;box-sizing:border-box!important}
+  .checkout-v3-login{width:100%!important;box-sizing:border-box!important;margin:20px 0!important}
+
+  /* Keep the app bottom nav above the PDP purchase bar rather than covering it. */
+  body:has(.ecomus-pdp) .mobile-bottom-nav,body:has(.ecomus-pdp) .mobile-nav{display:none!important}
 }
 
 @media (min-width:681px){
@@ -60,5 +83,4 @@ body:has(.ecomus-pdp) main{margin-top:0!important;padding-top:0!important}
   .ecomus-pdp .pdp-mobile-purchase{display:none!important}
 }
 
-/* Prevent accidental horizontal rails from breaking the viewport while preserving intentional product rails. */
 img,video{max-width:100%}
