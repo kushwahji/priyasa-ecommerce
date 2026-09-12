@@ -1,7 +1,5 @@
 import {SignJWT,jwtVerify} from 'jose';
-import bcrypt from 'bcryptjs';
 import {cookies} from 'next/headers';
-import {db} from '@/lib/db';
 
 const secret=()=>{
   const value=process.env.SESSION_SECRET?.trim();
@@ -34,23 +32,12 @@ export async function getSession(){
   }catch{return null;}
 }
 
+/**
+ * Legacy local-admin bootstrap was backed by the retired Prisma database.
+ * Admin provisioning now belongs to Priyasa Core / the dedicated admin app.
+ */
 export async function ensureAdminFromEnvironment(){
-  const email=process.env.ADMIN_EMAIL?.trim().toLowerCase();
-  const password=process.env.ADMIN_PASSWORD;
-  const phone=process.env.ADMIN_PHONE?.trim();
-  if(!email||!password||!phone) throw new Error('ADMIN_EMAIL, ADMIN_PASSWORD and ADMIN_PHONE are required');
-
-  const role=await db.adminRole.upsert({
-    where:{name:'ADMIN'},
-    update:{description:'Full commerce administration'},
-    create:{name:'ADMIN',description:'Full commerce administration'},
-  });
-  const existing=await db.user.findFirst({where:{OR:[{email},{phone}]}});
-  const passwordHash=await bcrypt.hash(password,12);
-  if(existing){
-    return db.user.update({where:{id:existing.id},data:{email,phone,passwordHash,role:'ADMIN',adminRoleId:role.id}});
-  }
-  return db.user.create({data:{phone,email,passwordHash,role:'ADMIN',name:'Priyasa Admin',adminRoleId:role.id}});
+  throw new Error('LOCAL_ADMIN_DATABASE_DISABLED: provision administrators through Priyasa Core API');
 }
 
 export async function requireAdmin(){
@@ -59,12 +46,13 @@ export async function requireAdmin(){
   return session;
 }
 
-export async function requireAdminPermission(permission:string){
+/**
+ * Permission checks are intentionally not reconstructed locally. Core API is
+ * authoritative for RBAC. Legacy Store admin routes must not become a second
+ * permission store.
+ */
+export async function requireAdminPermission(_permission:string){
   const session=await requireAdmin();
-  if(session.role==='ADMIN')return session;
-  const user=await db.user.findUnique({where:{id:session.userId},select:{adminRoleId:true}});
-  if(!user?.adminRoleId)throw new Error('FORBIDDEN_PERMISSION');
-  const role=await db.adminRole.findUnique({where:{id:user.adminRoleId},include:{permissions:{include:{permission:true}}}});
-  if(!role?.permissions.some(x=>x.permission.key===permission))throw new Error('FORBIDDEN_PERMISSION');
+  if(session.role!=='ADMIN')throw new Error('FORBIDDEN_PERMISSION');
   return session;
 }
