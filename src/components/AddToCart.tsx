@@ -25,5 +25,5 @@ export function AddToCart({ variantId, productId, name, price, image }: Props) {
     } catch (error) { setMessage(error instanceof Error ? error.message : 'We could not update your bag. Please try again.'); }
     finally { setBusy(false); }
   }
-  return <><button className="button" onClick={add} disabled={busy || !variantId}>{!variantId ? 'Unavailable' : done ? 'Added to Cart' : busy ? <><span className="button-spinner" />Adding…</> : 'Add to Cart'}</button>{message && <div className="storefront-toast is-visible" role="status" aria-live="polite"><CheckIcon />{message}</div>}</>;
+  return <><button className="button" onClick={add} disabled={busy || !variantId} aria-label={`Add ${name} to bag`}>{!variantId ? 'Unavailable' : done ? 'Added' : busy ? <><span className="button-spinner" />Adding…</> : 'Add'}</button>{message && <div className="storefront-toast is-visible" role="status" aria-live="polite"><CheckIcon />{message}</div>}</>;
 }
