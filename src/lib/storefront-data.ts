@@ -2,7 +2,7 @@ import type { Product } from '@/lib/catalog';
 
 type ApiResponse = { success?: boolean; data?: any; message?: string };
 export type StorefrontCategory = { id: string; name: string; slug: string; imageUrl: string; description?: string; products: any[]; _count?: { products?: number } };
-export type HomeCmsSection = { id: string; type?: string; title?: string; subtitle?: string; imageUrl?: string; ctaHref?: string; ctaLabel?: string; sortOrder?: number; [key: string]: any };
+export type HomeCmsSection = { id: string; type?: string; title?: string; subtitle?: string; imageUrl?: string; mobileImageUrl?: string; ctaHref?: string; ctaLabel?: string; sortOrder?: number; [key: string]: any };
 const BASE_URL = (process.env.PRIYASA_API_BASE_URL || 'https://api.priyasa.com').replace(/\/$/, '');
 async function coreFetch(path: string, init: RequestInit = {}): Promise<ApiResponse> {
   const attempts = 3;
@@ -39,7 +39,29 @@ export async function getSearchProducts(query: string, limit = 24) { return getS
 export async function getBestSellers(limit = 8) { return getStorefrontProducts({ limit }); }
 export async function getSaleProducts(limit = 8) { return (await getStorefrontProducts({ limit: Math.min(100, limit * 3) })).filter((p) => p.price > 0 && p.mrp > p.price).slice(0, limit); }
 export async function getProductsForHomeSection(type: string, limit = 8): Promise<Product[]> { const t = type.toLowerCase().trim(); if (t === 'products-sale' || t === 'sale') return getSaleProducts(limit); if (t === 'products-latest' || t === 'latest' || t === 'latest-collection') return getLatestLaunches(limit); if (t === 'products-best' || t === 'best-sellers' || t === 'trending') return getBestSellers(limit); if (t.startsWith('products-category:')) return getStorefrontProducts({ categorySlug: t.slice('products-category:'.length).trim(), limit }); return []; }
-export async function getStorefrontProduct(slug: string) { try { const response = await coreFetch(`/api/v1/storefront/products/${encodeURIComponent(slug)}`); const product = response.data; if (!product) return null; const mapped = mapProduct(product); const variants = Array.isArray(product.variants) ? product.variants.filter((v: any) => v?.is_active !== false) : []; let rating = 0, reviewCount = 0; try { const reviews = listFrom(await coreFetch(`/api/v1/storefront/products/${encodeURIComponent(slug)}/reviews`)); reviewCount = reviews.length; rating = reviewCount ? reviews.reduce((sum, review) => sum + Number(review.rating || 0), 0) / reviewCount : 0; } catch {} return { ...mapped, variants: variants.map((variant: any) => ({ id: String(variant.id), color: variant.color, size: variant.size, price: Number(variant.price ?? product.price ?? 0), mrp: Number(variant.mrp ?? product.mrp ?? 0), stock: available(variant), sku: variant.sku })), rating, reviewCount, fabric: product?.attributes?.fabric, care: product?.attributes?.care }; } catch (error) { console.warn(`[Priyasa storefront] product ${slug} unavailable: ${error instanceof Error ? error.message : String(error)}`); return null; } }
+export async function getStorefrontProduct(slug: string) {
+  try {
+    let product: any = null;
+    try {
+      product = (await coreFetch(`/api/v1/storefront/products/${encodeURIComponent(slug)}`)).data || null;
+    } catch (detailError) {
+      console.warn(`[Priyasa storefront] direct product lookup failed for ${slug}; trying catalog fallback: ${detailError instanceof Error ? detailError.message : String(detailError)}`);
+    }
+    if (!product) {
+      const catalog = await coreFetch(`/api/v1/storefront/products?search=${encodeURIComponent(slug)}&per_page=100`);
+      product = listFrom(catalog).find((item: any) => String(item?.slug || '') === String(slug) || String(item?.id || '') === String(slug)) || null;
+    }
+    if (!product) return null;
+    const mapped = mapProduct(product);
+    const variants = Array.isArray(product.variants) ? product.variants.filter((v: any) => v?.is_active !== false) : [];
+    let rating = 0, reviewCount = 0;
+    try { const reviews = listFrom(await coreFetch(`/api/v1/storefront/products/${encodeURIComponent(slug)}/reviews`)); reviewCount = reviews.length; rating = reviewCount ? reviews.reduce((sum, review) => sum + Number(review.rating || 0), 0) / reviewCount : 0; } catch {}
+    return { ...mapped, variants: variants.map((variant: any) => ({ id: String(variant.id), color: variant.color, size: variant.size, price: Number(variant.price ?? product.price ?? 0), mrp: Number(variant.mrp ?? product.mrp ?? 0), stock: available(variant), sku: variant.sku })), rating, reviewCount, fabric: product?.attributes?.fabric, care: product?.attributes?.care };
+  } catch (error) {
+    console.warn(`[Priyasa storefront] product ${slug} unavailable: ${error instanceof Error ? error.message : String(error)}`);
+    return null;
+  }
+}
 export async function getStorefrontCategories(): Promise<StorefrontCategory[]> { try { return listFrom(await coreFetch('/api/v1/storefront/categories')).map((category: any) => ({ id: String(category.id), name: String(category.name || ''), slug: String(category.slug || category.id), imageUrl: category.image_url || category.imageUrl || category.media?.url || '', description: category.description ? String(category.description) : undefined, products: [], _count: category._count })); } catch (error) { console.warn(`[Priyasa storefront] categories unavailable; rendering fallback: ${error instanceof Error ? error.message : String(error)}`); return []; } }
 export async function getActiveCms(key: string) { return (await coreFetch(`/api/v1/storefront/cms/${encodeURIComponent(key)}`).catch(() => ({ data: null }))).data || null; }
 export async function getHomeCms(): Promise<HomeCmsSection[]> { const data = await getActiveCms('home'); return Array.isArray(data) ? data : Array.isArray(data?.sections) ? data.sections : []; }
