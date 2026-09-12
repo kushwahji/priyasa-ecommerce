@@ -2,35 +2,35 @@ import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { priyasaApi, apiError } from '@/lib/priyasa-api';
 
+const IDEMPOTENCY_KEY = /^[A-Za-z0-9._:-]{8,128}$/;
+
 export async function POST(req: Request) {
   const token = (await cookies()).get('priyasa_access_token')?.value;
   if (!token) return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
 
   const body = await req.json().catch(() => null) as Record<string, unknown> | null;
-  const orderId = typeof body?.orderId === 'string' ? body.orderId : '';
-  const paymentId = typeof body?.razorpay_payment_id === 'string' ? body.razorpay_payment_id : '';
-  const razorpayOrderId = typeof body?.razorpay_order_id === 'string' ? body.razorpay_order_id : '';
-  const signature = typeof body?.razorpay_signature === 'string' ? body.razorpay_signature : '';
+  const orderId = typeof body?.orderId === 'string' ? body.orderId.trim() : '';
+  const paymentId = typeof body?.razorpay_payment_id === 'string' ? body.razorpay_payment_id.trim() : '';
+  const razorpayOrderId = typeof body?.razorpay_order_id === 'string' ? body.razorpay_order_id.trim() : '';
+  const signature = typeof body?.razorpay_signature === 'string' ? body.razorpay_signature.trim() : '';
 
   if (!orderId || !paymentId || !razorpayOrderId || !signature) {
     return NextResponse.json({ error: 'Missing payment verification fields' }, { status: 400 });
   }
 
-  const idempotencyKey = req.headers.get('idempotency-key') || crypto.randomUUID();
+  const idempotencyKey = req.headers.get('idempotency-key')?.trim() || '';
+  if (!IDEMPOTENCY_KEY.test(idempotencyKey)) {
+    return NextResponse.json({ error: 'A valid Idempotency-Key is required to safely capture payment.' }, { status: 400 });
+  }
+
   const { response, body: result } = await priyasaApi(
     `/api/v1/storefront/orders/${encodeURIComponent(orderId)}/payment/capture`,
     {
       method: 'POST',
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Idempotency-Key': idempotencyKey,
-      },
+      headers: { Authorization: `Bearer ${token}`, 'Idempotency-Key': idempotencyKey },
       body: JSON.stringify({
         provider_payment_id: paymentId,
-        payload: {
-          razorpay_order_id: razorpayOrderId,
-          razorpay_signature: signature,
-        },
+        payload: { razorpay_order_id: razorpayOrderId, razorpay_signature: signature },
       }),
     },
   );
