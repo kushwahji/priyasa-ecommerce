@@ -1,0 +1,117 @@
+/* Priyasa mobile commerce parity v1. Visual-only layer for the supplied Myntra references. */
+@media (max-width:760px){
+:root{--m-pink:#ff3f6c;--m-ink:#282c3f;--m-muted:#686b78;--m-line:#e6e6e6;--m-soft:#f7f7f7;--m-green:#149a82}
+body{background:#fff!important;color:var(--m-ink)!important}
+main{background:#fff!important}
+/* Myntra-like compact app header */
+.site-header{height:72px!important;min-height:72px!important;padding:0 18px!important;background:#fff!important;border-bottom:1px solid #eee!important;box-shadow:0 1px 5px rgba(0,0,0,.04)!important;gap:8px!important}
+.site-header .brand{min-width:50px!important;width:50px!important;align-items:center!important}
+.site-header .brand strong{font-size:0!important}
+.site-header .brand strong:after{content:'P';font:800 30px/1 Arial,sans-serif!important;color:var(--m-pink)!important}
+.site-header .brand small{display:none!important}
+.site-header nav{display:none!important}
+.site-header .mobile-menu{width:40px!important;height:48px!important;display:grid!important;place-items:center!important}
+.site-header .mobile-menu svg{width:28px!important;height:28px!important;color:var(--m-ink)!important}
+.site-header .actions{margin-left:auto!important;gap:4px!important}
+.site-header .actions .header-icon{width:42px!important;height:48px!important;background:transparent!important;border:0!important;color:var(--m-ink)!important}
+.site-header .actions .header-icon svg{width:25px!important;height:25px!important}
+/* Search + delivery strip placed immediately below header by the existing storefront shell */
+.mobile-reference-toolbar{display:block!important}
+/* Homepage spacing and reference hierarchy */
+.home-reference-v4 .home-section,.home-section{padding:18px 14px!important;background:#fff!important}
+.home-reference-v4 .home-section-head,.home-section-head{margin:0 0 12px!important}
+.home-reference-v4 .home-section-head h2,.home-section-head h2{font:700 20px/1.25 Arial,sans-serif!important;color:var(--m-ink)!important}
+.home-reference-v4 .home-kicker{font-size:10px!important;letter-spacing:1.2px!important;color:#9496a0!important}
+.home-reference-v4 .home-section-head p{font-size:12px!important;color:var(--m-muted)!important}
+/* Casual product rail: compact Myntra-style cards */
+.home-reference-v4 .home-flash-sale .home-product-grid,.home-flash-sale .home-product-grid{display:flex!important;gap:10px!important;overflow-x:auto!important;overflow-y:hidden!important;padding:2px 0 8px!important;scroll-snap-type:x proximity!important}
+.home-reference-v4 .home-flash-sale .product-card,.home-flash-sale .product-card{flex:0 0 43vw!important;width:43vw!important;min-width:43vw!important;border:1px solid #ddd!important;border-radius:12px!important;background:#fff!important;box-shadow:none!important;overflow:hidden!important;scroll-snap-align:start!important;transform:none!important}
+.home-reference-v4 .home-flash-sale .product-media,.home-flash-sale .product-media{position:relative!important;background:#f5f5f5!important}
+.home-reference-v4 .home-flash-sale .product-card img,.home-flash-sale .product-card img{aspect-ratio:1/1.15!important;object-fit:cover!important}
+.home-reference-v4 .home-flash-sale .product-info,.home-flash-sale .product-info{padding:8px 9px 10px!important}
+.home-reference-v4 .home-flash-sale .product-category,.home-flash-sale .product-category{font-size:10px!important;color:#777!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}
+.home-reference-v4 .home-flash-sale .product-info h3,.home-flash-sale .product-info h3{font:600 13px/1.25 Arial,sans-serif!important;margin:2px 0 5px!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}
+.home-reference-v4 .home-flash-sale .nykaa-price-row,.home-flash-sale .nykaa-price-row{display:flex!important;align-items:center!important;gap:5px!important;white-space:nowrap!important}
+.home-reference-v4 .home-flash-sale .price,.home-flash-sale .price{font-size:14px!important}
+.home-reference-v4 .home-flash-sale .mrp,.home-flash-sale .mrp{font-size:11px!important;margin-left:0!important}
+.home-reference-v4 .home-flash-sale .discount-text,.home-flash-sale .discount-text{font-size:10px!important;color:#c68a22!important;overflow:hidden!important;text-overflow:ellipsis!important}
+/* White outlined Add button over image */
+.home-flash-sale .nykaa-quick-add{position:absolute!important;left:8px!important;right:8px!important;bottom:8px!important;z-index:7!important}
+.home-flash-sale .nykaa-quick-add .button{width:100%!important;min-height:34px!important;height:34px!important;padding:0 10px!important;border-radius:7px!important;background:#fff!important;color:var(--m-pink)!important;border:1px solid var(--m-pink)!important;box-shadow:0 2px 8px rgba(0,0,0,.08)!important;font-size:12px!important;font-weight:700!important}
+/* Casual image/editorial section: two-up, full image, minimal overlay */
+.home-reference-v4 .home-casual-section{padding:18px 14px!important;background:#f7f7f7!important}
+.home-reference-v4 .home-casual-grid{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important;overflow:hidden!important}
+.home-reference-v4 .home-casual-card{width:100%!important;min-width:0!important;aspect-ratio:.72/1!important;border-radius:10px!important;background-size:cover!important;background-position:center!important;overflow:hidden!important;position:relative!important}
+.home-reference-v4 .home-casual-copy{padding:10px!important;background:linear-gradient(transparent,rgba(0,0,0,.72))!important;color:#fff!important}
+.home-reference-v4 .home-casual-copy small{font-size:8px!important;letter-spacing:.8px!important}
+.home-reference-v4 .home-casual-copy strong{font-size:13px!important;line-height:1.1!important}
+.home-reference-v4 .home-casual-copy span{font-size:8px!important;margin-top:3px!important}
+/* CMS image campaign / offer: edge-to-edge like reference */
+.home-reference-v4 .home-image-highlight-section{padding:8px 0 14px!important;background:#fff!important}
+.home-reference-v4 .home-image-highlight-section .campaign-carousel{width:100%!important;margin:0!important;padding:0!important}
+.home-reference-v4 .home-image-highlight-section .campaign-carousel-card{border-radius:0!important;box-shadow:none!important;min-width:100%!important}
+.home-reference-v4 .home-image-highlight-section .campaign-carousel-card img{width:100%!important;display:block!important;object-fit:cover!important}
+.home-reference-v4 .home-image-highlight-section .campaign-carousel-track{gap:0!important;padding:0!important}
+/* Generic promotional split/image cards */
+.home-reference-v4 .home-promo-board,.home-reference-v4 .home-promo-grid{margin:0!important}
+.home-reference-v4 .home-promo-grid{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important}
+/* Service strip */
+.home-reference-v4 .home-service-promises{padding:10px 0!important;background:#fff!important;border-top:1px solid var(--m-line)!important;border-bottom:1px solid var(--m-line)!important}
+.home-reference-v4 .home-service-promises-inner{display:grid!important;grid-template-columns:repeat(4,1fr)!important;gap:0!important}
+.home-reference-v4 .home-service-promise{min-width:0!important;padding:7px 4px!important;display:grid!important;justify-items:center!important;text-align:center!important;gap:4px!important}
+.home-reference-v4 .home-service-promise svg{width:22px!important;height:22px!important}
+.home-reference-v4 .home-service-promise strong{font-size:9px!important;line-height:1.1!important}
+.home-reference-v4 .home-service-promise small{display:none!important}
+/* Product grids */
+.home-reference-v4 .product-grid-editorial,.home-reference-v4 .home-product-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important}
+.home-reference-v4 .home-product-section .product-card{border:1px solid #eee!important;border-radius:10px!important;overflow:hidden!important;background:#fff!important}
+/* Shop/PLP */
+.page{padding:14px!important;background:#fff!important}
+.shop-layout{display:block!important}
+.filters{border:0!important;border-bottom:1px solid var(--m-line)!important;padding:8px 0!important}
+.product-grid.shop{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important}
+/* PDP */
+.product-detail{display:block!important}
+.detail{padding:14px!important}
+.detail h1{font:700 22px/1.25 Arial,sans-serif!important}
+/* Cart */
+.cart-row{display:grid!important;grid-template-columns:82px 1fr!important;gap:10px!important;padding:12px 0!important}
+.cart-row img{width:82px!important;height:105px!important;border-radius:7px!important}
+.summary{border:0!important;border-top:8px solid #f5f5f5!important;padding:16px!important}
+/* Checkout + payment */
+.priyasa-checkout-v3{background:#f6f6f6!important;min-height:100vh!important}
+.checkout-v3-head{position:sticky!important;top:0!important;z-index:30!important;background:#fff!important;padding:14px 16px!important;border-bottom:1px solid var(--m-line)!important}
+.checkout-v3-head .checkout-v3-title{font-size:20px!important;margin:3px 0!important}
+.checkout-v3-secure{font-size:10px!important}
+.checkout-v3-steps{position:sticky!important;top:67px!important;z-index:29!important;background:#fff!important;padding:10px 16px!important;border-bottom:1px solid var(--m-line)!important}
+.checkout-v3-layout{display:block!important}
+.checkout-v3-main{padding:8px!important}
+.checkout-v3-card,.checkout-v3-summary{background:#fff!important;border:0!important;border-radius:0!important;box-shadow:none!important;padding:14px!important;margin-bottom:8px!important}
+.checkout-v3-card h2{font-size:19px!important}
+.checkout-v3-sub{font-size:12px!important;color:var(--m-muted)!important}
+.checkout-v3-form-grid{display:grid!important;grid-template-columns:1fr!important;gap:10px!important}
+.checkout-v3-input{min-height:46px!important;border-radius:6px!important}
+.checkout-v3-saved{margin-bottom:12px!important}
+.checkout-v3-address{width:100%!important;text-align:left!important;background:#fff!important;border:1px solid #ddd!important;border-radius:8px!important;padding:12px!important;margin-bottom:8px!important}
+.checkout-v3-address.active{border:2px solid var(--m-pink)!important}
+.checkout-v3-payment-grid{display:grid!important;grid-template-columns:1fr!important;gap:8px!important}
+.checkout-v3-payment{background:#fff!important;border:1px solid #ddd!important;border-radius:8px!important;padding:14px!important}
+.checkout-v3-payment.active{border:2px solid var(--m-pink)!important}
+.checkout-v3-actions{position:sticky!important;bottom:0!important;z-index:25!important;background:#fff!important;border-top:1px solid var(--m-line)!important;padding:10px!important;margin:14px -14px -14px!important}
+.checkout-v3-actions .button{flex:1!important;width:100%!important;min-height:48px!important;background:var(--m-pink)!important;border-radius:4px!important}
+.checkout-v3-coupon{display:flex!important;border:1px solid #ddd!important;border-radius:6px!important;overflow:hidden!important;background:#fff!important}
+.checkout-v3-coupon input{min-width:0!important;border:0!important}
+.checkout-v3-coupon button{color:var(--m-pink)!important;background:#fff!important;border:0!important;font-weight:700!important;padding:0 14px!important}
+.payment-page-card{width:100%!important;margin:0!important;border:0!important;box-shadow:none!important;padding:14px!important}
+.payment-method-grid{grid-template-columns:1fr 1fr!important}
+/* Drawer closer to reference */
+.mobile-menu-backdrop{background:rgba(0,0,0,.42)!important}
+.mobile-drawer{width:76vw!important;max-width:520px!important;background:#fff!important}
+.mobile-drawer nav a{font-size:16px!important;min-height:64px!important}
+}
+@media(max-width:420px){
+.site-header{padding:0 10px!important}
+.site-header .actions .header-icon{width:38px!important}
+.home-reference-v4 .home-flash-sale .product-card,.home-flash-sale .product-card{flex-basis:46vw!important;width:46vw!important;min-width:46vw!important}
+.checkout-v3-main{padding:6px!important}
+}
