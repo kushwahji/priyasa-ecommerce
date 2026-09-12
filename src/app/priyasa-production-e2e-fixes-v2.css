@@ -21,10 +21,13 @@ body:has(.ecomus-pdp) main{margin-top:0!important;padding-top:0!important}
 
   /* Sticky purchase bar: Buy Now + Add to Bag + one WhatsApp order action. */
   .ecomus-pdp .pdp-mobile-purchase{position:fixed!important;left:0!important;right:0!important;bottom:0!important;z-index:100!important;background:#fff!important;border-top:1px solid #e5e7eb!important;box-shadow:0 -8px 28px rgba(20,20,20,.10)!important;padding:12px 12px calc(12px + env(safe-area-inset-bottom))!important;display:grid!important;grid-template-columns:1fr 1fr!important;gap:10px!important}
+  .ecomus-pdp .pdp-mobile-purchase>div:first-child{grid-column:1/-1!important;display:flex!important;align-items:center!important;justify-content:space-between!important;padding:0 4px!important}
+  .ecomus-pdp .pdp-mobile-purchase>div:first-child small{font-size:12px!important;color:#6b7280!important}
+  .ecomus-pdp .pdp-mobile-purchase>div:first-child strong{font-size:18px!important;color:#202532!important}
   .ecomus-pdp .pdp-mobile-purchase .mobile-buy-now,.ecomus-pdp .pdp-mobile-purchase .mobile-add-to-bag{min-height:52px!important;border-radius:10px!important;font-size:15px!important;font-weight:800!important;display:flex!important;align-items:center!important;justify-content:center!important}
-  .ecomus-pdp .pdp-mobile-purchase .mobile-whatsapp-order{grid-column:1/-1!important;min-height:44px!important;border:1px solid #25d366!important;background:#fff!important;color:#14863f!important;border-radius:10px!important;font-size:14px!important;font-weight:800!important;display:flex!important;align-items:center!important;justify-content:center!important}
-  .ecomus-pdp .pdp-mobile-purchase .mobile-whatsapp-order svg{width:19px;height:19px;margin-right:7px}
-  .ecomus-pdp{padding-bottom:150px!important}
+  .ecomus-pdp .pdp-mobile-purchase .whatsapp-mobile-button{grid-column:1/-1!important;min-height:44px!important;border:1px solid #25d366!important;background:#fff!important;color:#14863f!important;border-radius:10px!important;font-size:14px!important;font-weight:800!important;display:flex!important;align-items:center!important;justify-content:center!important}
+  .ecomus-pdp .pdp-mobile-purchase .whatsapp-mobile-button svg{width:19px;height:19px;margin-right:7px}
+  .ecomus-pdp{padding-bottom:170px!important}
 
   /* Mobile login = full-width bottom sheet, never a desktop-sized centered modal. */
   .otp-backdrop{align-items:flex-end!important;justify-content:center!important;padding:0!important;background:rgba(15,18,28,.48)!important}
