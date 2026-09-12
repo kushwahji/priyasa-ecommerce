@@ -7,6 +7,19 @@
   .premium-home-hero .home-hero-copy .button{min-height:36px!important;padding:0 15px!important;font-size:9px!important}
   .premium-home-hero .home-hero-control{width:32px!important;height:32px!important;font-size:20px!important}
 
+  /* Keep the homepage sequence editorial: hero -> service strip -> product discovery. */
+  main:has(.premium-home-hero) .home-page{display:flex!important;flex-direction:column!important}
+  main:has(.premium-home-hero) .home-page>.home-hero-multi{order:10!important}
+  main:has(.premium-home-hero) .home-page>.home-service-promises{order:20!important}
+  main:has(.premium-home-hero) .home-page>.home-product-section{order:30!important}
+  main:has(.premium-home-hero) .home-page>.home-casual-section{order:40!important}
+  main:has(.premium-home-hero) .home-page>.home-flash-sale{order:50!important}
+
+  /* Reference-style mobile header sizing. */
+  .site-header{min-height:68px!important;height:68px!important;padding:0 18px!important}
+  .site-header .brand-logo-full{width:145px!important;max-width:145px!important;height:auto!important}
+  .site-header .brand-logo-mobile{width:46px!important;height:46px!important}
+
   /* Home rails: New Arrivals / Trending become true horizontal product carousels. */
   .home-product-section:not(.home-flash-sale):not(:has(.home-load-more)) .home-product-grid{display:flex!important;grid-template-columns:none!important;gap:10px!important;overflow-x:auto!important;overflow-y:hidden!important;scroll-snap-type:x mandatory!important;scrollbar-width:none!important;padding:0 2px 6px!important}
   .home-product-section:not(.home-flash-sale):not(:has(.home-load-more)) .home-product-grid::-webkit-scrollbar{display:none!important}
