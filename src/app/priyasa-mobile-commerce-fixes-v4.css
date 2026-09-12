@@ -1,0 +1,391 @@
+/* Final mobile commerce corrections based on the supplied Myntra/PRIYASA reference screenshots. */
+@media (max-width: 760px) {
+  /* A CMS/fallback page can otherwise render the trust strip once after the hero
+     and again after the casual rail. Keep the first occurrence only. */
+  main:has(.home-casual-section) .home-casual-section ~ .home-service-promises {
+    display: none !important;
+  }
+
+  /* Flash Sale: Myntra-style two-up product cards, not a single oversized rail card. */
+  .home-flash-sale {
+    padding: 20px 14px 18px !important;
+    background: #fff !important;
+  }
+  .home-flash-sale .home-section-head {
+    align-items: flex-end !important;
+    margin-bottom: 14px !important;
+  }
+  .home-flash-sale .home-section-head h2 {
+    font-size: 28px !important;
+    line-height: 1.05 !important;
+    letter-spacing: -0.5px !important;
+    color: #c2185b !important;
+  }
+  .home-flash-sale .home-kicker {
+    color: #a51f57 !important;
+    font-weight: 800 !important;
+    letter-spacing: 1.4px !important;
+  }
+  .home-flash-sale .home-view-all {
+    color: #a51f57 !important;
+    font-size: 11px !important;
+    font-weight: 800 !important;
+    white-space: nowrap !important;
+  }
+  .home-flash-sale .home-product-grid {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 10px !important;
+    width: 100% !important;
+    overflow: visible !important;
+    padding: 0 !important;
+    scroll-snap-type: none !important;
+  }
+  .home-flash-sale .product-card {
+    width: 100% !important;
+    min-width: 0 !important;
+    flex: none !important;
+    border: 1px solid #e6e6e6 !important;
+    border-radius: 10px !important;
+    overflow: hidden !important;
+    background: #fff !important;
+    box-shadow: 0 1px 5px rgba(0,0,0,.04) !important;
+  }
+  .home-flash-sale .product-media {
+    aspect-ratio: .78 / 1 !important;
+    background: #f6f6f6 !important;
+  }
+  .home-flash-sale .product-card img {
+    width: 100% !important;
+    height: 100% !important;
+    aspect-ratio: auto !important;
+    object-fit: cover !important;
+  }
+  .home-flash-sale .nykaa-product-badges {
+    left: 7px !important;
+    top: 7px !important;
+  }
+  .home-flash-sale .nykaa-discount-badge {
+    font-size: 9px !important;
+    padding: 4px 6px !important;
+    border-radius: 4px !important;
+  }
+  .home-flash-sale .nykaa-product-actions {
+    top: 7px !important;
+    right: 7px !important;
+  }
+  .home-flash-sale .nykaa-wishlist {
+    width: 30px !important;
+    height: 30px !important;
+    font-size: 18px !important;
+    background: rgba(255,255,255,.94) !important;
+    border-radius: 50% !important;
+  }
+  .home-flash-sale .nykaa-quick {
+    display: none !important;
+  }
+  .home-flash-sale .product-info {
+    min-height: 91px !important;
+    padding: 8px 8px 10px !important;
+  }
+  .home-flash-sale .product-category {
+    font-size: 9px !important;
+    font-weight: 700 !important;
+    letter-spacing: .7px !important;
+    color: #686b78 !important;
+  }
+  .home-flash-sale .product-info h3 {
+    font-size: 12px !important;
+    line-height: 1.25 !important;
+    margin: 3px 0 6px !important;
+    height: 30px !important;
+  }
+  .home-flash-sale .nykaa-price-row {
+    gap: 4px !important;
+    flex-wrap: nowrap !important;
+  }
+  .home-flash-sale .price {
+    font-size: 13px !important;
+    font-weight: 800 !important;
+  }
+  .home-flash-sale .mrp {
+    font-size: 10px !important;
+    color: #8b8b8b !important;
+  }
+  .home-flash-sale .discount-text {
+    font-size: 9px !important;
+    color: #149a82 !important;
+    font-weight: 800 !important;
+  }
+  .home-flash-sale .nykaa-quick-add {
+    position: absolute !important;
+    left: 7px !important;
+    right: 7px !important;
+    bottom: 7px !important;
+  }
+  .home-flash-sale .nykaa-quick-add .button {
+    min-height: 30px !important;
+    height: 30px !important;
+    font-size: 10px !important;
+    border-radius: 5px !important;
+  }
+  .home-flash-sale .home-load-more {
+    margin-top: 12px !important;
+  }
+
+  /* Home campaign/banner: clean full-width Myntra-like visual rather than a tall card. */
+  .home-image-highlight-section {
+    padding: 8px 0 12px !important;
+    background: #fff !important;
+  }
+  .home-image-highlight-section .campaign-carousel {
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  .home-image-highlight-section .campaign-carousel-viewport,
+  .home-image-highlight-section .campaign-carousel-track {
+    width: 100% !important;
+  }
+  .home-image-highlight-section .campaign-carousel-track {
+    gap: 0 !important;
+    padding: 0 !important;
+  }
+  .home-image-highlight-section .campaign-carousel-card {
+    min-width: 100% !important;
+    width: 100% !important;
+    border-radius: 0 !important;
+    overflow: hidden !important;
+  }
+  .home-image-highlight-section .campaign-carousel-picture {
+    display: block !important;
+    width: 100% !important;
+    aspect-ratio: 1.72 / 1 !important;
+    background: #f3f3f3 !important;
+  }
+  .home-image-highlight-section .campaign-carousel-image {
+    display: block !important;
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+  }
+  .home-image-highlight-section .campaign-carousel-copy {
+    position: absolute !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    padding: 30px 18px 18px !important;
+    background: linear-gradient(transparent, rgba(0,0,0,.72)) !important;
+    color: #fff !important;
+  }
+  .home-image-highlight-section .campaign-carousel-copy span {
+    font-size: 9px !important;
+    font-weight: 800 !important;
+    letter-spacing: 1.2px !important;
+  }
+  .home-image-highlight-section .campaign-carousel-copy strong {
+    display: block !important;
+    font-size: 18px !important;
+    line-height: 1.15 !important;
+    margin-top: 3px !important;
+  }
+  .home-image-highlight-section .campaign-carousel-copy small {
+    display: inline-block !important;
+    margin-top: 7px !important;
+    font-size: 11px !important;
+    font-weight: 800 !important;
+  }
+  .home-image-highlight-section .campaign-carousel-dots {
+    margin-top: 8px !important;
+  }
+
+  /* PDP header/title/pricing: match the clean Myntra mobile hierarchy. */
+  .ecomus-pdp {
+    background: #fff !important;
+    color: #282c3f !important;
+  }
+  .ecomus-pdp .pdp-mobile-head {
+    min-height: 54px !important;
+    padding: 0 14px !important;
+    display: grid !important;
+    grid-template-columns: 40px 1fr auto !important;
+    align-items: center !important;
+    border-bottom: 1px solid #eee !important;
+    background: #fff !important;
+  }
+  .ecomus-pdp .pdp-mobile-brand {
+    justify-self: start !important;
+    font-size: 22px !important;
+    letter-spacing: .3px !important;
+    color: #ff3f6c !important;
+  }
+  .ecomus-pdp .pdp-mobile-head .actions {
+    display: flex !important;
+    gap: 3px !important;
+  }
+  .ecomus-pdp .pdp-mobile-head .actions a,
+  .ecomus-pdp .pdp-mobile-head .back {
+    width: 38px !important;
+    height: 42px !important;
+    display: grid !important;
+    place-items: center !important;
+    color: #282c3f !important;
+  }
+  .ecomus-pdp .pdp-unavailable { padding: 32px 18px 100px !important; }
+  .ecomus-pdp .pdp-mobile-head + .pdp-product-shell,
+  .ecomus-pdp .pdp-mobile-head + main { margin-top: 0 !important; }
+  .ecomus-pdp .pdp-product-info,
+  .ecomus-pdp .pdp-info,
+  .ecomus-pdp .product-info-panel { padding: 14px 18px !important; }
+  .ecomus-pdp .pdp-category,
+  .ecomus-pdp .product-category {
+    font-family: Arial, sans-serif !important;
+    font-size: 10px !important;
+    font-weight: 800 !important;
+    letter-spacing: 1.7px !important;
+    color: #8d1d4e !important;
+  }
+  .ecomus-pdp h1 {
+    font-family: Arial, sans-serif !important;
+    font-size: 25px !important;
+    line-height: 1.22 !important;
+    letter-spacing: -.25px !important;
+    color: #282c3f !important;
+    margin: 8px 0 12px !important;
+  }
+  .ecomus-pdp .pdp-price,
+  .ecomus-pdp .price {
+    font-family: Arial, sans-serif !important;
+    font-size: 24px !important;
+    font-weight: 800 !important;
+    color: #282c3f !important;
+  }
+  .ecomus-pdp .mrp { font-size: 15px !important; color: #8b8b8b !important; }
+  .ecomus-pdp .discount-text,
+  .ecomus-pdp .discount-badge {
+    color: #149a82 !important;
+    font-weight: 800 !important;
+  }
+  .ecomus-pdp .pdp-discount,
+  .ecomus-pdp .discount-badge {
+    background: #ff3f6c !important;
+    color: #fff !important;
+    border-radius: 4px !important;
+    padding: 6px 9px !important;
+    font-size: 11px !important;
+    font-weight: 800 !important;
+  }
+  .ecomus-pdp .pdp-buy-bar,
+  .ecomus-pdp .pdp-sticky-actions {
+    position: fixed !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 64px !important;
+    z-index: 80 !important;
+    background: #fff !important;
+    border-top: 1px solid #e6e6e6 !important;
+    box-shadow: 0 -4px 16px rgba(0,0,0,.08) !important;
+    padding: 8px 10px !important;
+  }
+  .ecomus-pdp .pdp-buy-bar button,
+  .ecomus-pdp .pdp-sticky-actions button {
+    min-height: 48px !important;
+    border-radius: 6px !important;
+    font-size: 12px !important;
+    font-weight: 800 !important;
+  }
+
+  /* PDP details: compact, card-based, scan-friendly sections. */
+  .pdp-details-stack {
+    padding: 0 !important;
+    background: #f5f5f6 !important;
+  }
+  .pdp-section-tabs {
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 40 !important;
+    display: flex !important;
+    gap: 0 !important;
+    overflow-x: auto !important;
+    background: #fff !important;
+    border-top: 1px solid #eee !important;
+    border-bottom: 1px solid #ddd !important;
+  }
+  .pdp-section-tabs a {
+    flex: 0 0 auto !important;
+    padding: 13px 17px 11px !important;
+    font-size: 12px !important;
+    font-weight: 800 !important;
+    color: #686b78 !important;
+    border-bottom: 3px solid transparent !important;
+  }
+  .pdp-section-tabs a.active { color: #282c3f !important; border-color: #ff3f6c !important; }
+  .pdp-detail-card,
+  .pdp-accordion-list,
+  .pdp-similar-card,
+  .pdp-reviews-card {
+    margin: 8px 0 0 !important;
+    padding: 15px !important;
+    background: #fff !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+  }
+  .pdp-card-heading {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 8px !important;
+    margin-bottom: 13px !important;
+  }
+  .pdp-card-heading h2 {
+    margin: 0 !important;
+    font-family: Arial, sans-serif !important;
+    font-size: 17px !important;
+    font-weight: 800 !important;
+    color: #282c3f !important;
+  }
+  .pdp-card-heading span,
+  .pdp-card-heading a { font-size: 9px !important; font-weight: 800 !important; letter-spacing: .8px !important; color: #ff3f6c !important; }
+  .pdp-highlights-grid { display: grid !important; grid-template-columns: repeat(2,minmax(0,1fr)) !important; gap: 8px !important; }
+  .pdp-highlight-item { min-height: 62px !important; padding: 9px !important; background: #fafafa !important; border: 1px solid #eee !important; border-radius: 6px !important; display: flex !important; align-items: center !important; gap: 8px !important; }
+  .pdp-highlight-item b { color: #ff3f6c !important; font-size: 17px !important; }
+  .pdp-highlight-item span { font-size: 11px !important; line-height: 1.25 !important; font-weight: 700 !important; color: #282c3f !important; }
+  .pdp-service-list { display: grid !important; gap: 0 !important; }
+  .pdp-service-list > div,
+  .pdp-offer-row { display: flex !important; align-items: center !important; gap: 11px !important; padding: 12px 0 !important; border-top: 1px solid #eee !important; }
+  .pdp-service-list > div:first-child,
+  .pdp-offer-row:first-of-type { border-top: 0 !important; }
+  .pdp-service-list b,
+  .pdp-offer-row > b { width: 28px !important; height: 28px !important; display: grid !important; place-items: center !important; flex: 0 0 28px !important; border-radius: 50% !important; background: #fff3f6 !important; color: #ff3f6c !important; }
+  .pdp-service-list span,
+  .pdp-offer-row span { min-width: 0 !important; flex: 1 !important; }
+  .pdp-service-list strong,
+  .pdp-offer-row strong { display: block !important; font-size: 12px !important; color: #282c3f !important; }
+  .pdp-service-list small,
+  .pdp-offer-row small { display: block !important; margin-top: 2px !important; font-size: 10px !important; color: #686b78 !important; line-height: 1.35 !important; }
+  .pdp-offer-row em { font-size: 22px !important; color: #282c3f !important; font-style: normal !important; }
+  .pdp-description-copy { margin: 0 0 12px !important; font-size: 12px !important; line-height: 1.6 !important; color: #555 !important; }
+  .pdp-attributes-table { border-top: 1px solid #eee !important; }
+  .pdp-attributes-table > div { display: grid !important; grid-template-columns: 38% 62% !important; gap: 8px !important; padding: 10px 0 !important; border-bottom: 1px solid #eee !important; }
+  .pdp-attributes-table span { font-size: 10px !important; color: #7a7a7a !important; }
+  .pdp-attributes-table strong { font-size: 11px !important; color: #282c3f !important; }
+  .pdp-accordion-list { padding: 0 !important; }
+  .pdp-accordion-list details { border-bottom: 1px solid #e6e6e6 !important; }
+  .pdp-accordion-list summary { min-height: 55px !important; padding: 12px 15px !important; display: grid !important; grid-template-columns: 1fr auto !important; gap: 8px !important; align-items: center !important; list-style: none !important; cursor: pointer !important; }
+  .pdp-accordion-list summary span { font-size: 13px !important; font-weight: 800 !important; color: #282c3f !important; }
+  .pdp-accordion-list summary small { font-size: 9px !important; color: #777 !important; text-align: right !important; }
+  .pdp-accordion-list details > div { padding: 0 15px 14px !important; font-size: 11px !important; line-height: 1.55 !important; color: #555 !important; }
+  .pdp-review-topline { display: block !important; }
+  .pdp-similar-grid { display: grid !important; grid-template-columns: repeat(2,minmax(0,1fr)) !important; gap: 8px !important; }
+  .pdp-similar-grid .product-card { min-width: 0 !important; width: 100% !important; }
+  .pdp-mobile-trust-strip { display: none !important; }
+}
+@media (max-width: 420px) {
+  .home-flash-sale .home-section-head h2 { font-size: 25px !important; }
+  .home-flash-sale .home-product-grid { gap: 8px !important; }
+  .home-flash-sale .product-info { min-height: 86px !important; padding: 7px !important; }
+  .home-flash-sale .product-info h3 { font-size: 11px !important; }
+  .home-image-highlight-section .campaign-carousel-picture { aspect-ratio: 1.58 / 1 !important; }
+  .ecomus-pdp h1 { font-size: 23px !important; }
+}
