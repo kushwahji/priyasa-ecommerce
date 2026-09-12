@@ -67,12 +67,38 @@ function mapProduct(product: any): Product {
   const sizes = [...new Set(variants.map((v: any) => v.size).filter(Boolean))] as string[];
   return { id: String(product.id), name: String(product.name || product.title || ''), slug: String(product.slug || product.product_slug || product.handle || product.id), category: String(category?.name || product?.category_name || 'Priyasa'), categorySlug: category?.slug ? String(category.slug) : product?.category_slug ? String(product.category_slug) : undefined, price, mrp, image: urls[0] || '/images/product-placeholder.svg', images: urls.length ? urls : ['/images/product-placeholder.svg'], colors: colors.length ? colors : [attributeValue({ attributes }, ['color', 'colour'])].filter(Boolean), sizes: sizes.length ? sizes : [attributeValue({ attributes }, ['size', 'sizes'])].filter(Boolean), description: String(product?.short_description || product?.description || ''), variantId: inStock?.id ? String(inStock.id) : String(product?.variant_id ?? ''), badge: mrp > price && price > 0 ? `${Math.round(((mrp - price) / mrp) * 100)}% OFF` : undefined };
 }
-export async function getStorefrontProducts(options: { categorySlug?: string; limit?: number; search?: string; sort?: string } = {}): Promise<Product[]> { const params = new URLSearchParams(); if (options.categorySlug) params.set('category', options.categorySlug); if (options.search) params.set('search', options.search); if (options.sort) params.set('sort', options.sort); params.set('per_page', String(Math.min(Math.max(options.limit || 24, 1), 100))); try { return listFrom(await coreFetch(`/api/v1/storefront/products?${params.toString()}`)).map(mapProduct); } catch (error) { console.warn(`[Priyasa storefront] products unavailable; rendering fallback: ${error instanceof Error ? error.message : String(error)}`); return []; } }
-export async function getLatestLaunches(limit = 8, sort?: string) { return getStorefrontProducts({ limit, sort: sort || 'newest' }); }
+
+type StorefrontProductQuery = { categorySlug?: string; limit?: number; search?: string; sort?: string; in_stock?: boolean; sale_only?: boolean; brand?: string; collection?: string };
+
+export async function getStorefrontProducts(options: StorefrontProductQuery = {}): Promise<Product[]> {
+  const params = new URLSearchParams();
+  if (options.categorySlug) params.set('category', options.categorySlug);
+  if (options.search) params.set('search', options.search);
+  if (options.sort) params.set('sort', options.sort);
+  if (options.in_stock != null) params.set('in_stock', String(options.in_stock));
+  if (options.sale_only != null) params.set('sale_only', String(options.sale_only));
+  if (options.brand) params.set('brand', options.brand);
+  if (options.collection) params.set('collection', options.collection);
+  params.set('per_page', String(Math.min(Math.max(options.limit || 24, 1), 100)));
+  try { return listFrom(await coreFetch(`/api/v1/storefront/products?${params.toString()}`)).map(mapProduct); }
+  catch (error) { console.warn(`[Priyasa storefront] products unavailable; rendering fallback: ${error instanceof Error ? error.message : String(error)}`); return []; }
+}
+
+export async function getLatestLaunches(limit = 8, sort?: string, filters?: Omit<StorefrontProductQuery, 'limit' | 'sort'>) { return getStorefrontProducts({ ...filters, limit, sort: sort || 'newest' }); }
 export async function getSearchProducts(query: string, limit = 24) { return getStorefrontProducts({ search: query, limit }); }
-export async function getBestSellers(limit = 8, sort?: string) { return getStorefrontProducts({ limit, sort: sort || 'popular' }); }
-export async function getSaleProducts(limit = 8, sort?: string) { return (await getStorefrontProducts({ limit: Math.min(100, limit * 3), sort: sort || 'sale' })).filter((p) => p.price > 0 && p.mrp > p.price).slice(0, limit); }
-export async function getProductsForHomeSection(type: string, limit = 8, options: { sort?: string } = {}): Promise<Product[]> { const t = type.toLowerCase().trim(); if (t === 'products-sale' || t === 'sale') return getSaleProducts(limit, options.sort); if (t === 'products-latest' || t === 'latest' || t === 'latest-collection' || t === 'new_arrivals' || t === 'new-arrivals') return getLatestLaunches(limit, options.sort); if (t === 'products-best' || t === 'best-sellers' || t === 'trending') return getBestSellers(limit, options.sort); if (t.startsWith('products-category:')) return getStorefrontProducts({ categorySlug: t.slice('products-category:'.length).trim(), limit, sort: options.sort }); return []; }
+export async function getBestSellers(limit = 8, sort?: string, filters?: Omit<StorefrontProductQuery, 'limit' | 'sort'>) { return getStorefrontProducts({ ...filters, limit, sort: sort || 'popular' }); }
+export async function getSaleProducts(limit = 8, sort?: string, filters?: Omit<StorefrontProductQuery, 'limit' | 'sort'>) { return (await getStorefrontProducts({ ...filters, limit: Math.min(100, limit * 3), sort: sort || 'sale' })).filter((p) => p.price > 0 && p.mrp > p.price).slice(0, limit); }
+
+export async function getProductsForHomeSection(type: string, limit = 8, options: StorefrontProductQuery = {}): Promise<Product[]> {
+  const t = type.toLowerCase().trim();
+  const filters = { in_stock: options.in_stock, sale_only: options.sale_only, brand: options.brand, collection: options.collection, categorySlug: options.categorySlug };
+  if (t === 'products-sale' || t === 'sale') return getSaleProducts(limit, options.sort, filters);
+  if (t === 'products-latest' || t === 'latest' || t === 'latest-collection' || t === 'new_arrivals' || t === 'new-arrivals') return getLatestLaunches(limit, options.sort, filters);
+  if (t === 'products-best' || t === 'best-sellers' || t === 'trending') return getBestSellers(limit, options.sort, filters);
+  if (t.startsWith('products-category:')) return getStorefrontProducts({ ...filters, categorySlug: t.slice('products-category:'.length).trim(), limit, sort: options.sort });
+  return [];
+}
+
 export async function getStorefrontProduct(slug: string) {
   try {
     const requested = decodeURIComponent(slug); const candidates = [...new Set([requested, requested.trim(), requested.replace(/^product[-_]/i, '')])].filter(Boolean); let product: any = null;
