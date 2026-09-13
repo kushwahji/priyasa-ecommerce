@@ -6,9 +6,18 @@ import { getSession } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
 
-export default async function LoginPage() {
+type SearchParams = { next?: string | string[] };
+
+function safeNext(value: string | string[] | undefined) {
+  const candidate = Array.isArray(value) ? value[0] : value;
+  return candidate && candidate.startsWith('/') && !candidate.startsWith('//') ? candidate : '/account';
+}
+
+export default async function LoginPage({ searchParams }: { searchParams?: Promise<SearchParams> }) {
+  const params = searchParams ? await searchParams : {};
+  const next = safeNext(params.next);
   const session = await getSession();
-  if (session) redirect('/account');
+  if (session) redirect(next);
 
   return <main className="customer-auth-page">
     <section className="customer-auth-art"><div className="customer-auth-copy"><BrandLogo href="/"/><span className="eyebrow">EVERY YOU, BEAUTIFUL</span><h1>Fashion made<br/><em>for you.</em></h1><p>Discover styles that make every mood, moment and occasion feel beautiful.</p></div></section>
