@@ -9,7 +9,9 @@ export async function GET() {
   const name = jar.get('priyasa_user_name')?.value || '';
   const email = jar.get('priyasa_user_email')?.value || '';
 
-  if (!token && !userId && !phone) return NextResponse.json({ authenticated: false });
+  // The Core access token is the authoritative customer session. Do not treat
+  // stale profile cookies as an authenticated checkout/order session.
+  if (!token) return NextResponse.json({ authenticated: false });
 
   return NextResponse.json({
     authenticated: true,
