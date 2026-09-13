@@ -19,33 +19,16 @@ export function AuthOtpModal({ open, onClose }: { open: boolean; onClose: () => 
   const sendOtp = async () => {
     setError(''); setMessage(''); if (!/^\d{10}$/.test(normalized)) { setError('Enter a valid 10-digit mobile number.'); return; }
     setLoading(true); setMessage('Sending OTP securely…');
-    try {
-      const r = await jsonFetch('/api/auth/send-otp', { mobile: normalized, country_code: '+91', device_token: 'web', device_id: getDeviceId(), purpose: 'login', channel: 'whatsapp', app_version: '1.0.0', platform: 'web' });
-      const d = r.data as any; if (!r.ok || d.data?.success === false) { setMessage(''); setError(d.data?.message || d.message || 'Unable to send OTP. Please try again.'); return; }
-      setRequestId(d.data?.request_id || d.request_id || ''); setCooldown(Number(d.data?.retry_after || 30)); setStep('otp'); setMessage(d.data?.message || d.message || 'OTP sent successfully on WhatsApp.');
-    } catch { setMessage(''); setError('Network error while sending OTP. Please try again.'); } finally { setLoading(false); }
+    try { const r = await jsonFetch('/api/auth/send-otp', { mobile: normalized, country_code: '+91', device_token: 'web', device_id: getDeviceId(), purpose: 'login', channel: 'whatsapp', app_version: '1.0.0', platform: 'web' }); const d = r.data as any; if (!r.ok || d.data?.success === false) { setMessage(''); setError(d.data?.message || d.message || 'Unable to send OTP. Please try again.'); return; } setRequestId(d.data?.request_id || d.request_id || ''); setCooldown(Number(d.data?.retry_after || 30)); setStep('otp'); setMessage(d.data?.message || d.message || 'OTP sent successfully on WhatsApp.'); } catch { setMessage(''); setError('Network error while sending OTP. Please try again.'); } finally { setLoading(false); }
   };
-
   const verifyOtp = async () => {
     setError(''); setMessage(''); if (!/^\d{4,8}$/.test(otp)) { setError('Enter the OTP you received.'); return; } if (!requestId) { setError('OTP request has expired. Please request a new OTP.'); return; }
     setLoading(true); setMessage('Verifying OTP securely…');
-    try {
-      const r = await jsonFetch('/api/auth/verify-otp', { mobile: normalized, otp, request_id: requestId, device_token: 'web', device_id: getDeviceId(), app_version: '1.0.0', platform: 'web' });
-      const d = r.data as VerifyResult; if (!r.ok || !d.data?.success) { setMessage(''); setError(d.data?.message || d.message || d.errors?.otp?.[0] || 'OTP verification failed. Please check the code and try again.'); return; }
-      setMessage('OTP verified. Signing you in…'); window.setTimeout(() => { onClose(); window.location.reload(); }, 450);
-    } catch { setMessage(''); setError('Network error while verifying OTP. Please try again.'); } finally { setLoading(false); }
+    try { const r = await jsonFetch('/api/auth/verify-otp', { mobile: normalized, otp, request_id: requestId, device_token: 'web', device_id: getDeviceId(), app_version: '1.0.0', platform: 'web' }); const d = r.data as VerifyResult; if (!r.ok || !d.data?.success) { setMessage(''); setError(d.data?.message || d.message || d.errors?.otp?.[0] || 'OTP verification failed. Please check the code and try again.'); return; } setMessage('OTP verified. Signing you in…'); window.setTimeout(() => { onClose(); window.location.reload(); }, 450); } catch { setMessage(''); setError('Network error while verifying OTP. Please try again.'); } finally { setLoading(false); }
   };
-
   const resend = async () => {
-    if (cooldown > 0 || loading) return;
-    // Reuse the supported send-OTP contract instead of calling an undocumented
-    // /resend-otp endpoint. The Core API controls its own retry policy.
-    setError(''); setMessage('Sending a new OTP…'); setLoading(true);
-    try {
-      const r = await jsonFetch('/api/auth/send-otp', { mobile: normalized, country_code: '+91', device_token: 'web', device_id: getDeviceId(), purpose: 'login', channel: 'whatsapp', app_version: '1.0.0', platform: 'web' });
-      const d = r.data as any; if (!r.ok || d.data?.success === false) { setMessage(''); setError(d.data?.message || d.message || 'Unable to resend OTP. Please try again.'); return; }
-      setRequestId(d.data?.request_id || d.request_id || requestId); setCooldown(Number(d.data?.retry_after || 30)); setMessage(d.data?.message || d.message || 'New OTP sent successfully.');
-    } catch { setMessage(''); setError('Network error while resending OTP.'); } finally { setLoading(false); }
+    if (cooldown > 0 || loading) return; setError(''); setMessage('Sending a new OTP…'); setLoading(true);
+    try { const r = await jsonFetch('/api/auth/send-otp', { mobile: normalized, country_code: '+91', device_token: 'web', device_id: getDeviceId(), purpose: 'login', channel: 'whatsapp', app_version: '1.0.0', platform: 'web' }); const d = r.data as any; if (!r.ok || d.data?.success === false) { setMessage(''); setError(d.data?.message || d.message || 'Unable to resend OTP. Please try again.'); return; } setRequestId(d.data?.request_id || d.request_id || requestId); setCooldown(Number(d.data?.retry_after || 30)); setMessage(d.data?.message || d.message || 'New OTP sent successfully.'); } catch { setMessage(''); setError('Network error while resending OTP.'); } finally { setLoading(false); }
   };
   const cancel = () => { if (!loading) onClose(); };
   const setDigit = (index: number, value: string) => { const digits = value.replace(/\D/g, '').slice(0, 6); if (!digits) return; const next = (otp.slice(0, index) + digits + otp.slice(index + digits.length)).slice(0, 6); setOtp(next); otpRefs.current[Math.min(index + digits.length, 5)]?.focus(); };
@@ -53,20 +36,14 @@ export function AuthOtpModal({ open, onClose }: { open: boolean; onClose: () => 
   const clearAt = (index: number) => { if (otp[index]) { setOtp(otp.slice(0, index) + otp.slice(index + 1)); return; } if (index > 0) { const next = otp.slice(0, index - 1) + otp.slice(index); setOtp(next); otpRefs.current[index - 1]?.focus(); } };
 
   return <div className="otp-backdrop" role="dialog" aria-modal="true" aria-label="Priyasa login" onMouseDown={(e) => { if (e.target === e.currentTarget && !loading) cancel(); }}>
+    <style>{`.otp-backdrop{align-items:center}.otp-modal{max-height:min(760px,calc(100dvh - 36px));overflow:auto}.otp-brand{margin-bottom:12px}.otp-modal input{min-width:0}.otp-digits{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin:10px 0 4px}.otp-digit{height:52px;text-align:center;border:1px solid #dbc8cb;background:#fff;border-radius:6px;font-size:22px;font-weight:700}.otp-status{display:flex;align-items:center;gap:8px}.otp-meta{display:grid;grid-template-columns:1fr 1fr;gap:8px}@media(max-width:560px){.otp-backdrop{align-items:flex-end;padding:0}.otp-modal{width:100%;max-width:none;max-height:92dvh;border-radius:20px 20px 0 0;padding:24px 18px calc(24px + env(safe-area-inset-bottom));box-shadow:0 -18px 60px rgba(0,0,0,.25)}.otp-modal h2{font-size:30px}.otp-phone input{font-size:16px}.otp-submit{min-height:50px}.otp-digit{height:50px}.otp-close{right:12px;top:8px;width:42px;height:42px}.otp-foot{padding-bottom:4px}}`}</style>
     <div className="otp-modal">
       <button type="button" className="otp-close" onClick={cancel} aria-label="Close">×</button>
       <div className="otp-brand"><img src="/images/priyasa-logo.svg" alt="PRIYASA" width={122} height={32}/></div>
       <div className="eyebrow">{step === 'phone' ? 'WELCOME TO PRIYASA' : 'SECURE VERIFICATION'}</div>
       <h2>{step === 'phone' ? 'Welcome Back' : 'Verify Your Phone'}</h2>
       <p className="muted">{step === 'phone' ? 'Login or create your Priyasa account with your mobile number.' : `We have sent a 6-digit OTP to +91 ${normalized}.`}</p>
-      {step === 'phone' ? <>
-        <label>Mobile number<div className="otp-phone"><span>+91</span><input autoFocus inputMode="numeric" maxLength={10} value={mobile} onChange={(e) => setMobile(e.target.value.replace(/\D/g, ''))} placeholder="Enter your mobile number"/></div></label>
-        <button type="button" className="button otp-submit" disabled={loading} onClick={sendOtp}>{loading ? <><span className="otp-spinner"/>Sending OTP…</> : 'Send OTP'}</button>
-      </> : <>
-        <label>Enter OTP</label><div className="otp-digits" onPaste={handlePaste}>{Array.from({ length: 6 }).map((_, i) => <input key={i} ref={(el) => { otpRefs.current[i] = el; }} className="otp-digit" inputMode="numeric" autoComplete={i === 0 ? 'one-time-code' : 'off'} maxLength={1} value={otp[i] || ''} onChange={(e) => setDigit(i, e.target.value)} onKeyDown={(e) => { if (e.key === 'Backspace') clearAt(i); if (e.key === 'ArrowLeft' && i > 0) otpRefs.current[i - 1]?.focus(); if (e.key === 'ArrowRight' && i < 5) otpRefs.current[i + 1]?.focus(); }} aria-label={`OTP digit ${i + 1}`}/>)}</div>
-        <button type="button" className="button otp-submit" disabled={loading} onClick={verifyOtp}>{loading ? <><span className="otp-spinner"/>Verifying OTP…</> : 'Verify & Login'}</button>
-        <div className="otp-meta"><button type="button" className="otp-link" disabled={loading || cooldown > 0} onClick={resend}>{cooldown > 0 ? `Resend OTP in 00:${String(cooldown).padStart(2, '0')}` : 'Resend OTP'}</button><button type="button" className="otp-link" disabled={loading} onClick={() => { setStep('phone'); setOtp(''); setError(''); setMessage(''); }}>Change number</button></div>
-      </>}
+      {step === 'phone' ? <><label>Mobile number<div className="otp-phone"><span>+91</span><input autoFocus inputMode="numeric" maxLength={10} value={mobile} onChange={(e) => setMobile(e.target.value.replace(/\D/g, ''))} placeholder="Enter your mobile number"/></div></label><button type="button" className="button otp-submit" disabled={loading} onClick={sendOtp}>{loading ? <><span className="otp-spinner"/>Sending OTP…</> : 'Send OTP'}</button></> : <><label>Enter OTP</label><div className="otp-digits" onPaste={handlePaste}>{Array.from({ length: 6 }).map((_, i) => <input key={i} ref={(el) => { otpRefs.current[i] = el; }} className="otp-digit" inputMode="numeric" autoComplete={i === 0 ? 'one-time-code' : 'off'} maxLength={1} value={otp[i] || ''} onChange={(e) => setDigit(i, e.target.value)} onKeyDown={(e) => { if (e.key === 'Backspace') clearAt(i); if (e.key === 'ArrowLeft' && i > 0) otpRefs.current[i - 1]?.focus(); if (e.key === 'ArrowRight' && i < 5) otpRefs.current[i + 1]?.focus(); }} aria-label={`OTP digit ${i + 1}`}/>)}</div><button type="button" className="button otp-submit" disabled={loading} onClick={verifyOtp}>{loading ? <><span className="otp-spinner"/>Verifying OTP…</> : 'Verify & Login'}</button><div className="otp-meta"><button type="button" className="otp-link" disabled={loading || cooldown > 0} onClick={resend}>{cooldown > 0 ? `Resend OTP in 00:${String(cooldown).padStart(2, '0')}` : 'Resend OTP'}</button><button type="button" className="otp-link" disabled={loading} onClick={() => { setStep('phone'); setOtp(''); setError(''); setMessage(''); }}>Change number</button></div></>}
       {message && <div className="otp-status success" role="status" aria-live="polite">{loading && <span className="otp-spinner"/>}<CheckIcon/>{message}</div>}{error && <div className="otp-status error" role="alert">{error}</div>}
       <small className="otp-foot">By continuing, you agree to Priyasa's Terms & Privacy Policy.</small>
     </div>
