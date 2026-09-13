@@ -1,0 +1,79 @@
+/* PRIYASA final visual fixes: one responsive shell, deterministic PDP media, identical home section order. */
+
+/* Home header: keep menu, brand and actions in one real row on mobile. */
+@media (max-width:680px){
+  .site-header{
+    display:grid!important;
+    grid-template-columns:44px minmax(0,1fr) auto!important;
+    align-items:center!important;
+    width:100%!important;
+    min-height:64px!important;
+    height:64px!important;
+    padding:0 10px!important;
+    gap:8px!important;
+    position:sticky!important;
+    top:0!important;
+  }
+  .site-header>.mobile-menu{position:static!important;grid-column:1!important;grid-row:1!important;width:44px!important;height:44px!important;margin:0!important;z-index:3!important;display:grid!important;place-items:center!important}
+  .site-header>.brand-logo-link{position:static!important;left:auto!important;top:auto!important;transform:none!important;grid-column:2!important;grid-row:1!important;justify-self:start!important;width:auto!important;min-width:0!important;height:44px!important;margin:0!important;display:flex!important;align-items:center!important;justify-content:flex-start!important;z-index:2!important}
+  .site-header>.brand-logo-link .brand-logo-full{display:block!important;width:112px!important;height:auto!important;max-height:38px!important;object-fit:contain!important}
+  .site-header>.brand-logo-link .brand-logo-mobile{display:none!important}
+  .site-header nav{display:none!important}
+  .site-header>.actions{position:static!important;right:auto!important;top:auto!important;grid-column:3!important;grid-row:1!important;height:44px!important;display:flex!important;align-items:center!important;justify-content:flex-end!important;gap:2px!important;margin:0!important}
+  .site-header>.actions .header-icon{width:40px!important;height:40px!important;flex:0 0 40px!important}
+  .site-header>.actions .header-icon[aria-label="Search"]{display:none!important}
+  .site-header>.actions .header-icon[aria-label="Wishlist"]{display:none!important}
+}
+@media (max-width:420px){
+  .site-header{grid-template-columns:40px minmax(0,1fr) auto!important;padding:0 7px!important;gap:5px!important}
+  .site-header>.mobile-menu{width:40px!important;height:40px!important}
+  .site-header>.brand-logo-link .brand-logo-full{width:104px!important}
+  .site-header>.actions .header-icon{width:36px!important;height:36px!important;flex-basis:36px!important}
+}
+
+/* PDP mobile: no reserved header band, no legacy shell spacing. */
+@media (max-width:760px){
+  body:has(.ecomus-pdp){overflow-x:hidden!important}
+  body:has(.ecomus-pdp)>.site-header{display:none!important}
+  body:has(.ecomus-pdp)>.announcement{display:none!important}
+  body:has(.ecomus-pdp)>main{margin:0!important;padding:0!important;min-height:0!important}
+  .ecomus-pdp{display:block!important;width:100%!important;margin:0!important;padding:0!important;min-height:0!important;overflow-x:clip!important}
+  .ecomus-pdp .pdp-mobile-head{display:grid!important;grid-template-columns:40px minmax(0,1fr) auto!important;align-items:center!important;width:100%!important;height:64px!important;min-height:64px!important;margin:0!important;padding:0 10px!important;box-sizing:border-box!important;position:sticky!important;top:0!important;z-index:120!important;background:#fff!important;border-bottom:1px solid #ececef!important}
+  .ecomus-pdp .pdp-mobile-head .back{display:flex!important;align-items:center!important;justify-content:flex-start!important;width:40px!important;height:40px!important;font-size:36px!important;line-height:1!important;text-decoration:none!important;color:#282c3f!important}
+  .ecomus-pdp .pdp-mobile-brand{justify-self:start!important;font-size:28px!important;line-height:1!important;font-weight:800!important;color:#f03b6b!important;letter-spacing:-.6px!important}
+  .ecomus-pdp .pdp-mobile-head .actions{display:flex!important;align-items:center!important;justify-content:flex-end!important;gap:1px!important;height:44px!important}
+  .ecomus-pdp .pdp-mobile-head .actions a{display:flex!important;align-items:center!important;justify-content:center!important;width:40px!important;height:40px!important;color:#282c3f!important;text-decoration:none!important;font-size:31px!important;line-height:1!important}
+  .ecomus-pdp .pdp-page{display:block!important;width:100%!important;max-width:none!important;margin:0!important;padding:0!important}
+  .ecomus-pdp .pdp-layout-v2{display:flex!important;flex-direction:column!important;width:100%!important;margin:0!important;padding:0!important;gap:0!important}
+  .ecomus-pdp .premium-pdp-gallery{display:block!important;width:100%!important;margin:0!important;padding:0!important}
+  .ecomus-pdp .pdp-main-image{position:relative!important;display:block!important;width:100%!important;height:min(118vw,560px)!important;min-height:0!important;max-height:560px!important;margin:0!important;padding:0!important;aspect-ratio:auto!important;border:0!important;border-radius:0!important;background:#fff!important;overflow:hidden!important;opacity:1!important;visibility:visible!important;filter:none!important;isolation:isolate!important}
+  .ecomus-pdp .pdp-main-image::before,.ecomus-pdp .pdp-main-image::after,.ecomus-pdp .gallery-image-button::before,.ecomus-pdp .gallery-image-button::after{content:none!important;display:none!important;opacity:0!important;background:transparent!important}
+  .ecomus-pdp .pdp-main-image .gallery-image-button{position:absolute!important;inset:0!important;display:block!important;width:100%!important;height:100%!important;min-height:0!important;margin:0!important;padding:0!important;border:0!important;background:transparent!important;opacity:1!important;visibility:visible!important;filter:none!important;box-shadow:none!important;mix-blend-mode:normal!important}
+  .ecomus-pdp .pdp-main-image .gallery-image-button img{position:absolute!important;inset:0!important;display:block!important;width:100%!important;height:100%!important;object-fit:cover!important;object-position:center center!important;margin:0!important;padding:0!important;opacity:1!important;visibility:visible!important;filter:none!important;mix-blend-mode:normal!important}
+  .ecomus-pdp .gallery-counter{z-index:10!important}
+  .ecomus-pdp .gallery-arrow,.ecomus-pdp .gallery-zoom-button,.ecomus-pdp .gallery-fullscreen-button{z-index:11!important}
+  .ecomus-pdp .pdp-mobile-slider{display:none!important}
+  .ecomus-pdp .gallery-dots{display:flex!important;justify-content:center!important;align-items:center!important;gap:7px!important;padding:12px 0!important;background:#fff!important}
+  .ecomus-pdp .gallery-dots button{width:7px!important;height:7px!important;border:0!important;border-radius:50%!important;background:#c9c9cd!important;padding:0!important}
+  .ecomus-pdp .gallery-dots button.active{width:30px!important;border-radius:999px!important;background:#24252b!important}
+  .ecomus-pdp .pdp-info{position:static!important;width:100%!important;box-sizing:border-box!important;padding:16px 14px 0!important;margin:0!important}
+}
+
+/* Home CMS: desktop and mobile must consume exactly the server/API order. */
+.home-page.home-reference-v4{display:block!important;position:relative!important;width:100%!important;height:auto!important;grid-template-columns:none!important;grid-auto-flow:initial!important;flex-direction:initial!important}
+.home-page.home-reference-v4>*{order:initial!important;float:none!important;clear:both!important}
+.home-page.home-reference-v4>.home-section,
+.home-page.home-reference-v4>section.home-section,
+.home-page.home-reference-v4>.home-product-section{display:block!important;position:relative!important;width:100%!important;height:auto!important;min-height:0!important;order:initial!important;float:none!important;clear:both!important;transform:none!important}
+.home-page.home-reference-v4 .home-new-arrivals{display:block!important;visibility:visible!important;opacity:1!important}
+
+/* Remove breakpoint-specific ordering from earlier parity layers. */
+@media (max-width:760px){
+  .home-page.home-reference-v4>.home-hero-multi,
+  .home-page.home-reference-v4>.home-new-arrivals,
+  .home-page.home-reference-v4>.home-api-offer,
+  .home-page.home-reference-v4>.home-category-section,
+  .home-page.home-reference-v4>.home-trending,
+  .home-page.home-reference-v4>.home-api-banner,
+  .home-page.home-reference-v4>.home-api-text{order:initial!important}
+}
