@@ -7,22 +7,19 @@ import { BreadcrumbStructuredData } from '@/app/seo-schema';
 import { BagIcon, SearchIcon } from '@/components/StorefrontIcons';
 
 type ProductSchemaVariant = { sku?: string | null; stock?: number | null };
-
 export const dynamic = 'force-dynamic';
 export const dynamicParams = true;
 export const revalidate = 0;
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
-  const { slug } = await params;
-  const product = await getStorefrontProduct(slug);
+  const { slug } = await params; const product = await getStorefrontProduct(slug);
   if (!product) return { title: 'PRIYASA Product' };
   const description = product.description?.slice(0, 160) || `Shop ${product.name} from PRIYASA.`;
   return { title: product.name, description, alternates: { canonical: `/product/${product.slug}` }, openGraph: { type: 'website', title: product.name, description, images: product.image ? [{ url: product.image, alt: product.name }] : [] } };
 }
 
 export default async function ProductPage({ params }: { params: Promise<{ slug: string }> }) {
-  const { slug } = await params;
-  const product = await getStorefrontProduct(slug);
+  const { slug } = await params; const product = await getStorefrontProduct(slug);
   if (!product) return <div className="storefront-page ecomus-pdp"><div className="pdp-mobile-head"><Link className="back" href="/shop" aria-label="Back">‹</Link><strong className="pdp-mobile-brand">PRIYASA</strong><div className="actions"><Link href="/search" aria-label="Search"><SearchIcon /></Link><Link href="/cart" aria-label="Bag"><BagIcon /></Link></div></div><main className="pdp-unavailable"><span className="eyebrow dark">PRIYASA</span><h1>Product temporarily unavailable</h1><p>We could not load this product right now. Please return to the collection and try again.</p><div><Link className="button" href="/shop">Continue Shopping</Link><Link className="text-link" href="/">Go to Home →</Link></div></main></div>;
 
   const related = (await getStorefrontProducts({ categorySlug: product.categorySlug, limit: 8 })).filter((item) => item.id !== product.id).slice(0, 4);
@@ -30,7 +27,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
   const discount = product.mrp > product.price ? Math.round((1 - product.price / product.mrp) * 100) : 0;
   const base = process.env.NEXT_PUBLIC_APP_URL || 'https://priyasa.com';
   const schemaVariants = (product.variants || []) as ProductSchemaVariant[];
-  const productJsonLd = { '@context': 'https://schema.org', '@type': 'Product', name: product.name, description: product.description, sku: schemaVariants.find((variant) => variant.sku)?.sku || product.id, image: images, brand: { '@type': 'Brand', name: 'PRIYASA' }, category: product.category, url: `${base}/product/${product.slug}`, offers: { '@type': 'Offer', url: `${base}/product/${product.slug}`, priceCurrency: 'INR', price: product.price.toFixed(2), availability: schemaVariants.some((variant) => (variant.stock || 0) > 0) ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock', itemCondition: 'https://schema.org/NewCondition' }, ...(product.reviewCount ? { aggregateRating: { '@type': 'AggregateRating', ratingValue: (product.rating || 0).toFixed(1), reviewCount: product.reviewCount } : {}) };
+  const productJsonLd = { '@context': 'https://schema.org', '@type': 'Product', name: product.name, description: product.description, sku: schemaVariants.find((variant) => variant.sku)?.sku || product.id, image: images, brand: { '@type': 'Brand', name: 'PRIYASA' }, category: product.category, url: `${base}/product/${product.slug}`, offers: { '@type': 'Offer', url: `${base}/product/${product.slug}`, priceCurrency: 'INR', price: product.price.toFixed(2), availability: schemaVariants.some((variant) => (variant.stock || 0) > 0) ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock', itemCondition: 'https://schema.org/NewCondition' }, ...(product.reviewCount ? { aggregateRating: { '@type': 'AggregateRating', ratingValue: (product.rating || 0).toFixed(1), reviewCount: product.reviewCount } } : {}) };
 
   return <div className="storefront-page ecomus-pdp">
     <div className="pdp-mobile-head"><Link className="back" href="/" aria-label="Back">‹</Link><strong className="pdp-mobile-brand">PRIYASA</strong><div className="actions"><Link href="/search" aria-label="Search"><SearchIcon /></Link><Link href="/wishlist" aria-label="Wishlist">♡</Link><Link href="/cart" aria-label="Bag"><BagIcon /></Link></div></div>
@@ -38,18 +35,8 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
     <BreadcrumbStructuredData items={[{ name: 'Home', url: base }, { name: product.category, url: `${base}/category/${product.categorySlug || ''}` }, { name: product.name, url: `${base}/product/${product.slug}` }]} />
     <style>{`.pdp-page{padding-top:18px}.pdp-page .breadcrumbs{display:none}.pdp-info{min-width:0}.pdp-bank-offer{display:none}@media(max-width:760px){.pdp-page{padding:0 0 28px}.pdp-layout-v2{gap:0}.pdp-info{padding:20px 16px 0}.pdp-gallery{border-radius:0}.pdp-brand-line{margin-top:0}}`}</style>
     <main className="page storefront-inner pdp-page">
-      <div className="pdp-layout pdp-layout-v2">
-        <ProductGallery image={product.image} name={product.name} gallery={images} />
-        <section className="pdp-info">
-          <div className="pdp-brand-line"><span className="eyebrow dark">{product.category}</span>{product.badge && <span className="pdp-bestseller">{product.badge}</span>}</div>
-          <h1>{product.name}</h1>
-          {product.reviewCount ? <div className="pdp-rating"><span>★</span><b>{(product.rating || 0).toFixed(1)}</b><a href="#reviews">{product.reviewCount} ratings</a></div> : <div className="pdp-rating muted">Be the first to review this product</div>}
-          <div className="pdp-price pdp-price-v2"><strong>{money(product.price)}</strong>{product.mrp > product.price && <><del>{money(product.mrp)}</del><span>{discount}% OFF</span></>}</div>
-          <small className="pdp-tax-note">Inclusive of all applicable taxes</small>
-          <ProductPurchase product={product} />
-        </section>
-      </div>
-      <ProductPdpDetails product={product} related={related} />
+      <div className="pdp-layout pdp-layout-v2"><ProductGallery image={product.image} name={product.name} gallery={images}/><section className="pdp-info"><div className="pdp-brand-line"><span className="eyebrow dark">{product.category}</span>{product.badge && <span className="pdp-bestseller">{product.badge}</span>}</div><h1>{product.name}</h1>{product.reviewCount ? <div className="pdp-rating"><span>★</span><b>{(product.rating || 0).toFixed(1)}</b><a href="#reviews">{product.reviewCount} ratings</a></div> : <div className="pdp-rating muted">Be the first to review this product</div>}<div className="pdp-price pdp-price-v2"><strong>{money(product.price)}</strong>{product.mrp > product.price && <><del>{money(product.mrp)}</del><span>{discount}% OFF</span></>}</div><small className="pdp-tax-note">Inclusive of all applicable taxes</small><ProductPurchase product={product}/></section></div>
+      <ProductPdpDetails product={product} related={related}/>
     </main>
   </div>;
 }
