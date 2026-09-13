@@ -1,0 +1,137 @@
+/* Final E2E commerce hardening. Loaded last in the cascade. */
+
+/* PDP: the gallery must be real media, never a translucent legacy overlay. */
+.ecomus-pdp .premium-pdp-gallery,
+.ecomus-pdp .pdp-main-image,
+.ecomus-pdp .gallery-image-button,
+.ecomus-pdp .gallery-image-button img { opacity: 1 !important; visibility: visible !important; }
+.ecomus-pdp .pdp-main-image::before,
+.ecomus-pdp .pdp-main-image::after,
+.ecomus-pdp .gallery-image-button::before,
+.ecomus-pdp .gallery-image-button::after,
+.ecomus-pdp .gallery-image-button img::before,
+.ecomus-pdp .gallery-image-button img::after { content: none !important; display: none !important; background: transparent !important; }
+.ecomus-pdp .pdp-main-image { background: #f7f7f8 !important; }
+.ecomus-pdp .gallery-image-button { background: transparent !important; }
+.ecomus-pdp .gallery-image-button img { object-fit: cover !important; object-position: center center !important; filter: none !important; mix-blend-mode: normal !important; }
+.ecomus-pdp .gallery-fullscreen-button,
+.ecomus-pdp .gallery-zoom-button,
+.ecomus-pdp .gallery-arrow { z-index: 8 !important; }
+
+/* PDP: compact purchase controls; only one WhatsApp CTA in the DOM. */
+.ecomus-pdp .purchase-actions { display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 10px !important; margin-top: 16px !important; }
+.ecomus-pdp .purchase-actions .button { min-height: 52px !important; margin: 0 !important; }
+.ecomus-pdp .whatsapp-order-button { display: flex !important; width: 100% !important; min-height: 48px !important; align-items: center !important; justify-content: center !important; gap: 8px !important; margin: 10px 0 0 !important; border: 1px solid #25d366 !important; border-radius: 6px !important; background: #25d366 !important; color: #fff !important; font-weight: 800 !important; letter-spacing: .1px !important; cursor: pointer !important; }
+.ecomus-pdp .whatsapp-order-button:disabled { opacity: .5 !important; cursor: not-allowed !important; }
+.ecomus-pdp .purchase-trust { display: grid !important; grid-template-columns: repeat(3, minmax(0,1fr)) !important; gap: 8px !important; margin-top: 12px !important; }
+.ecomus-pdp .purchase-trust span { padding: 9px 7px !important; border: 1px solid #ececef !important; border-radius: 6px !important; text-align: center !important; font-size: 10px !important; color: #555861 !important; }
+.ecomus-pdp .pdp-purchase-toast { margin: 10px 0 0 !important; }
+
+/* Remove the legacy second mobile purchase bar that caused the blank pink box. */
+.ecomus-pdp .pdp-mobile-purchase { display: none !important; }
+
+/* PDP mobile: the global shell must not leave an empty white header band. */
+@media (max-width: 760px) {
+  body:has(.ecomus-pdp) .announcement,
+  body:has(.ecomus-pdp) > main > .site-header,
+  body:has(.ecomus-pdp) > .site-header { display: none !important; }
+  body:has(.ecomus-pdp) > main { margin: 0 !important; padding: 0 !important; }
+  .ecomus-pdp { width: 100% !important; margin: 0 !important; padding: 0 !important; overflow-x: clip !important; }
+  .ecomus-pdp .pdp-mobile-head { display: grid !important; position: sticky !important; top: 0 !important; z-index: 120 !important; }
+  .ecomus-pdp .pdp-page { width: 100% !important; max-width: none !important; padding: 0 !important; margin: 0 !important; }
+  .ecomus-pdp .breadcrumbs { display: none !important; }
+  .ecomus-pdp .pdp-layout-v2 { display: flex !important; flex-direction: column !important; gap: 0 !important; width: 100% !important; }
+  .ecomus-pdp .premium-pdp-gallery { display: block !important; width: 100% !important; margin: 0 !important; padding: 0 !important; }
+  .ecomus-pdp .pdp-main-image { min-height: 0 !important; height: auto !important; aspect-ratio: 4 / 5 !important; max-height: none !important; border-radius: 0 !important; }
+  .ecomus-pdp .pdp-main-image .gallery-image-button,
+  .ecomus-pdp .pdp-main-image .gallery-image-button img { position: absolute !important; inset: 0 !important; width: 100% !important; height: 100% !important; }
+  .ecomus-pdp .pdp-main-image .gallery-image-button img { object-fit: cover !important; }
+  .ecomus-pdp .pdp-info { padding: 16px 14px 0 !important; }
+  .ecomus-pdp .pdp-info h1 { font-size: 20px !important; line-height: 1.3 !important; margin: 7px 0 9px !important; }
+  .ecomus-pdp .pdp-bank-offer { margin: 12px 0 !important; }
+  .ecomus-pdp .premium-purchase-panel { margin-top: 0 !important; }
+  .ecomus-pdp .purchase-actions { grid-template-columns: 1fr 1fr !important; gap: 8px !important; }
+  .ecomus-pdp .purchase-actions .button { min-height: 50px !important; }
+  .ecomus-pdp .whatsapp-order-button { min-height: 48px !important; }
+  .ecomus-pdp .purchase-trust { grid-template-columns: 1fr 1fr 1fr !important; }
+  .ecomus-pdp .pdp-details-stack { margin-top: 18px !important; }
+  .ecomus-pdp .pdp-section-tabs { top: 62px !important; gap: 0 !important; justify-content: space-around !important; }
+  .ecomus-pdp .pdp-section-tabs a { flex: 1 1 25% !important; text-align: center !important; padding: 14px 2px 11px !important; font-size: 12px !important; }
+  .ecomus-pdp .pdp-detail-card { margin: 12px 14px 0 !important; padding: 15px !important; border-radius: 9px !important; }
+  .ecomus-pdp .pdp-highlights-grid { grid-template-columns: 1fr 1fr !important; }
+  .ecomus-pdp .pdp-similar-grid { grid-template-columns: 1fr 1fr !important; }
+}
+
+/* Login: desktop dialog, mobile full-width bottom sheet. */
+.otp-backdrop { z-index: 2000 !important; padding: 20px !important; }
+.otp-modal { width: min(460px, calc(100vw - 32px)) !important; max-height: min(760px, calc(100dvh - 40px)) !important; overflow-y: auto !important; }
+.otp-submit { width: 100% !important; min-height: 50px !important; }
+.otp-phone input, .otp-digit { font-size: 16px !important; }
+@media (max-width: 760px) {
+  .otp-backdrop { align-items: flex-end !important; justify-content: stretch !important; padding: 0 !important; background: rgba(20,18,22,.55) !important; }
+  .otp-modal { width: 100% !important; max-width: none !important; max-height: min(88dvh, 760px) !important; margin: 0 !important; padding: 22px 18px calc(20px + env(safe-area-inset-bottom)) !important; border-radius: 22px 22px 0 0 !important; overflow-y: auto !important; box-shadow: 0 -12px 40px rgba(0,0,0,.2) !important; }
+  .otp-close { top: 12px !important; right: 14px !important; }
+  .otp-brand { margin-top: 4px !important; }
+  .otp-digits { display: grid !important; grid-template-columns: repeat(6, minmax(0,1fr)) !important; gap: 7px !important; }
+  .otp-digit { width: 100% !important; min-width: 0 !important; height: 52px !important; }
+  .otp-meta { display: flex !important; justify-content: space-between !important; gap: 12px !important; }
+}
+
+/* Cart: stable two-column desktop / one-column mobile, no horizontal overflow. */
+.nykaa-cart-v1 { overflow-x: clip !important; }
+.cart-layout { align-items: start !important; }
+.cart-summary { position: sticky !important; top: 88px !important; }
+.cart-checkout { width: 100% !important; min-height: 50px !important; display: flex !important; align-items: center !important; justify-content: center !important; }
+@media (max-width: 760px) {
+  .nykaa-cart-v1 .cart-page { padding: 0 12px 110px !important; }
+  .nykaa-cart-v1 .breadcrumbs, .nykaa-cart-v1 .cart-heading { display: none !important; }
+  .nykaa-cart-v1 .cart-layout { display: flex !important; flex-direction: column !important; gap: 12px !important; }
+  .nykaa-cart-v1 .cart-items, .nykaa-cart-v1 .cart-summary { width: 100% !important; position: static !important; }
+  .nykaa-cart-v1 .cart-product { grid-template-columns: 94px minmax(0,1fr) !important; gap: 11px !important; }
+  .nykaa-cart-v1 .cart-product-image { width: 94px !important; height: 126px !important; }
+  .nykaa-cart-v1 .cart-product-info h3 { font-size: 12px !important; line-height: 1.35 !important; }
+  .nykaa-cart-v1 .cart-summary { order: 2 !important; }
+  .nykaa-cart-v1 .nykaa-offers-v1, .nykaa-cart-v1 .nykaa-price-card { margin-left: 0 !important; margin-right: 0 !important; }
+}
+
+/* Checkout: explicit Address → Payment → Confirm hierarchy. */
+.priyasa-checkout-v3 { min-height: 100dvh !important; background: #fff !important; }
+.checkout-v3-head, .checkout-v3-steps, .checkout-v3-layout { width: min(1180px, calc(100% - 32px)) !important; margin-left: auto !important; margin-right: auto !important; }
+.checkout-v3-head { padding-top: 26px !important; }
+.checkout-v3-steps { display: grid !important; grid-template-columns: repeat(3,1fr) !important; gap: 8px !important; margin-top: 18px !important; margin-bottom: 20px !important; }
+.checkout-v3-step { min-height: 54px !important; display: flex !important; align-items: center !important; justify-content: center !important; gap: 8px !important; border-bottom: 2px solid #e8e8ec !important; color: #858891 !important; }
+.checkout-v3-step.active { color: #ff3f6c !important; border-bottom-color: #ff3f6c !important; }
+.checkout-v3-step b { width: 26px !important; height: 26px !important; display: grid !important; place-items: center !important; border-radius: 50% !important; background: #f0f0f3 !important; font-size: 12px !important; }
+.checkout-v3-step.active b { background: #ff3f6c !important; color: #fff !important; }
+.checkout-v3-layout { display: grid !important; grid-template-columns: minmax(0,1.25fr) minmax(300px,.75fr) !important; gap: 18px !important; padding-bottom: 90px !important; }
+.checkout-v3-main { min-width: 0 !important; }
+.checkout-v3-card, .checkout-v3-summary { border: 1px solid #ececf0 !important; border-radius: 12px !important; background: #fff !important; box-shadow: 0 4px 18px rgba(20,20,30,.04) !important; }
+.checkout-v3-card { padding: 20px !important; }
+.checkout-v3-summary { padding: 18px !important; position: sticky !important; top: 88px !important; align-self: start !important; }
+.checkout-v3-payment-grid { display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 10px !important; }
+.checkout-v3-payment { min-height: 112px !important; padding: 14px !important; border: 1px solid #dedee4 !important; border-radius: 9px !important; background: #fff !important; text-align: left !important; }
+.checkout-v3-payment.active { border-color: #ff3f6c !important; box-shadow: 0 0 0 1px #ff3f6c inset !important; background: #fff7f9 !important; }
+.checkout-v3-input { width: 100% !important; min-height: 46px !important; box-sizing: border-box !important; }
+.checkout-v3-actions { display: flex !important; align-items: center !important; justify-content: space-between !important; gap: 12px !important; margin-top: 20px !important; }
+.checkout-v3-actions .button { min-height: 50px !important; }
+@media (max-width: 760px) {
+  .checkout-v3-head, .checkout-v3-steps, .checkout-v3-layout { width: calc(100% - 24px) !important; }
+  .checkout-v3-head { padding-top: 14px !important; }
+  .checkout-v3-title { font-size: 24px !important; }
+  .checkout-v3-steps { position: sticky !important; top: 0 !important; z-index: 80 !important; background: #fff !important; width: 100% !important; padding: 0 12px !important; box-sizing: border-box !important; margin: 0 0 12px !important; }
+  .checkout-v3-step { min-height: 48px !important; font-size: 11px !important; }
+  .checkout-v3-layout { display: flex !important; flex-direction: column !important; gap: 10px !important; padding-bottom: 110px !important; }
+  .checkout-v3-summary { position: static !important; order: 0 !important; }
+  .checkout-v3-main { display: contents !important; }
+  .checkout-v3-card { padding: 15px !important; border-radius: 9px !important; }
+  .checkout-v3-payment-grid { grid-template-columns: 1fr !important; }
+  .checkout-v3-form-grid { grid-template-columns: 1fr !important; }
+  .checkout-v3-actions { flex-direction: column-reverse !important; align-items: stretch !important; }
+  .checkout-v3-actions .button, .checkout-v3-back { width: 100% !important; min-height: 50px !important; display: flex !important; align-items: center !important; justify-content: center !important; }
+}
+
+/* Prevent the fixed mobile navigation from covering checkout/cart controls. */
+@media (max-width: 760px) {
+  .priyasa-checkout-v3, .nykaa-cart-v1, .ecomus-pdp { padding-bottom: 0 !important; }
+  .priyasa-checkout-v3:after, .nykaa-cart-v1:after { content: ''; display: block; height: 78px; }
+}
