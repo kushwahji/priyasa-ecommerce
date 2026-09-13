@@ -1,0 +1,61 @@
+/* Staging E2E hardening. Keep this stylesheet last in the cascade. */
+
+/* PDP: one purchase panel; never hide the real controls. */
+.ecomus-pdp .pdp-purchase { display: block !important; visibility: visible !important; opacity: 1 !important; }
+.ecomus-pdp .pdp-purchase .purchase-actions { display: grid !important; grid-template-columns: repeat(2,minmax(0,1fr)) !important; gap: 10px !important; }
+.ecomus-pdp .pdp-purchase .whatsapp-order-button { display: flex !important; width: 100% !important; min-height: 50px !important; align-items: center !important; justify-content: center !important; margin: 10px 0 0 !important; background: #25d366 !important; color: #fff !important; border: 1px solid #25d366 !important; border-radius: 8px !important; font-weight: 800 !important; }
+.ecomus-pdp .pdp-purchase .purchase-trust { display: grid !important; grid-template-columns: repeat(3,minmax(0,1fr)) !important; gap: 8px !important; }
+.ecomus-pdp .pdp-main-image,
+.ecomus-pdp .pdp-main-image .gallery-image-button,
+.ecomus-pdp .pdp-main-image img { opacity: 1 !important; visibility: visible !important; filter: none !important; mix-blend-mode: normal !important; }
+.ecomus-pdp .pdp-main-image .gallery-image-button img { object-fit: cover !important; }
+
+/* PDP: eliminate legacy desktop/mobile shell whitespace and duplicate header spacing. */
+@media (max-width:760px) {
+  body:has(.ecomus-pdp) .announcement { display:none !important; }
+  body:has(.ecomus-pdp) > main { margin:0 !important; padding:0 !important; min-height:0 !important; }
+  body:has(.ecomus-pdp) > main > .site-header { display:none !important; }
+  .ecomus-pdp { margin:0 !important; padding:0 !important; width:100% !important; min-height:0 !important; }
+  .ecomus-pdp .pdp-mobile-head { margin:0 !important; }
+  .ecomus-pdp .pdp-page { margin:0 !important; padding:0 !important; width:100% !important; max-width:none !important; }
+  .ecomus-pdp .pdp-layout-v2 { margin:0 !important; padding:0 !important; gap:0 !important; }
+  .ecomus-pdp .premium-pdp-gallery { margin:0 !important; padding:0 !important; }
+  .ecomus-pdp .pdp-main-image { margin:0 !important; border-radius:0 !important; aspect-ratio:4/5 !important; height:auto !important; min-height:0 !important; }
+  .ecomus-pdp .pdp-info { padding:14px !important; }
+  .ecomus-pdp .pdp-purchase { margin:0 !important; }
+}
+
+/* Authentication: mobile is a true bottom sheet; desktop remains a centered dialog. */
+.otp-backdrop { z-index:2000 !important; }
+.otp-modal { width:min(460px,calc(100vw - 32px)) !important; }
+@media (max-width:760px) {
+  .otp-backdrop { align-items:flex-end !important; justify-content:stretch !important; padding:0 !important; }
+  .otp-modal { width:100% !important; max-width:none !important; max-height:90dvh !important; margin:0 !important; border-radius:22px 22px 0 0 !important; padding:22px 18px calc(20px + env(safe-area-inset-bottom)) !important; overflow:auto !important; }
+  .otp-digits { grid-template-columns:repeat(6,minmax(0,1fr)) !important; gap:7px !important; }
+  .otp-digit { width:100% !important; min-width:0 !important; height:52px !important; font-size:18px !important; }
+}
+
+/* Home: API controls the section order. Responsive CSS may change layout inside a section, never section order. */
+.home-page > .home-section,
+.home-page > section.home-section,
+.home-page > .home-product-section { order:initial !important; }
+
+/* Cart/checkout: predictable mobile stacking and fixed-nav clearance. */
+@media (max-width:760px) {
+  .nykaa-cart-v1 .cart-page { padding-bottom:120px !important; }
+  .nykaa-cart-v1 .cart-layout { display:flex !important; flex-direction:column !important; gap:12px !important; }
+  .nykaa-cart-v1 .cart-items,
+  .nykaa-cart-v1 .cart-summary { width:100% !important; position:static !important; }
+  .priyasa-checkout-v3 { padding-bottom:100px !important; }
+  .checkout-v3-layout { display:flex !important; flex-direction:column !important; width:calc(100% - 24px) !important; gap:12px !important; }
+  .checkout-v3-main { display:contents !important; }
+  .checkout-v3-summary { order:0 !important; position:static !important; width:100% !important; box-sizing:border-box !important; }
+  .checkout-v3-card { width:100% !important; box-sizing:border-box !important; }
+  .checkout-v3-payment-grid { grid-template-columns:1fr !important; }
+  .checkout-v3-actions { flex-direction:column-reverse !important; align-items:stretch !important; }
+  .checkout-v3-actions .button,
+  .checkout-v3-actions .checkout-v3-back { width:100% !important; min-height:50px !important; }
+}
+
+/* Prevent legacy fixed bars from creating blank/overlapping PDP purchase areas. */
+.ecomus-pdp .pdp-mobile-purchase { display:block !important; }
