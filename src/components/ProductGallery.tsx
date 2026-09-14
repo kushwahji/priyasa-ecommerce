@@ -3,9 +3,11 @@ import {useEffect,useMemo,useState} from 'react';
 
 type Props={image?:string|null;name:string;productId?:string|null;gallery?:string[]|null};
 const FALLBACK='/images/product-placeholder.svg';
-const API_BASE=(process.env.NEXT_PUBLIC_PRIYASA_API_BASE_URL||process.env.NEXT_PUBLIC_API_BASE_URL||'https://api.priyasa.com').replace(/\/$/,'');
+const configuredApi=(process.env.NEXT_PUBLIC_PRIYASA_API_BASE_URL||process.env.NEXT_PUBLIC_API_BASE_URL||'https://api.priyasa.com').replace(/\/$/,'');
+function mediaOrigin(){try{return new URL(configuredApi).origin}catch{return 'https://api.priyasa.com';}}
+const API_ORIGIN=mediaOrigin();
 const isVideo=(src:string)=>/\.(mp4|webm|mov)(\?|#|$)/i.test(src);
-function mediaSrc(value:string){const src=value.trim();if(!src)return FALLBACK;if(/^https?:\/\//i.test(src)||src.startsWith('data:')||src.startsWith('blob:'))return src;if(src.startsWith('//'))return `https:${src}`;return `${API_BASE}/${src.replace(/^\/+/, '')}`;}
+function mediaSrc(value:string){const src=value.trim();if(!src)return FALLBACK;if(/^https?:\/\//i.test(src)||src.startsWith('data:')||src.startsWith('blob:'))return src;if(src.startsWith('//'))return `https:${src}`;return `${API_ORIGIN}/${src.replace(/^\/+/, '')}`;}
 function collectMedia(value:any,out:string[]=[]):string[]{if(typeof value==='string'){const v=value.trim();if(v)out.push(v);return out;}if(Array.isArray(value)){value.forEach(item=>collectMedia(item,out));return out;}if(value&&typeof value==='object'){const preferred=['url','image_url','imageUrl','src','path','original_url','originalUrl','secure_url','secureUrl','media_url','mediaUrl'];let found=false;for(const key of preferred){if(value[key]!=null){found=true;collectMedia(value[key],out);}}if(!found)Object.values(value).forEach(item=>collectMedia(item,out));}return out;}
 function MediaImage({src,alt,className}:{src:string;alt:string;className?:string}){const[failed,setFailed]=useState(false);const resolved=mediaSrc(src);return <img src={failed?FALLBACK:resolved} alt={alt} className={className} loading="eager" decoding="async" onError={()=>{setFailed(true);window.dispatchEvent(new CustomEvent('priyasa:pdp-media-failed'))}}/>}
 
@@ -13,7 +15,7 @@ export function ProductGallery({image,name,productId,gallery=[]}:Props){
   const initialImages=useMemo(()=>[...new Set([image||'',...(gallery||[])].filter(Boolean))],[image,gallery]);
   const[remoteImages,setRemoteImages]=useState<string[]>([]);const[active,setActive]=useState(0);const[zoom,setZoom]=useState(false);const[lightbox,setLightbox]=useState(false);const[mediaFailed,setMediaFailed]=useState(false);
   useEffect(()=>{const handler=()=>setMediaFailed(true);window.addEventListener('priyasa:pdp-media-failed',handler);return()=>window.removeEventListener('priyasa:pdp-media-failed',handler)},[]);
-  useEffect(()=>{if(!productId||(!mediaFailed&&initialImages.some(src=>src&&src!==FALLBACK)))return;let cancelled=false;(async()=>{try{const r=await fetch(`/api/products/${encodeURIComponent(productId)}`,{cache:'no-store'});if(!r.ok)return;const body=await r.json().catch(()=>null);const data=body?.data?.product??body?.data?.data??body?.data??body?.product??body;const found=collectMedia(data);if(!cancelled)setRemoteImages([...new Set(found)]);}catch{}})();return()=>{cancelled=true}},[productId,initialImages,mediaFailed]);
+  useEffect(()=>{if(!productId||(!mediaFailed&&initialImages.some(src=>src&&src!==FALLBACK)))return;let cancelled=false;(async()=>{try{const r=await fetch(`/api/products/${encodeURIComponent(productId)}`,{cache:'no-store',credentials:'same-origin'});if(!r.ok)return;const body=await r.json().catch(()=>null);const data=body?.data?.product??body?.data?.data??body?.data??body?.product??body;const found=collectMedia(data);if(!cancelled)setRemoteImages([...new Set(found)]);}catch{}})();return()=>{cancelled=true}},[productId,initialImages,mediaFailed]);
   const images=useMemo(()=>[...new Set([...initialImages,...remoteImages].filter(Boolean))], [initialImages,remoteImages]);
   const hasMultiple=images.length>1;
   useEffect(()=>{if(active>=images.length)setActive(0)},[active,images.length]);
