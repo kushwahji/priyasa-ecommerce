@@ -1,16 +1,3 @@
-'use client';
-
-import { useEffect } from 'react';
-
-export default function StorefrontSettingsHydrator() {
-  useEffect(() => {
-    fetch('/api/storefront/settings', { cache: 'no-store' })
-      .then((response) => response.json())
-      .then((payload) => {
-        const title = payload?.data?.siteTitle;
-        if (typeof title === 'string' && title.trim()) document.title = title.trim();
-      })
-      .catch(() => undefined);
-  }, []);
-  return null;
-}
+'use client';import{useEffect}from'react';
+const color=(value:unknown)=>{const v=String(value||'').trim();return/^#[0-9a-fA-F]{6}$/.test(v)?v:null};
+export default function StorefrontSettingsHydrator(){useEffect(()=>{fetch('/api/storefront/settings',{cache:'no-store'}).then(r=>r.json()).then(p=>{const d=p?.data||{};const title=typeof d.site_title==='string'?d.site_title.trim():'';if(title)document.title=title;const primary=color(d.primary_color);if(primary)document.documentElement.style.setProperty('--store-primary',primary);const accent=color(d.accent_color);if(accent)document.documentElement.style.setProperty('--store-accent',accent)}).catch(()=>undefined)},[]);return null}
