@@ -1,0 +1,5 @@
+'use client';
+import {useEffect,useState} from 'react';
+import {grantAdsConsent,revokeAdsConsent} from '@/components/StorefrontAnalytics';
+const KEY='priyasa_ads_consent';
+export default function StorefrontPrivacyConsent(){const[open,setOpen]=useState(false);useEffect(()=>{try{setOpen(!localStorage.getItem(KEY))}catch{setOpen(false)}},[]);if(!open)return null;const choose=(value:'granted'|'denied')=>{try{localStorage.setItem(KEY,value)}catch{};if(value==='granted')grantAdsConsent();else revokeAdsConsent();setOpen(false)};return <aside className="privacy-consent" role="dialog" aria-label="Privacy choices"><div><strong>Privacy & personalised shopping</strong><p>We use optional first-party analytics to remember shopping activity and improve recommendations and relevant advertising. You can continue without this.</p></div><div className="privacy-consent-actions"><button onClick={()=>choose('denied')}>Continue without</button><button className="button" onClick={()=>choose('granted')}>Allow personalised ads</button></div></aside>}
