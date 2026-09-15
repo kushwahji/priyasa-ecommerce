@@ -1,0 +1,23 @@
+:root{--store-primary:#ff3f6c;--store-accent:#ff3f6c;--store-bg:#f5f5f6;--store-surface:#fff;--store-text:#282c3f;--store-muted:#696e79;--store-border:#eaeaec;--store-shadow:0 4px 16px rgba(40,44,63,.08)}
+body{background:var(--store-bg);color:var(--store-text);font-family:Arial,Helvetica,sans-serif}
+.site-header{height:80px;background:rgba(255,255,255,.98);border-bottom:1px solid var(--store-border);box-shadow:0 2px 8px rgba(40,44,63,.04);padding:0 clamp(16px,4vw,64px);gap:26px}
+.brand,.brand strong{color:var(--store-primary)}
+.site-header nav a,.actions a,.header-icon{color:var(--store-text)}
+.site-header nav a:hover,.actions a:hover{color:var(--store-primary)}
+.button{background:var(--store-primary);border-radius:3px;box-shadow:none}.button:hover{background:#e7335e;box-shadow:0 8px 18px rgba(255,63,108,.2)}
+.announcement{background:var(--store-primary);font-size:11px;padding:7px 12px}
+.home-section,.section{background:var(--store-bg)}
+.home-section-head h2,.section h2{font-family:Arial,Helvetica,sans-serif;font-weight:700;color:var(--store-text);font-size:24px}
+.home-kicker,.eyebrow{color:var(--store-muted);letter-spacing:1.2px;font-size:11px;font-weight:700}
+.product-card{border:0;background:var(--store-surface);box-shadow:none;overflow:hidden}.product-card:hover{transform:none;box-shadow:var(--store-shadow)}.product-info{padding:10px 10px 14px}.product-info h3{font-family:Arial,Helvetica,sans-serif;font-size:14px;font-weight:600;color:var(--store-text)}
+.product-card img{background:#fff}.price{color:var(--store-text)}.badge{background:var(--store-primary)}
+.category-card{background:#fff;border:1px solid var(--store-border)}
+.split-banner,.home-casual-section,.home-festival-wrap{background:var(--store-bg)}
+.search-hero{background:#fff;border-bottom:1px solid var(--store-border)}
+.search-input-wrap input{border-color:#d4d5d9;border-radius:2px}.search-input-wrap input:focus{border-color:var(--store-primary);box-shadow:0 0 0 2px rgba(255,63,108,.12)}
+.search-chips button,.zero-result-suggestions button{border-color:#d4d5d9;background:#fff;color:var(--store-text)}.search-chips button:hover,.zero-result-suggestions button:hover{border-color:var(--store-primary);color:var(--store-primary)}
+.search-toolbar{background:#fff;border-top:1px solid var(--store-border);border-bottom:1px solid var(--store-border)}
+.filters,.summary,.payment-page-card,.form{background:#fff;border-color:var(--store-border)}
+.site-header .header-icon{position:relative}.site-header .header-icon[data-count]::after{content:attr(data-count);position:absolute;right:-8px;top:-7px;min-width:16px;height:16px;padding:0 4px;border-radius:9px;background:var(--store-primary);color:#fff;font-size:9px;line-height:16px;text-align:center}
+@media(max-width:900px){.site-header{height:64px}.product-grid-editorial{gap:10px}.home-section-head h2,.section h2{font-size:20px}}
+@media(max-width:560px){body{padding-bottom:62px}.announcement{font-size:10px}.site-header{padding:0 14px;gap:10px}.home-section,.section{padding-left:12px;padding-right:12px}.product-info h3{font-size:13px}.price{font-size:13px}.mrp{font-size:11px}.home-section-head{margin-bottom:14px}}
