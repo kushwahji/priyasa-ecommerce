@@ -1,20 +1,5 @@
-import Link from 'next/link';
-import { getCachedStorefrontCategories } from '@/lib/storefront-cache';
-import AdvancedStorefrontSearch from '@/components/AdvancedStorefrontSearch';
-
-export const revalidate = 300;
-
-export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
-  const { slug } = await params;
-  const categories = await getCachedStorefrontCategories();
-  const category = categories.find(c => c.slug === slug);
-  return { title: category ? `${category.name} Collection | PRIYASA` : 'Collection | PRIYASA', description: category?.description || `Shop the latest ${category?.name || 'PRIYASA'} styles.`, alternates: category ? { canonical: `/category/${category.slug}` } : undefined };
-}
-
-export default async function Category({ params }: { params: Promise<{ slug: string }> }) {
-  const { slug } = await params;
-  const categories = await getCachedStorefrontCategories();
-  const category = categories.find(c => c.slug === slug);
-  if (!category) return <div className="page"><h1>Collection not found</h1><Link className="button" href="/shop">Browse Shop</Link></div>;
-  return <div className="storefront-page ecomus-discovery"><div className="page storefront-inner"><div className="breadcrumbs"><Link href="/">Home</Link> / <Link href="/shop">Shop</Link> / {category.name}</div><div className="collection-intro"><div><span className="eyebrow dark">PRIYASA COLLECTION</span><h1>{category.name}</h1></div><p>{category.description || 'Explore the latest styles from this collection.'}</p></div><AdvancedStorefrontSearch initialCategory={slug} /></div></div>;
-}
+import Link from 'next/link';import { notFound } from 'next/navigation';import { getCachedStorefrontCategories } from '@/lib/storefront-cache';import AdvancedStorefrontSearch from '@/components/AdvancedStorefrontSearch';import { BreadcrumbStructuredData } from '@/app/seo-schema';
+export const revalidate=300;
+const BASE=process.env.NEXT_PUBLIC_APP_URL||'https://priyasa.com';
+export async function generateMetadata({params}:{params:Promise<{slug:string}>}){const{slug}=await params;const categories=await getCachedStorefrontCategories();const category=categories.find(c=>c.slug===slug);if(!category)return{title:'Collection not found | PRIYASA',robots:{index:false,follow:false}};const description=(category.description||`Shop the latest ${category.name} styles at PRIYASA.`).slice(0,160);const image=category.imageUrl||undefined;return{title:`${category.name} Collection`,description,alternates:{canonical:`/category/${category.slug}`},openGraph:{type:'website',title:`${category.name} Collection | PRIYASA`,description,url:`${BASE}/category/${category.slug}`,images:image?[{url:image,alt:category.name}]:[]},twitter:{card:'summary_large_image',title:`${category.name} Collection | PRIYASA`,description,images:image?[image]:[]}}}
+export default async function Category({params}:{params:Promise<{slug:string}>}){const{slug}=await params;const categories=await getCachedStorefrontCategories();const category=categories.find(c=>c.slug===slug);if(!category)return notFound();const url=`${BASE}/category/${category.slug}`;const collectionJsonLd={'@context':'https://schema.org','@type':'CollectionPage',name:`${category.name} Collection`,description:category.description||`Shop ${category.name} styles at PRIYASA.`,url};return <div className="storefront-page ecomus-discovery"><script type="application/ld+json" dangerouslySetInnerHTML={{__html:JSON.stringify(collectionJsonLd)}}/><BreadcrumbStructuredData items={[{name:'Home',url:BASE},{name:'Shop',url:`${BASE}/shop`},{name:category.name,url}]}/><div className="page storefront-inner"><div className="breadcrumbs"><Link href="/">Home</Link> / <Link href="/shop">Shop</Link> / {category.name}</div><div className="collection-intro"><div><span className="eyebrow dark">PRIYASA COLLECTION</span><h1>{category.name}</h1></div><p>{category.description||'Explore the latest styles from this collection.'}</p></div><AdvancedStorefrontSearch initialCategory={slug}/></div></div>}
