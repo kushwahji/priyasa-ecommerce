@@ -1,5 +1,26 @@
-import {NextResponse} from 'next/server';
-import {getSearchProducts,getStorefrontCategories,getStorefrontProducts} from '@/lib/storefront-data';
-const norm=(v:string)=>v.toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
-const distance=(a:string,b:string)=>{const x=norm(a),y=norm(b),d=Array.from({length:y.length+1},(_,i)=>i);for(let i=1;i<=x.length;i++){let prev=d[0];d[0]=i;for(let j=1;j<=y.length;j++){const cur=d[j];d[j]=x[i-1]===y[j-1]?prev:Math.min(prev+1,d[j]+1,d[j-1]+1);prev=cur}}return d[y.length]};
-export async function GET(req:Request){try{const u=new URL(req.url),q=(u.searchParams.get('q')||'').trim(),limit=Math.min(100,Math.max(4,Number(u.searchParams.get('limit')||24))),category=(u.searchParams.get('category')||'').toLowerCase(),size=(u.searchParams.get('size')||'').toLowerCase(),color=(u.searchParams.get('color')||'').toLowerCase(),min=Number(u.searchParams.get('min')||0),max=Number(u.searchParams.get('max')||0),sort=u.searchParams.get('sort')||'relevance';const [candidates,categories]=await Promise.all([q?getSearchProducts(q,limit):getStorefrontProducts({categorySlug:category||undefined,limit}),getStorefrontCategories()]);let products=candidates.filter(p=>(!category||p.categorySlug?.toLowerCase()===category)&&(!size||p.sizes.some(s=>s.toLowerCase()===size))&&(!color||p.colors.some(c=>c.toLowerCase()===color))&&(!min||p.price>=min)&&(!max||p.price<=max));if(q){const nq=norm(q),tokens=nq.split(/\s+/).filter(Boolean);products.sort((a,b)=>{const score=(p:any)=>{const text=norm(`${p.name} ${p.category} ${p.description} ${(p.colors||[]).join(' ')} ${(p.sizes||[]).join(' ')}`);return text.includes(nq)?0:tokens.reduce((s,t)=>s+(text.includes(t)?0:Math.min(4,distance(t,text.split(' ').sort((x:string,y:string)=>distance(t,x)-distance(t,y))[0]||''))),0)};return score(a)-score(b)})}if(sort==='price_asc')products.sort((a,b)=>a.price-b.price);else if(sort==='price_desc')products.sort((a,b)=>b.price-a.price);else if(sort==='discount')products.sort((a,b)=>(b.mrp-b.price)/Math.max(1,b.mrp)-(a.mrp-a.price)/Math.max(1,a.mrp));else if(sort==='name')products.sort((a,b)=>a.name.localeCompare(b.name));else if(sort==='newest')products=products.slice().reverse();return NextResponse.json({data:{query:q,products:products.slice(0,limit),categories:categories.map(c=>({name:c.name,slug:c.slug,productCount:c._count?.products||0}))}})}catch(e){return NextResponse.json({error:e instanceof Error?e.message:'Unable to search'},{status:500})}}
+import { NextResponse } from 'next/server';
+import { mapProduct, searchStorefront } from '@/lib/storefront-data';
+
+export async function GET(req: Request) {
+  try {
+    const source = new URL(req.url).searchParams;
+    const params: Record<string,string> = {};
+    for (const key of ['q','category','brand','size','color','min_price','max_price','in_stock','sale_only','sort','page']) {
+      const value = source.get(key);
+      if (value) params[key] = value;
+    }
+    params.per_page = String(Math.min(100, Math.max(4, Number(source.get('limit') || source.get('per_page') || 24))));
+    const result = await searchStorefront(params);
+    return NextResponse.json({
+      data: {
+        query: params.q || '',
+        products: result.items.map(mapProduct),
+        facets: result.facets,
+        categories: result.facets?.categories || [],
+        meta: result.meta,
+      },
+    }, { headers: { 'Cache-Control': 'private, no-store' } });
+  } catch (error) {
+    return NextResponse.json({ error: error instanceof Error ? error.message : 'Unable to search' }, { status: 502 });
+  }
+}
